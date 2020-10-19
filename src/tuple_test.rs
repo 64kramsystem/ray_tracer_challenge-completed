@@ -54,6 +54,15 @@ demonstrate! {
                     }
                 }
             }
+
+            // For simplicity, ignore NaN.
+            //
+            it "equals other tuples with the same values, within epsilon" {
+                let tuple1 = Tuple(1.0, 2.0, 3.0, 1.0);
+                let tuple2 = Tuple(1.00000000001, 2.00000000001, 3.00000000001, 1.00000000001);
+
+                assert_eq!(tuple1, tuple2);
+            }
         }
     }
 }
