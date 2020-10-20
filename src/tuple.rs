@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::ops::{Add, Sub};
 
 pub const POINT_TYPE: f64 = 1.0;
 pub const VECTOR_TYPE: f64 = 0.0;
@@ -41,6 +41,19 @@ impl Add for Tuple {
             self.1 + rhs.1,
             self.2 + rhs.2,
             self.3 + rhs.3,
+        )
+    }
+}
+
+impl Sub for Tuple {
+    type Output = Tuple;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Tuple(
+            self.0 - rhs.0,
+            self.1 - rhs.1,
+            self.2 - rhs.2,
+            self.3 - rhs.3,
         )
     }
 }

@@ -72,6 +72,46 @@ demonstrate! {
 
                 assert_eq!(tuple1 + tuple2, expected_tuple);
             }
+
+            context "as point" {
+                it "can be subtracted from a point" {
+                    let tuple1 = Tuple::point(3.0, 2.0, 1.0);
+                    let tuple2 = Tuple::point(5.0, 6.0, 7.0);
+
+                    let expected_tuple = Tuple::vector(-2.0, -4.0, -6.0);
+
+                    assert_eq!(tuple1 - tuple2, expected_tuple);
+                }
+            }
+
+            context "as vector" {
+                it "can be subtracted from a point" {
+                    let tuple1 = Tuple::point(3.0, 2.0, 1.0);
+                    let tuple2 = Tuple::vector(5.0, 6.0, 7.0);
+
+                    let expected_tuple = Tuple::point(-2.0, -4.0, -6.0);
+
+                    assert_eq!(tuple1 - tuple2, expected_tuple);
+                }
+
+                it "can be subtracted from a vector" {
+                    let tuple1 = Tuple::vector(3.0, 2.0, 1.0);
+                    let tuple2 = Tuple::vector(5.0, 6.0, 7.0);
+
+                    let expected_tuple = Tuple::vector(-2.0, -4.0, -6.0);
+
+                    assert_eq!(tuple1 - tuple2, expected_tuple);
+                }
+            }
+
+            it "can be subtracted from the zero vector" {
+                let tuple1 = Tuple::vector(0.0, 0.0, 0.0);
+                let tuple2 = Tuple::vector(5.0, 6.0, 7.0);
+
+                let expected_tuple = Tuple::vector(-5.0, -6.0, -7.0);
+
+                assert_eq!(tuple1 - tuple2, expected_tuple);
+            }
         }
     }
 }
