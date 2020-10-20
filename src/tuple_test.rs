@@ -112,6 +112,16 @@ demonstrate! {
 
                 assert_eq!(tuple1 - tuple2, expected_tuple);
             }
+
+            // At this stage of the book, it's unclear why the book negates a non-meaningful tuple.
+            //
+            it "can be negated" {
+                let tuple = Tuple(1.0, -2.0, 0.0, 2.0);
+
+                let expected_tuple = Tuple(-1.0, 2.0, -0.0, -2.0);
+
+                assert_eq!(-tuple, expected_tuple);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub};
+use std::ops::{Add, Neg, Sub};
 
 pub const POINT_TYPE: f64 = 1.0;
 pub const VECTOR_TYPE: f64 = 0.0;
@@ -55,5 +55,13 @@ impl Sub for Tuple {
             self.2 - rhs.2,
             self.3 - rhs.3,
         )
+    }
+}
+
+impl Neg for Tuple {
+    type Output = Tuple;
+
+    fn neg(self) -> Self::Output {
+        Tuple(-self.0, -self.1, -self.2, -self.3)
     }
 }
