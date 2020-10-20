@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 pub const POINT_TYPE: f64 = 1.0;
 pub const VECTOR_TYPE: f64 = 0.0;
 
@@ -27,5 +29,18 @@ impl PartialEq for Tuple {
             && ((self.1 - rhs.1).abs() < EPSILON)
             && ((self.2 - rhs.2).abs() < EPSILON)
             && ((self.3 - rhs.3).abs() < EPSILON)
+    }
+}
+
+impl Add for Tuple {
+    type Output = Tuple;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Tuple(
+            self.0 + rhs.0,
+            self.1 + rhs.1,
+            self.2 + rhs.2,
+            self.3 + rhs.3,
+        )
     }
 }

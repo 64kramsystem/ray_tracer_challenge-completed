@@ -63,6 +63,15 @@ demonstrate! {
 
                 assert_eq!(tuple1, tuple2);
             }
+
+            it "can be added to another tuple" {
+                let tuple1 = Tuple(3.0, -2.0, 5.0, 1.0);
+                let tuple2 = Tuple(-2.0, 3.0, 1.0, 0.0);
+
+                let expected_tuple = Tuple(1.0, 1.0, 6.0, 1.0);
+
+                assert_eq!(tuple1 + tuple2, expected_tuple);
+            }
         }
     }
 }
