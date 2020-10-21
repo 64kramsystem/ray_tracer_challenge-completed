@@ -8,7 +8,7 @@ pub const EPSILON: f64 = 1e-6;
 // At this stage, is not clear is direct operation will be carried also on the type field. If so, using
 // an enum may make things more complicated, so conservatively, a float is used.
 //
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Tuple(pub f64, pub f64, pub f64, pub f64);
 
 impl Tuple {
