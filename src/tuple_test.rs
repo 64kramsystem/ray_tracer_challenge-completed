@@ -1,6 +1,6 @@
 use demonstrate::demonstrate;
 
-use crate::tuple::{Tuple, POINT_TYPE, VECTOR_TYPE};
+use crate::tuple::{Tuple, EPSILON, POINT_TYPE, VECTOR_TYPE};
 
 demonstrate! {
     describe "CPU" {
@@ -137,6 +137,16 @@ demonstrate! {
                 let expected_tuple = Tuple(2.0, -4.0, 0.0, 4.0);
 
                 assert_eq!(tuple / 0.5, expected_tuple);
+            }
+
+            context "should have a magnitude" {
+                it "as vector (-1, -2, -3)" {
+                    let vector = Tuple::vector(-1.0, -2.0, -3.0);
+
+                    let expected_magnitude = 14.0_f64.sqrt();
+
+                    assert!(vector.magnitude() - expected_magnitude < EPSILON);
+                }
             }
         }
     }

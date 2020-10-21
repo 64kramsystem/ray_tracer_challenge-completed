@@ -19,6 +19,10 @@ impl Tuple {
     pub fn vector(x: f64, y: f64, z: f64) -> Tuple {
         Tuple(x, y, z, VECTOR_TYPE)
     }
+
+    pub fn magnitude(&self) -> f64 {
+        (self.0.powi(2) + self.1.powi(2) + self.2.powi(2) + self.3.powi(2)).sqrt()
+    }
 }
 
 impl PartialEq for Tuple {
