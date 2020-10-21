@@ -23,6 +23,12 @@ impl Tuple {
     pub fn magnitude(&self) -> f64 {
         (self.0.powi(2) + self.1.powi(2) + self.2.powi(2) + self.3.powi(2)).sqrt()
     }
+
+    pub fn normalize(&self) -> Self {
+        let magnitude = self.magnitude();
+
+        Self::vector(self.0 / magnitude, self.1 / magnitude, self.2 / magnitude)
+    }
 }
 
 impl PartialEq for Tuple {

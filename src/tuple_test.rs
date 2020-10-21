@@ -6,6 +6,9 @@ demonstrate! {
     describe "CPU" {
         use super::*;
 
+        // The testing framework doesn't support reusing contexts, so some similar operations are not
+        // close to each other.
+        //
         context "Tuple" {
             context "with w=1_0" {
                 it "is a point" {
@@ -101,6 +104,14 @@ demonstrate! {
                     let expected_tuple = Tuple::vector(-2.0, -4.0, -6.0);
 
                     assert_eq!(tuple1 - tuple2, expected_tuple);
+                }
+
+                it "can be normalized" {
+                    let vector = Tuple::vector(1.0, 2.0, 3.0);
+
+                    let expected_vector = Tuple::vector(1.0 / 14_f64.sqrt(), 2.0 / 14_f64.sqrt(), 3.0 / 14_f64.sqrt());
+
+                    assert_eq!(vector.normalize(), expected_vector);
                 }
             }
 
