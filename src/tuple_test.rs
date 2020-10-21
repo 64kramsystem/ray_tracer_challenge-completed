@@ -113,6 +113,15 @@ demonstrate! {
 
                     assert_eq!(vector.normalize(), expected_vector);
                 }
+
+                it "has a cross product with another vector" {
+                    let vector1 = Tuple::vector(1.0, 2.0, 3.0);
+                    let vector2 = Tuple::vector(2.0, 3.0, 4.0);
+
+                    let expected_vector = Tuple::vector(-1.0, 2.0, -1.0);
+
+                    assert_eq!(vector1.cross_product(vector2), expected_vector);
+                }
             }
 
             it "can be subtracted from the zero vector" {

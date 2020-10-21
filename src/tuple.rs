@@ -33,6 +33,14 @@ impl Tuple {
     pub fn dot_product(&self, rhs: Tuple) -> f64 {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2 + self.3 * rhs.3
     }
+
+    pub fn cross_product(&self, rhs: Tuple) -> Tuple {
+        Tuple::vector(
+            self.1 * rhs.2 - self.2 * rhs.1,
+            self.2 * rhs.0 - self.0 * rhs.2,
+            self.0 * rhs.1 - self.1 * rhs.0,
+        )
+    }
 }
 
 impl PartialEq for Tuple {
