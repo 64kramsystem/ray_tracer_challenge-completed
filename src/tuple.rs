@@ -1,4 +1,4 @@
-use std::ops::{Add, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub const POINT_TYPE: f64 = 1.0;
 pub const VECTOR_TYPE: f64 = 0.0;
@@ -63,5 +63,21 @@ impl Neg for Tuple {
 
     fn neg(self) -> Self::Output {
         Tuple(-self.0, -self.1, -self.2, -self.3)
+    }
+}
+
+impl Mul<f64> for Tuple {
+    type Output = Tuple;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Tuple(self.0 * rhs, self.1 * rhs, self.2 * rhs, self.3 * rhs)
+    }
+}
+
+impl Div<f64> for Tuple {
+    type Output = Tuple;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Tuple(self.0 / rhs, self.1 / rhs, self.2 / rhs, self.3 / rhs)
     }
 }

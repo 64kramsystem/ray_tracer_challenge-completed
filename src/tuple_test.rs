@@ -122,6 +122,22 @@ demonstrate! {
 
                 assert_eq!(-tuple, expected_tuple);
             }
+
+            it "can be multiplied by a floating point factor" {
+                let tuple = Tuple(1.0, -2.0, 0.0, 2.0);
+
+                let expected_tuple = Tuple(2.5, -5.0, 0.0, 5.0);
+
+                assert_eq!(tuple * 2.5, expected_tuple);
+            }
+
+            it "can be divided by a floating point factor" {
+                let tuple = Tuple(1.0, -2.0, 0.0, 2.0);
+
+                let expected_tuple = Tuple(2.0, -4.0, 0.0, 4.0);
+
+                assert_eq!(tuple / 0.5, expected_tuple);
+            }
         }
     }
 }
