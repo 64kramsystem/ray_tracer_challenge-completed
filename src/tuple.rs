@@ -29,6 +29,10 @@ impl Tuple {
 
         Self::vector(self.0 / magnitude, self.1 / magnitude, self.2 / magnitude)
     }
+
+    pub fn dot_product(&self, rhs: Tuple) -> f64 {
+        self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2 + self.3 * rhs.3
+    }
 }
 
 impl PartialEq for Tuple {

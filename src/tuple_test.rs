@@ -159,6 +159,15 @@ demonstrate! {
                     assert!(vector.magnitude() - expected_magnitude < EPSILON);
                 }
             }
+
+            it "has a dot product" {
+                let tuple1 = Tuple::vector(1.0, 2.0, 3.0);
+                let tuple2 = Tuple::vector(2.0, 3.0, 4.0);
+
+                let expected_dot_product = 20.0;
+
+                assert_eq!(tuple1.dot_product(tuple2), expected_dot_product);
+            }
         }
     }
 }
