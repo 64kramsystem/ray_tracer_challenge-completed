@@ -8,6 +8,12 @@ pub const EPSILON: f64 = 1e-6;
 // At this stage, is not clear is direct operation will be carried also on the type field. If so, using
 // an enum may make things more complicated, so conservatively, a float is used.
 //
+// This struct could be divided in Vector and Point. This has the advantage of enforcing type safety,
+// e.g., disallowing adding a Point to a Point, at the cost of either duplication of the methods, or
+// of creating a trait exposing x/y/z/w, which would make attribute access uneven in cases where the
+// trait is referenced. At this stage, it's better to wait to see how the vector/point logic mix, although
+// if there isn't much mixing, splitting could be advantageous.
+//
 #[derive(Clone, Copy, Debug)]
 pub struct Tuple(pub f64, pub f64, pub f64, pub f64);
 
