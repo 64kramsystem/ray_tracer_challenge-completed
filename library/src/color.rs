@@ -2,7 +2,7 @@ use std::ops::{Add, Mul, Sub};
 
 pub const EPSILON: f64 = 1e-6;
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Color {
     pub r: f64,
     pub g: f64,
