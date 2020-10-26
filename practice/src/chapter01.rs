@@ -44,10 +44,10 @@ impl Environment {
 pub fn practice() {
     let mut environment = Environment::new();
 
-    while environment.projectile.position.1 > 0.0 {
+    while environment.projectile.position.y > 0.0 {
         println!(
             "Position: x:{:.2}, y:{:.2}",
-            environment.projectile.position.0, environment.projectile.position.1
+            environment.projectile.position.x, environment.projectile.position.y
         );
         environment.tick();
     }

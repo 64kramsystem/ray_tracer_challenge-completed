@@ -15,36 +15,51 @@ pub const EPSILON: f64 = 1e-6;
 // if there isn't much mixing, splitting could be advantageous.
 //
 #[derive(Clone, Copy, Debug)]
-pub struct Tuple(pub f64, pub f64, pub f64, pub f64);
+pub struct Tuple {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+    pub w: f64,
+}
 
 impl Tuple {
     pub fn point(x: f64, y: f64, z: f64) -> Tuple {
-        Tuple(x, y, z, POINT_TYPE)
+        Tuple {
+            x,
+            y,
+            z,
+            w: POINT_TYPE,
+        }
     }
 
     pub fn vector(x: f64, y: f64, z: f64) -> Tuple {
-        Tuple(x, y, z, VECTOR_TYPE)
+        Tuple {
+            x,
+            y,
+            z,
+            w: VECTOR_TYPE,
+        }
     }
 
     pub fn magnitude(&self) -> f64 {
-        (self.0.powi(2) + self.1.powi(2) + self.2.powi(2) + self.3.powi(2)).sqrt()
+        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2) + self.w.powi(2)).sqrt()
     }
 
     pub fn normalize(&self) -> Self {
         let magnitude = self.magnitude();
 
-        Self::vector(self.0 / magnitude, self.1 / magnitude, self.2 / magnitude)
+        Self::vector(self.x / magnitude, self.y / magnitude, self.z / magnitude)
     }
 
     pub fn dot_product(&self, rhs: Tuple) -> f64 {
-        self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2 + self.3 * rhs.3
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z + self.w * rhs.w
     }
 
     pub fn cross_product(&self, rhs: Tuple) -> Tuple {
         Tuple::vector(
-            self.1 * rhs.2 - self.2 * rhs.1,
-            self.2 * rhs.0 - self.0 * rhs.2,
-            self.0 * rhs.1 - self.1 * rhs.0,
+            self.y * rhs.z - self.z * rhs.y,
+            self.z * rhs.x - self.x * rhs.z,
+            self.x * rhs.y - self.y * rhs.x,
         )
     }
 }
@@ -53,10 +68,10 @@ impl PartialEq for Tuple {
     // Values are considered as equals if within EPSILON.
     //
     fn eq(&self, rhs: &Self) -> bool {
-        ((self.0 - rhs.0).abs() < EPSILON)
-            && ((self.1 - rhs.1).abs() < EPSILON)
-            && ((self.2 - rhs.2).abs() < EPSILON)
-            && ((self.3 - rhs.3).abs() < EPSILON)
+        ((self.x - rhs.x).abs() < EPSILON)
+            && ((self.y - rhs.y).abs() < EPSILON)
+            && ((self.z - rhs.z).abs() < EPSILON)
+            && ((self.w - rhs.w).abs() < EPSILON)
     }
 }
 
@@ -64,12 +79,12 @@ impl Add for Tuple {
     type Output = Tuple;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Tuple(
-            self.0 + rhs.0,
-            self.1 + rhs.1,
-            self.2 + rhs.2,
-            self.3 + rhs.3,
-        )
+        Tuple {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+            w: self.w + rhs.w,
+        }
     }
 }
 
@@ -77,12 +92,12 @@ impl Sub for Tuple {
     type Output = Tuple;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        Tuple(
-            self.0 - rhs.0,
-            self.1 - rhs.1,
-            self.2 - rhs.2,
-            self.3 - rhs.3,
-        )
+        Tuple {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+            w: self.w - rhs.w,
+        }
     }
 }
 
@@ -90,7 +105,12 @@ impl Neg for Tuple {
     type Output = Tuple;
 
     fn neg(self) -> Self::Output {
-        Tuple(-self.0, -self.1, -self.2, -self.3)
+        Tuple {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+            w: -self.w,
+        }
     }
 }
 
@@ -98,7 +118,12 @@ impl Mul<f64> for Tuple {
     type Output = Tuple;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Tuple(self.0 * rhs, self.1 * rhs, self.2 * rhs, self.3 * rhs)
+        Tuple {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
+            w: self.w * rhs,
+        }
     }
 }
 
@@ -106,6 +131,11 @@ impl Div<f64> for Tuple {
     type Output = Tuple;
 
     fn div(self, rhs: f64) -> Self::Output {
-        Tuple(self.0 / rhs, self.1 / rhs, self.2 / rhs, self.3 / rhs)
+        Tuple {
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
+            w: self.w / rhs,
+        }
     }
 }

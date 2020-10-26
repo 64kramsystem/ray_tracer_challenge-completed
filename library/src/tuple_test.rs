@@ -12,10 +12,10 @@ demonstrate! {
         context "Tuple" {
             context "with w=1_0" {
                 it "is a point" {
-                    let tuple = Tuple(2.0, 4.0, 8.0, 1.0);
+                    let tuple = Tuple { x: 2.0, y: 4.0, z: 8.0, w: 1.0 };
 
                     match tuple {
-                        Tuple(_, _, _, type_value) => {
+                        Tuple { x: _, y: _, z: _, w: type_value } => {
                           assert_float_absolute_eq!(type_value, POINT_TYPE);
                         }
                     }
@@ -24,10 +24,10 @@ demonstrate! {
 
             context "with w=0_0" {
                 it "is a vector" {
-                    let tuple = Tuple(2.0, 4.0, 8.0, 0.0);
+                    let tuple = Tuple { x: 2.0, y: 4.0, z: 8.0, w: 0.0 };
 
                     match tuple {
-                        Tuple(_, _, _, type_value) => {
+                        Tuple { x: _, y: _, z: _, w: type_value } => {
                           assert_float_absolute_eq!(type_value, VECTOR_TYPE);
                         }
                     }
@@ -39,7 +39,7 @@ demonstrate! {
                     let tuple = Tuple::point(2.0, 4.0, 8.0);
 
                     match tuple {
-                        Tuple(_, _, _, type_value) => {
+                        Tuple { x: _, y: _, z: _, w: type_value } => {
                           assert_float_absolute_eq!(type_value, POINT_TYPE);
                         }
                     }
@@ -51,7 +51,7 @@ demonstrate! {
                     let tuple = Tuple::vector(2.0, 4.0, 8.0);
 
                     match tuple {
-                        Tuple(_, _, _, type_value) => {
+                        Tuple { x: _, y: _, z: _, w: type_value } => {
                           assert_float_absolute_eq!(type_value, VECTOR_TYPE);
                         }
                     }
@@ -61,17 +61,17 @@ demonstrate! {
             // For simplicity, ignore NaN.
             //
             it "equals other tuples with the same values, within epsilon" {
-                let tuple1 = Tuple(1.0, 2.0, 3.0, 1.0);
-                let tuple2 = Tuple(1.00000000001, 2.00000000001, 3.00000000001, 1.00000000001);
+                let tuple1 = Tuple { x: 1.0, y: 2.0, z: 3.0, w: 1.0 };
+                let tuple2 = Tuple { x: 1.00000000001, y: 2.00000000001, z: 3.00000000001, w: 1.00000000001 };
 
                 assert_eq!(tuple1, tuple2);
             }
 
             it "can be added to another tuple" {
-                let tuple1 = Tuple(3.0, -2.0, 5.0, 1.0);
-                let tuple2 = Tuple(-2.0, 3.0, 1.0, 0.0);
+                let tuple1 = Tuple { x: 3.0, y: -2.0, z: 5.0, w: 1.0 };
+                let tuple2 = Tuple { x: -2.0, y: 3.0, z: 1.0, w: 0.0 };
 
-                let expected_tuple = Tuple(1.0, 1.0, 6.0, 1.0);
+                let expected_tuple = Tuple { x: 1.0, y: 1.0, z: 6.0, w: 1.0 };
 
                 assert_eq!(tuple1 + tuple2, expected_tuple);
             }
@@ -136,25 +136,25 @@ demonstrate! {
             // At this stage of the book, it's unclear why the book negates a non-meaningful tuple.
             //
             it "can be negated" {
-                let tuple = Tuple(1.0, -2.0, 0.0, 2.0);
+                let tuple = Tuple { x: 1.0, y: -2.0, z: 0.0, w: 2.0 };
 
-                let expected_tuple = Tuple(-1.0, 2.0, -0.0, -2.0);
+                let expected_tuple = Tuple { x: -1.0, y: 2.0, z: -0.0, w: -2.0 };
 
                 assert_eq!(-tuple, expected_tuple);
             }
 
             it "can be multiplied by a floating point factor" {
-                let tuple = Tuple(1.0, -2.0, 0.0, 2.0);
+                let tuple = Tuple { x: 1.0, y: -2.0, z: 0.0, w: 2.0 };
 
-                let expected_tuple = Tuple(2.5, -5.0, 0.0, 5.0);
+                let expected_tuple = Tuple { x: 2.5, y: -5.0, z: 0.0, w: 5.0 };
 
                 assert_eq!(tuple * 2.5, expected_tuple);
             }
 
             it "can be divided by a floating point factor" {
-                let tuple = Tuple(1.0, -2.0, 0.0, 2.0);
+                let tuple = Tuple { x: 1.0, y: -2.0, z: 0.0, w: 2.0 };
 
-                let expected_tuple = Tuple(2.0, -4.0, 0.0, 4.0);
+                let expected_tuple = Tuple { x: 2.0, y: -4.0, z: 0.0, w: 4.0 };
 
                 assert_eq!(tuple / 0.5, expected_tuple);
             }
