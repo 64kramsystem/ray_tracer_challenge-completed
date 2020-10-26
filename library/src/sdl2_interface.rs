@@ -3,7 +3,7 @@ use crate::interface::Interface;
 use sdl2::{
     event::{Event, WindowEvent},
     pixels,
-    rect::{Point, Rect},
+    rect::Point,
     render,
     video::Window,
     EventPump,
@@ -83,42 +83,6 @@ impl Interface for Sdl2Interface {
         self.canvas.present();
     }
 
-    fn read_pixel(&self, x: u16, y: u16) -> crate::Color {
-        let rect = Rect::new(
-            self.left_border_size + x as i32,
-            self.top_border_size + y as i32,
-            1,
-            1,
-        );
-
-        let raw_pixels = self
-            .canvas
-            .read_pixels(rect, pixels::PixelFormatEnum::RGB888)
-            .unwrap();
-
-        Sdl2Interface::convert_rgb888_pixel_to_color(&raw_pixels[..])
-    }
-
-    // Relatively slow, but in this context, doesn't matter.
-    //
-    fn read_all_pixels(&self) -> Vec<crate::Color> {
-        let rect = Rect::new(0, 0, CANVAS_WIDTH as u32, CANVAS_HEIGHT as u32);
-
-        let raw_pixels = self
-            .canvas
-            .read_pixels(rect, pixels::PixelFormatEnum::RGB888)
-            .unwrap();
-
-        // Not clear what the hell happens here. Tested with a 4x4 pixels canvas, writing `Color { r: 1.0, g: 1.0, b: 0.0}`
-        // at  (x, y) = (2, 1), raw_pixels() returns 64 bytes with 0 value, even if the colored square
-        // is visible.
-        //
-        raw_pixels
-            .chunks(4)
-            .map(|pixel| Sdl2Interface::convert_rgb888_pixel_to_color(pixel))
-            .collect::<Vec<crate::Color>>()
-    }
-
     fn wait_keypress(&mut self) {
         self.process_events(true);
     }
@@ -176,19 +140,5 @@ impl Sdl2Interface {
         //
         self.canvas.set_draw_color(pixels::Color::RGB(0, 0, 0));
         self.canvas.clear();
-    }
-
-    fn convert_rgb888_pixel_to_color(pixel: &[u8]) -> crate::Color {
-        // What the fork!! The order is BGR!!
-        //
-        if let [b, g, r, _] = pixel {
-            crate::Color {
-                r: *r as f64 / 255.0,
-                g: *g as f64 / 255.0,
-                b: *b as f64 / 255.0,
-            }
-        } else {
-            panic!()
-        }
     }
 }

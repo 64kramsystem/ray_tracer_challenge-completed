@@ -13,14 +13,7 @@ pub use tuple::Tuple;
 extern crate assert_float_eq;
 
 #[cfg(test)]
-#[macro_use]
-extern crate lazy_static;
-
-#[cfg(test)]
 mod tuple_test;
 
 #[cfg(test)]
 mod color_test;
-
-#[cfg(test)]
-mod sdl2_interface_test;
