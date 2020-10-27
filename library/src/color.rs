@@ -2,11 +2,41 @@ use std::ops::{Add, Mul, Sub};
 
 pub const EPSILON: f64 = 1e-6;
 
+pub trait HasFloat64Value {
+    fn as_f64(self) -> f64;
+}
+
+impl HasFloat64Value for u32 {
+    fn as_f64(self) -> f64 {
+        self as f64
+    }
+}
+
+impl HasFloat64Value for f64 {
+    fn as_f64(self) -> f64 {
+        self
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub struct Color {
     pub r: f64,
     pub g: f64,
     pub b: f64,
+}
+
+impl Color {
+    pub fn new<T: HasFloat64Value, U: HasFloat64Value, V: HasFloat64Value>(
+        r: T,
+        g: U,
+        b: V,
+    ) -> Self {
+        Self {
+            r: r.as_f64(),
+            g: g.as_f64(),
+            b: b.as_f64(),
+        }
+    }
 }
 
 impl PartialEq for Color {
