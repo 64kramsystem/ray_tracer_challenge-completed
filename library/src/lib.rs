@@ -1,10 +1,12 @@
 mod color;
 mod export_to_pixels;
+mod ppm_encoder;
 mod sdl2_interface;
 mod tuple;
 
 pub use color::Color;
 pub use export_to_pixels::ExportToPixels;
+pub use ppm_encoder::PpmEncoder;
 pub use sdl2_interface::Sdl2Interface;
 pub use tuple::Tuple;
 
@@ -17,3 +19,6 @@ mod tuple_test;
 
 #[cfg(test)]
 mod color_test;
+
+#[cfg(test)]
+mod ppm_encoder_test;
