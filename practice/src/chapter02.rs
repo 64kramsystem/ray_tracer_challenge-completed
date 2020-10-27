@@ -1,48 +1,30 @@
-use library::{Color, Interface, Sdl2Interface};
+use library::{Color, Sdl2Interface};
 
 pub fn practice() {
-    let mut interface = Sdl2Interface::init("Yay!");
-    let x_base = 0;
+    let (width, height) = (3, 3);
 
-    interface.write_pixel(
-        x_base + 0,
-        0,
-        Color {
-            r: 1.0,
-            g: 0.0,
-            b: 0.0,
-        },
-    );
+    let mut interface = Sdl2Interface::init("Yay!", width, height);
 
-    interface.write_pixel(
-        x_base + 1,
-        1,
-        Color {
-            r: 0.0,
-            g: 1.0,
-            b: 0.0,
-        },
-    );
+    for y in 0..height {
+        for x in 0..width {
+            let base_color = match x % 3 {
+                0 => (0.25, 0.0, 0.0),
+                1 => (0.0, 0.25, 0.0),
+                2 => (0.0, 0.0, 0.25),
+                _ => unreachable!(),
+            };
 
-    interface.write_pixel(
-        x_base + 2,
-        2,
-        Color {
-            r: 0.0,
-            g: 0.0,
-            b: 1.0,
-        },
-    );
+            // Don't start with (0, 0, 0) - black, which is ugly.
+            //
+            let multiplied_color = Color {
+                r: (base_color.0 * (y + 1) as f64) % 1.0, // won't be 1.0
+                g: (base_color.1 * (y + 1) as f64) % 1.0, // won't be 1.0
+                b: (base_color.2 * (y + 1) as f64) % 1.0, // won't be 1.0
+            };
 
-    interface.write_pixel(
-        x_base + 3,
-        3,
-        Color {
-            r: 1.0,
-            g: 1.0,
-            b: 1.0,
-        },
-    );
+            interface.write_pixel(x, y, multiplied_color);
+        }
+    }
 
     interface.update_canvas();
 

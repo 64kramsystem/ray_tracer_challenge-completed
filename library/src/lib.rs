@@ -1,10 +1,8 @@
 mod color;
-mod interface;
 mod sdl2_interface;
 mod tuple;
 
 pub use color::Color;
-pub use interface::Interface;
 pub use sdl2_interface::Sdl2Interface;
 pub use tuple::Tuple;
 
