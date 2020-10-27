@@ -1,5 +1,7 @@
 use sdl2::{event::Event, pixels, rect::Point, render, video::Window, EventPump};
 
+use crate::export_to_pixels::ExportToPixels;
+
 // Interface for drawing to a canvas, and waiting a keypress, intentionally designed to be as simple
 // as  possible.
 //
@@ -11,6 +13,11 @@ use sdl2::{event::Event, pixels, rect::Point, render, video::Window, EventPump};
 pub struct Sdl2Interface {
     event_pump: EventPump,
     canvas: render::Canvas<Window>,
+
+    // The SDL2 pixel reading doesn't work as intended (see history), so we keep an internal buffer.
+    // The upside is that this can be used, if desired, to trivially redraw on window resize.
+    //
+    pixels_buffer: Vec<crate::Color>,
 }
 
 impl Sdl2Interface {
@@ -43,23 +50,42 @@ impl Sdl2Interface {
         //
         event_pump.pump_events();
 
-        Self { event_pump, canvas }
+        let pixels_buffer = vec![
+            crate::Color {
+                r: 0.0,
+                g: 0.0,
+                b: 0.0,
+            };
+            width as usize * height as usize
+        ];
+
+        Self {
+            event_pump,
+            canvas,
+            pixels_buffer,
+        }
     }
 
     // Doesn't update the canvas; for that, must invoke update_canvas().
     //
     pub fn write_pixel(&mut self, x: u16, y: u16, color: crate::Color) {
-        let pixel = pixels::Color::RGB(
-            (255.0 * color.r) as u8,
-            (255.0 * color.g) as u8,
-            (255.0 * color.b) as u8,
-        );
+        let (width, height) = self.canvas.logical_size();
 
-        self.canvas.set_draw_color(pixel);
+        if x < width as u16 && y < height as u16 {
+            self.pixels_buffer[y as usize * width as usize + x as usize] = color;
 
-        self.canvas
-            .draw_point(Point::new(x as i32, y as i32))
-            .unwrap();
+            let pixel = pixels::Color::RGB(
+                (255.0 * color.r) as u8,
+                (255.0 * color.g) as u8,
+                (255.0 * color.b) as u8,
+            );
+
+            self.canvas.set_draw_color(pixel);
+
+            self.canvas
+                .draw_point(Point::new(x as i32, y as i32))
+                .unwrap();
+        }
     }
 
     pub fn update_canvas(&mut self) {
@@ -78,5 +104,13 @@ impl Sdl2Interface {
                 _ => {}
             }
         }
+    }
+}
+
+impl ExportToPixels for Sdl2Interface {
+    fn to_pixels(&self) -> (&Vec<crate::Color>, u16) {
+        let (width, _) = self.canvas.logical_size();
+
+        (&self.pixels_buffer, width as u16)
     }
 }

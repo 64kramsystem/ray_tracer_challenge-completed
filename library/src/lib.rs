@@ -1,8 +1,10 @@
 mod color;
+mod export_to_pixels;
 mod sdl2_interface;
 mod tuple;
 
 pub use color::Color;
+pub use export_to_pixels::ExportToPixels;
 pub use sdl2_interface::Sdl2Interface;
 pub use tuple::Tuple;
 
