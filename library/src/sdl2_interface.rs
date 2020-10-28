@@ -67,11 +67,12 @@ impl Sdl2Interface {
     }
 
     // Doesn't update the canvas; for that, must invoke update_canvas().
+    // Pixels outside the canvas are ignored.
     //
-    pub fn write_pixel(&mut self, x: u16, y: u16, color: crate::Color) {
+    pub fn write_pixel(&mut self, x: i16, y: i16, color: crate::Color) {
         let (width, height) = self.canvas.logical_size();
 
-        if x < width as u16 && y < height as u16 {
+        if x >= 0 && x < width as i16 && y >= 0 && y < height as i16 {
             self.pixels_buffer[y as usize * width as usize + x as usize] = color;
 
             let (r, g, b) = color.u8_components();
@@ -101,6 +102,12 @@ impl Sdl2Interface {
                 _ => {}
             }
         }
+    }
+
+    // Convenience method.
+    //
+    pub fn canvas_height(&self) -> u16 {
+        self.canvas.logical_size().1 as u16
     }
 }
 

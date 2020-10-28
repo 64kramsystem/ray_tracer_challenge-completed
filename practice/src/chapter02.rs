@@ -22,7 +22,7 @@ pub fn practice() {
                 b: (base_color.2 * (y + 1) as f64) % 1.0, // won't be 1.0
             };
 
-            interface.write_pixel(x, y, multiplied_color);
+            interface.write_pixel(x as i16, y as i16, multiplied_color);
         }
     }
 
