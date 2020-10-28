@@ -1,22 +1,8 @@
 use std::ops::{Add, Mul, Sub};
 
+use crate::has_float64_value::HasFloat64Value;
+
 pub const EPSILON: f64 = 1e-6;
-
-pub trait HasFloat64Value {
-    fn as_f64(self) -> f64;
-}
-
-impl HasFloat64Value for u32 {
-    fn as_f64(self) -> f64 {
-        self as f64
-    }
-}
-
-impl HasFloat64Value for f64 {
-    fn as_f64(self) -> f64 {
-        self
-    }
-}
 
 #[derive(Clone, Copy, Debug)]
 pub struct Color {

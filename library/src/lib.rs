@@ -1,5 +1,6 @@
 mod color;
 mod export_to_pixels;
+mod has_float64_value;
 mod ppm_encoder;
 mod sdl2_interface;
 mod tuple;
