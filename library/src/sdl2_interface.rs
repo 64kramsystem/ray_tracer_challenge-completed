@@ -74,11 +74,8 @@ impl Sdl2Interface {
         if x < width as u16 && y < height as u16 {
             self.pixels_buffer[y as usize * width as usize + x as usize] = color;
 
-            let pixel = pixels::Color::RGB(
-                (255.0 * color.r) as u8,
-                (255.0 * color.g) as u8,
-                (255.0 * color.b) as u8,
-            );
+            let (r, g, b) = color.u8_components();
+            let pixel = pixels::Color::RGB(r, g, b);
 
             self.canvas.set_draw_color(pixel);
 

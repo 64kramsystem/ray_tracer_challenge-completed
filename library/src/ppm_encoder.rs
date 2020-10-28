@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use crate::{export_to_pixels::ExportToPixels, Color};
+use crate::export_to_pixels::ExportToPixels;
 
 pub struct PpmEncoder {}
 
@@ -16,12 +16,14 @@ impl PpmEncoder {
 
         let mut current_line = String::new();
 
-        for Color { r, g, b } in pixels {
-            for color_component in &[*r, *g, *b] {
+        for color in pixels {
+            let (r, g, b) = color.u8_components();
+
+            for color_component in &[r, g, b] {
                 // Avoid conditionals by always having the prefixing space, but must account that when
                 // counting the max length, and then trim.
                 //
-                let r_str = format!(" {}", (color_component * 255.0) as u8);
+                let r_str = format!(" {}", color_component);
 
                 if current_line.len() + r_str.len() > MAX_LINE_LENGHT + 1 {
                     buffer += &current_line.trim_start();
