@@ -1,3 +1,5 @@
+use crate::has_float64_value::HasFloat64Value;
+
 use crate::EPSILON;
 
 use std::mem::MaybeUninit; // For the lulz
@@ -13,7 +15,7 @@ macro_rules! matrix {
         }
 
         impl $name {
-            pub fn new(source_values: &[f64]) -> Self {
+            pub fn new<T: Copy + HasFloat64Value>(source_values: &[T]) -> Self {
                 if source_values.len() != $order * $order {
                     panic!("Inappropriate number of source values");
                 }
@@ -22,7 +24,9 @@ macro_rules! matrix {
                     unsafe { MaybeUninit::uninit().assume_init() };
 
                 for (row, source_row) in values.iter_mut().zip(source_values.chunks_exact($order)) {
-                    row.copy_from_slice(source_row);
+                    for (value, source_value) in row.iter_mut().zip(source_row.iter()) {
+                        *value = source_value.as_f64();
+                    }
                 }
 
                 Self { values }
