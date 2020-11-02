@@ -20,6 +20,44 @@ demonstrate! {
             assert_float_absolute_eq!(matrix[3][0], 13.5);
             assert_float_absolute_eq!(matrix[3][2], 15.5);
         }
+
+        describe "comparison" {
+            it "should return true for equal matrices" {
+                let matrix1 = Matrix4::new(&[
+                    1.0, 2.0, 3.0, 4.0,
+                    5.5, 6.5, 7.5, 8.5,
+                    9.0, 10.0, 11.0, 12.0,
+                    13.5, 14.5, 15.5, 16.5
+                ]);
+
+                let matrix2 = Matrix4::new(&[
+                    1.0, 2.0, 3.0, 4.0,
+                    5.5, 6.5, 7.5, 8.5,
+                    9.0, 10.0, 11.0, 12.0,
+                    13.5, 14.5, 15.5, 16.5
+                ]);
+
+                assert_eq!(matrix1, matrix2);
+            }
+
+            it "should return false for different matrices" {
+                let matrix1 = Matrix4::new(&[
+                    1.0, 2.0, 3.0, 4.0,
+                    5.5, 6.5, 7.5, 8.5,
+                    9.0, 10.0, 11.0, 12.0,
+                    13.5, 14.5, 15.5, 16.5
+                ]);
+
+                let matrix2 = Matrix4::new(&[
+                    1.0, 2.0, 3.0, 4.0,
+                    5.5, 6.5, 7.5, 8.5,
+                    9.0, 10.0, 11.0, 12.0,
+                    13.5, 14.5, 15.5, 16.4
+                ]);
+
+                assert!(!(matrix1 == matrix2));
+            }
+        }
     }
 
     describe "Matrix2" {

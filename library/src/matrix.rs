@@ -1,3 +1,5 @@
+use crate::EPSILON;
+
 use std::convert::TryInto;
 use std::mem::MaybeUninit; // For the lulz
 use std::ops::{Index, IndexMut};
@@ -41,6 +43,21 @@ macro_rules! matrix {
         impl IndexMut<usize> for $name {
             fn index_mut(&mut self, y: usize) -> &mut [f64; $order] {
                 &mut self.values[y]
+            }
+        }
+
+        // Due to the epsilon handling, we can't use a direct/bitwise comparison.
+        //
+        impl PartialEq for $name {
+            fn eq(&self, rhs: &Self) -> bool {
+                self.values
+                    .iter()
+                    .zip(rhs.values.iter())
+                    .all(|(row, rhs_row)| {
+                        row.iter()
+                            .zip(rhs_row.iter())
+                            .all(|(value, rhs_value)| (value - rhs_value).abs() < EPSILON)
+                    })
             }
         }
     };
