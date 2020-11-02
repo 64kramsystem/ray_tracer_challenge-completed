@@ -1,6 +1,5 @@
 use crate::EPSILON;
 
-use std::convert::TryInto;
 use std::mem::MaybeUninit; // For the lulz
 use std::ops::{Index, IndexMut};
 
@@ -19,14 +18,12 @@ macro_rules! matrix {
                     panic!("Inappropriate number of source values");
                 }
 
-                let mut values: [MaybeUninit<[f64; $order]>; $order] =
+                let mut values: [[f64; $order]; $order] =
                     unsafe { MaybeUninit::uninit().assume_init() };
 
                 for (row, source_row) in values.iter_mut().zip(source_values.chunks_exact($order)) {
-                    *row = MaybeUninit::new(source_row.try_into().unwrap());
+                    row.copy_from_slice(source_row);
                 }
-
-                let values = unsafe { std::mem::transmute::<_, [[f64; $order]; $order]>(values) };
 
                 Self { values }
             }
