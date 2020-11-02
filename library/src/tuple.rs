@@ -1,5 +1,7 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
+use crate::has_float64_value::HasFloat64Value;
+
 pub const POINT_TYPE: f64 = 1.0;
 pub const VECTOR_TYPE: f64 = 0.0;
 
@@ -23,20 +25,28 @@ pub struct Tuple {
 }
 
 impl Tuple {
-    pub fn point(x: f64, y: f64, z: f64) -> Tuple {
-        Tuple {
-            x,
-            y,
-            z,
+    pub fn point<T: HasFloat64Value, U: HasFloat64Value, V: HasFloat64Value>(
+        x: T,
+        y: U,
+        z: V,
+    ) -> Self {
+        Self {
+            x: x.as_f64(),
+            y: y.as_f64(),
+            z: z.as_f64(),
             w: POINT_TYPE,
         }
     }
 
-    pub fn vector(x: f64, y: f64, z: f64) -> Tuple {
-        Tuple {
-            x,
-            y,
-            z,
+    pub fn vector<T: HasFloat64Value, U: HasFloat64Value, V: HasFloat64Value>(
+        x: T,
+        y: U,
+        z: V,
+    ) -> Self {
+        Self {
+            x: x.as_f64(),
+            y: y.as_f64(),
+            z: z.as_f64(),
             w: VECTOR_TYPE,
         }
     }

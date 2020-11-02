@@ -13,6 +13,15 @@ impl Projectile {
         }
     }
 
+    // Used in/from Chapter 2.
+    //
+    pub fn with_values(position: Tuple, velocity: Tuple) -> Self {
+        Projectile {
+            position: position,
+            velocity: velocity,
+        }
+    }
+
     pub fn tick(&mut self, gravity: Tuple, wind: Tuple) {
         self.position = self.position + self.velocity;
         self.velocity = self.velocity + gravity + wind;
@@ -27,12 +36,12 @@ pub struct Environment {
 }
 
 impl Environment {
-    pub fn new() -> Self {
+    pub fn new(projectile: Projectile) -> Self {
         Environment {
             gravity: Tuple::vector(0.0, -0.1, 0.0),
             wind: Tuple::vector(-0.01, 0.0, 0.0),
 
-            projectile: Projectile::new(),
+            projectile: projectile,
         }
     }
 
@@ -42,7 +51,8 @@ impl Environment {
 }
 
 pub fn practice() {
-    let mut environment = Environment::new();
+    let projectile = Projectile::new();
+    let mut environment = Environment::new(projectile);
 
     while environment.projectile.position.y > 0.0 {
         println!(
