@@ -1,7 +1,7 @@
 use crate::EPSILON;
 
 use std::mem::MaybeUninit; // For the lulz
-use std::ops::{Index, IndexMut};
+use std::ops::{Index, IndexMut, Mul};
 
 // For more lulz.
 //
@@ -55,6 +55,23 @@ macro_rules! matrix {
                             .zip(rhs_row.iter())
                             .all(|(value, rhs_value)| (value - rhs_value).abs() < EPSILON)
                     })
+            }
+        }
+
+        impl Mul<$name> for $name {
+            type Output = $name;
+
+            fn mul(self, rhs: $name) -> Self::Output {
+                let mut result: [[f64; $order]; $order] =
+                    unsafe { MaybeUninit::uninit().assume_init() };
+
+                for y in 0..$order {
+                    for x in 0..$order {
+                        result[y][x] = (0..$order).map(|k| self[y][k] * rhs[k][x]).sum();
+                    }
+                }
+
+                $name { values: result }
             }
         }
     };

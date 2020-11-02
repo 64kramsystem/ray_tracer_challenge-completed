@@ -58,6 +58,31 @@ demonstrate! {
                 assert!(!(matrix1 == matrix2));
             }
         }
+
+        it "should be multiplied by another matrix" {
+            let matrix1 = Matrix4::new(&[
+                1.0, 2.0, 3.0, 4.0,
+                5.0, 6.0, 7.0, 8.0,
+                9.0, 8.0, 7.0, 6.0,
+                5.0, 4.0, 3.0, 2.0,
+            ]);
+
+            let matrix2 = Matrix4::new(&[
+                -2.0, 1.0, 2.0,  3.0,
+                 3.0, 2.0, 1.0, -1.0,
+                 4.0, 3.0, 6.0,  5.0,
+                 1.0, 2.0, 7.0,  8.0,
+            ]);
+
+            let expected_result = Matrix4::new(&[
+                20.0, 22.0,  50.0,  48.0,
+                44.0, 54.0, 114.0, 108.0,
+                40.0, 58.0, 110.0, 102.0,
+                16.0, 26.0,  46.0,  42.0,
+            ]);
+
+            assert_eq!(matrix1 * matrix2, expected_result);
+        }
     }
 
     describe "Matrix2" {
