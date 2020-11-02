@@ -2,10 +2,10 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 
 use crate::has_float64_value::HasFloat64Value;
 
+use crate::EPSILON;
+
 pub const POINT_TYPE: f64 = 1.0;
 pub const VECTOR_TYPE: f64 = 0.0;
-
-pub const EPSILON: f64 = 1e-6;
 
 // At this stage, is not clear is direct operation will be carried also on the type field. If so, using
 // an enum may make things more complicated, so conservatively, a float is used.

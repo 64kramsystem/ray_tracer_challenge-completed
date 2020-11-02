@@ -1,6 +1,7 @@
 use demonstrate::demonstrate;
 
-use crate::tuple::{Tuple, EPSILON, POINT_TYPE, VECTOR_TYPE};
+use crate::tuple::{Tuple, POINT_TYPE, VECTOR_TYPE};
+use crate::EPSILON;
 
 demonstrate! {
     describe "Tuple" {

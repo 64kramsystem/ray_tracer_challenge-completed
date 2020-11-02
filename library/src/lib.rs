@@ -15,6 +15,8 @@ pub use ppm_encoder::PpmEncoder;
 pub use sdl2_interface::Sdl2Interface;
 pub use tuple::Tuple;
 
+pub const EPSILON: f64 = 1e-6;
+
 #[cfg(test)]
 #[macro_use]
 extern crate assert_float_eq;
