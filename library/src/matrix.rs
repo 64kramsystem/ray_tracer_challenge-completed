@@ -44,6 +44,21 @@ macro_rules! matrix {
 
                 Self::new(&source_values)
             }
+
+            // Shame - the destructive version is very amusing, using the Rust swap API.
+            //
+            pub fn transpose(&self) -> Self {
+                let mut values: [[f64; $order]; $order] =
+                    unsafe { MaybeUninit::uninit().assume_init() };
+
+                for y in 0..$order {
+                    for x in 0..$order {
+                        values[y][x] = self[x][y];
+                    }
+                }
+
+                Self { values }
+            }
         }
 
         impl Index<usize> for $name {

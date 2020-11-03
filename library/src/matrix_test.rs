@@ -124,6 +124,24 @@ demonstrate! {
                 assert_eq!(matrix * Matrix4::identity(), expected_result)
             }
         } // describe "multiplication"
+
+        it "should construct a transposed matrix" {
+            let matrix = Matrix4::new(&[
+                0, 9, 3, 0,
+                9, 8, 0, 8,
+                1, 8, 5, 3,
+                0, 0, 5, 8,
+            ]);
+
+            let expected_result = Matrix4::new(&[
+                0, 9, 1, 0,
+                9, 8, 8, 0,
+                3, 0, 5, 5,
+                0, 8, 3, 8,
+            ]);
+
+            assert_eq!(matrix.transpose(), expected_result)
+        }
     }
 
     describe "Matrix2" {
