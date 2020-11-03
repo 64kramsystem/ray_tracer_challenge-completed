@@ -10,7 +10,7 @@ use std::ops::{Index, IndexMut, Mul};
 //
 macro_rules! matrix {
     ($name:ident, $order: literal) => {
-        #[derive(Debug)]
+        #[derive(Clone, Debug)]
         pub struct $name {
             pub values: [[f64; $order]; $order],
         }
@@ -31,6 +31,18 @@ macro_rules! matrix {
                 }
 
                 Self { values }
+            }
+
+            pub fn identity() -> Self {
+                // Tee-hee-hee!
+                //
+                let mut source_values = [0; $order * $order];
+
+                for i in 0..$order {
+                    source_values[($order + 1) * i] = 1;
+                }
+
+                Self::new(&source_values)
             }
         }
 

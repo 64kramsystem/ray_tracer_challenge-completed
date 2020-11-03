@@ -110,6 +110,19 @@ demonstrate! {
 
                 assert_eq!(matrix * tuple, expected_result);
             }
+
+            it "against an identity matrix should return a matrix equal to the first one" {
+                let matrix = Matrix4::new(&[
+                    1, 2, 3, 4,
+                    2, 4, 4, 2,
+                    8, 6, 4, 1,
+                    0, 0, 0, 1,
+                ]);
+
+                let expected_result = matrix.clone();
+
+                assert_eq!(matrix * Matrix4::identity(), expected_result)
+            }
         } // describe "multiplication"
     }
 
