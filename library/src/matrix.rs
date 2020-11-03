@@ -1,4 +1,5 @@
 use crate::has_float64_value::HasFloat64Value;
+use crate::tuple::Tuple;
 
 use crate::EPSILON;
 
@@ -76,6 +77,24 @@ macro_rules! matrix {
                 }
 
                 $name { values: result }
+            }
+        }
+
+        impl Mul<Tuple> for $name {
+            type Output = Tuple;
+
+            fn mul(self, rhs: Tuple) -> Self::Output {
+                if $order != 4 {
+                    panic!("Only matrices of order 4 are allowed to be multiplied by a Tuple");
+                }
+
+                let mut result = Tuple::uninitialized();
+
+                for y in 0..$order {
+                    result[y] = (0..$order).map(|k| self[y][k] * rhs[k]).sum();
+                }
+
+                result
             }
         }
     };
