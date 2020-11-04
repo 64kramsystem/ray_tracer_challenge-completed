@@ -158,6 +158,15 @@ demonstrate! {
             assert_float_absolute_eq!(matrix[1][0], 1.0);
             assert_float_absolute_eq!(matrix[1][1], -2.0);
         }
+
+        it "should compute the determinant" {
+            let matrix = Matrix2::new(&[
+                1, 5,
+                -3, 2,
+            ]);
+
+            assert_eq!(matrix.determinant(), 17.0);
+        }
     }
 
     describe "Matrix3" {

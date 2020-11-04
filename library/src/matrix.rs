@@ -10,6 +10,7 @@ pub trait Matrix:
     Index<usize> + IndexMut<usize> + PartialEq + Sized + Mul<Self> + Mul<Tuple>
 {
     fn transpose(&self) -> Self;
+    fn determinant(&self) -> f64;
 }
 
 // For more lulz.
@@ -66,6 +67,14 @@ macro_rules! matrix {
                 }
 
                 Self { values }
+            }
+
+            fn determinant(&self) -> f64 {
+                if $order != 2 {
+                    panic!()
+                }
+
+                self[0][0] * self[1][1] - self[0][1] * self[1][0]
             }
         }
 
