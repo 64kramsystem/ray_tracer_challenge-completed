@@ -6,6 +6,12 @@ use crate::EPSILON;
 use std::mem::MaybeUninit; // For the lulz
 use std::ops::{Index, IndexMut, Mul};
 
+pub trait Matrix:
+    Index<usize> + IndexMut<usize> + PartialEq + Sized + Mul<Self> + Mul<Tuple>
+{
+    fn transpose(&self) -> Self;
+}
+
 // For more lulz.
 //
 macro_rules! matrix {
@@ -44,10 +50,12 @@ macro_rules! matrix {
 
                 Self::new(&source_values)
             }
+        }
 
+        impl Matrix for $name {
             // Shame - the destructive version is very amusing, using the Rust swap API.
             //
-            pub fn transpose(&self) -> Self {
+            fn transpose(&self) -> Self {
                 let mut values: [[f64; $order]; $order] =
                     unsafe { MaybeUninit::uninit().assume_init() };
 

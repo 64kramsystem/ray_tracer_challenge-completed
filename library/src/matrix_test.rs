@@ -2,7 +2,7 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Matrix4" {
-        use crate::matrix::Matrix4;
+        use crate::matrix::{Matrix,Matrix4};
         use crate::tuple::Tuple;
 
         it "should construct a matrix (order: 4) from values, and access them" {
@@ -145,7 +145,7 @@ demonstrate! {
     }
 
     describe "Matrix2" {
-        use crate::matrix::Matrix2;
+        use crate::matrix::{Matrix, Matrix2};
 
         it "should construct a matrix (order: 2) from values, and access them" {
             let matrix = Matrix2::new(&[
@@ -161,7 +161,7 @@ demonstrate! {
     }
 
     describe "Matrix3" {
-        use crate::matrix::Matrix3;
+        use crate::matrix::{Matrix, Matrix3};
 
         it "should construct a matrix (order: 3) from values, and access them" {
             let matrix = Matrix3::new(&[
