@@ -11,6 +11,10 @@ pub trait Matrix:
 {
     fn transpose(&self) -> Self;
     fn determinant(&self) -> f64;
+
+    // Can't return `Box<dyn Matrix>`, because of the methods (particularly PartialEq) returning self.
+    //
+    // fn submatrix(&self, row: usize, column: usize) -> Box<dyn Matrix>;
 }
 
 // For more lulz.
