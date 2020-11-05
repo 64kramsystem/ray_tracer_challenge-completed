@@ -8,9 +8,7 @@ mod tuple;
 
 pub use color::Color;
 pub use export_to_pixels::ExportToPixels;
-pub use matrix::Matrix2;
-pub use matrix::Matrix3;
-pub use matrix::Matrix4;
+pub use matrix::Matrix;
 pub use ppm_encoder::PpmEncoder;
 pub use sdl2_interface::Sdl2Interface;
 pub use tuple::Tuple;
