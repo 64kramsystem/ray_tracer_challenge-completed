@@ -197,6 +197,16 @@ demonstrate! {
                 assert_float_absolute_eq!(matrix[1][1], -2.0);
                 assert_float_absolute_eq!(matrix[2][2], 1.0);
             }
+
+            it "should compute a minor" {
+                let matrix = Matrix::new(&[
+                    3,  5,  0,
+                    2, -1, -7,
+                    6, -1,  5,
+                ]);
+
+                assert_eq!(matrix.minor(1, 0), 25.0);
+            }
         } // describe "Matrix (order 3)"
     }
 }

@@ -99,6 +99,10 @@ impl Matrix {
 
         Self { values: result }
     }
+
+    pub fn minor(&self, y: usize, x: usize) -> f64 {
+        self.submatrix(y, x).determinant()
+    }
 }
 
 impl Index<usize> for Matrix {
