@@ -143,6 +143,23 @@ demonstrate! {
 
                 assert_eq!(matrix.transpose(), expected_result)
             }
+
+            it "should extract a submatrix" {
+                let matrix = Matrix::new(&[
+                    -6, 1,  1, 6,
+                    -8, 5,  8, 6,
+                    -1, 0,  8, 2,
+                    -7, 1, -1, 1,
+                ]);
+
+                let expected_result = Matrix::new(&[
+                    -6,  1, 6,
+                    -8,  8, 6,
+                    -7, -1, 1,
+                ]);
+
+                assert_eq!(matrix.submatrix(2, 1), expected_result)
+            }
         } // describe "Matrix (order 4)"
 
         describe "Matrix (order 2)" {

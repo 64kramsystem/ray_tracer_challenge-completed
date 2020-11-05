@@ -77,6 +77,28 @@ impl Matrix {
 
         self[0][0] * self[1][1] - self[0][1] * self[1][0]
     }
+
+    pub fn submatrix(&self, y: usize, x: usize) -> Matrix {
+        let order = self.values.len();
+
+        let mut result = Vec::with_capacity(order - 1);
+
+        for current_y in 0..order {
+            if current_y != y {
+                let mut result_row = Vec::with_capacity(order - 1);
+
+                for current_x in 0..order {
+                    if current_x != x {
+                        result_row.push(self[current_y][current_x]);
+                    }
+                }
+
+                result.push(result_row);
+            }
+        }
+
+        Self { values: result }
+    }
 }
 
 impl Index<usize> for Matrix {
