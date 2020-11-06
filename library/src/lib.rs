@@ -13,7 +13,7 @@ pub use ppm_encoder::PpmEncoder;
 pub use sdl2_interface::Sdl2Interface;
 pub use tuple::Tuple;
 
-pub const EPSILON: f64 = 1e-6;
+pub const EPSILON: f64 = 1e-4;
 
 #[cfg(test)]
 #[macro_use]
