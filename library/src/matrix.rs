@@ -127,6 +127,28 @@ impl Matrix {
         //
         unsafe { transmute::<_, f64>(minor_bits ^ sign_bits) }
     }
+
+    pub fn inverse(&self) -> Option<Matrix> {
+        let determinant = self.determinant();
+
+        if determinant == 0.0 {
+            None
+        } else {
+            let order = self.values.len();
+
+            let result = (0..order)
+                .map(|y| {
+                    (0..order)
+                        // WATCH OUT! row/col inversion here.
+                        //
+                        .map(|x| self.cofactor(x, y) / determinant)
+                        .collect::<Vec<_>>()
+                })
+                .collect::<Vec<_>>();
+
+            Some(Self { values: result })
+        }
+    }
 }
 
 impl Index<usize> for Matrix {
