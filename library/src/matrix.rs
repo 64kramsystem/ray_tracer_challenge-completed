@@ -71,11 +71,15 @@ impl Matrix {
     }
 
     pub fn determinant(&self) -> f64 {
-        if self.values.len() != 2 {
-            panic!()
+        if self.values.len() == 2 {
+            self[0][0] * self[1][1] - self[0][1] * self[1][0]
+        } else {
+            self[0]
+                .iter()
+                .enumerate()
+                .map(|(x, value)| value * self.cofactor(0, x))
+                .sum()
         }
-
-        self[0][0] * self[1][1] - self[0][1] * self[1][0]
     }
 
     pub fn submatrix(&self, y: usize, x: usize) -> Matrix {

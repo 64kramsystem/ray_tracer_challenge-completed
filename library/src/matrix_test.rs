@@ -160,6 +160,17 @@ demonstrate! {
 
                 assert_eq!(matrix.submatrix(2, 1), expected_result)
             }
+
+            it "should compute the determinant" {
+                let matrix = Matrix::new(&[
+                    -2, -8,  3,  5,
+                    -3,  1,  7,  3,
+                     1,  2, -9,  6,
+                    -6,  7,  7, -9,
+                ]);
+
+                assert_eq!(matrix.determinant(), -4071.0);
+            }
         } // describe "Matrix (order 4)"
 
         describe "Matrix (order 2)" {
