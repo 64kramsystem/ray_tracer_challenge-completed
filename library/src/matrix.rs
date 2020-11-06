@@ -14,6 +14,15 @@ pub struct Matrix {
 }
 
 impl Matrix {
+    // There isn't an entirely clean structure for the values to pass:
+    //
+    // - an array of arrays doesn't work, since the size must be known at compile time;
+    // - a flat list could work with by appending an empty comment to each line, but as soon as a method
+    //   is invoked on an entry (e.g. as_f64()), it alignes vertically.
+    // - using slices works, although it's quite ugly.
+    //
+    // So, screw rustfmt, and just use `#[rustfmt::skip]`.
+    //
     pub fn new<T: Copy + HasFloat64Value>(source_values: &[T]) -> Self {
         let order = (source_values.len() as f64).sqrt() as usize;
 
