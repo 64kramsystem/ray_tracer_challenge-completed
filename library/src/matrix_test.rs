@@ -207,6 +207,17 @@ demonstrate! {
 
                 assert_eq!(matrix.minor(1, 0), 25.0);
             }
+
+            it "should compute a cofactor" {
+                let matrix = Matrix::new(&[
+                    3,  5,  0,
+                    2, -1, -7,
+                    6, -1,  5,
+                ]);
+
+                assert_eq!(matrix.cofactor(0, 0), -12.0);
+                assert_eq!(matrix.cofactor(1, 0), -25.0);
+            }
         } // describe "Matrix (order 3)"
     }
 }

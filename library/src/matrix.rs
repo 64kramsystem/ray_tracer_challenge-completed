@@ -4,7 +4,7 @@ use crate::tuple::Tuple;
 use crate::EPSILON;
 
 use std::{
-    mem::MaybeUninit,
+    mem::{transmute, MaybeUninit},
     ops::{Index, IndexMut, Mul},
 };
 
@@ -102,6 +102,26 @@ impl Matrix {
 
     pub fn minor(&self, y: usize, x: usize) -> f64 {
         self.submatrix(y, x).determinant()
+    }
+
+    // Mad lulz here. Note that for portability, the bit shift should change depending on the arch.
+    //
+    pub fn cofactor(&self, y: usize, x: usize) -> f64 {
+        let minor = self.minor(y, x);
+
+        // The data type is irrelevant here, as long as it supports bit shifts (float doesn't).
+        // usize is used for convenience on the next operation.
+        //
+        let minor_bits = unsafe { transmute::<_, usize>(minor) };
+
+        // This is (0 for even/1 for odd), shifted to be the leftmost bit, so that it's in the sign position
+        // of f64 values.
+        //
+        let sign_bits = (x + y) << 63;
+
+        // Xor keeps the <destination sign> if the <sign operand> is 0, and changes it, if the <sign operand> is 1.
+        //
+        unsafe { transmute::<_, f64>(minor_bits ^ sign_bits) }
     }
 }
 
