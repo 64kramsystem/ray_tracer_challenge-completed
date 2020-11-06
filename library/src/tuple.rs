@@ -3,7 +3,7 @@ use std::{
     ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub},
 };
 
-use crate::has_float64_value::HasFloat64Value;
+use crate::{has_float64_value::HasFloat64Value, Matrix};
 
 use crate::EPSILON;
 
@@ -96,6 +96,10 @@ impl Tuple {
             self.z * rhs.x - self.x * rhs.z,
             self.x * rhs.y - self.y * rhs.x,
         )
+    }
+
+    pub fn translate<T: HasFloat64Value>(self, x: T, y: T, z: T) -> Tuple {
+        Matrix::translation(x, y, z) * self
     }
 }
 

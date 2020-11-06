@@ -174,5 +174,15 @@ demonstrate! {
 
             assert_eq!(tuple1.dot_product(tuple2), expected_dot_product);
         }
+
+        context "transformations" {
+            it "should translate" {
+                let tuple = Tuple::point(-3, 4, 5);
+
+                let expected_result = Tuple::point(2, 1, 7);
+
+                assert_eq!(tuple.translate(5, -3, 2), expected_result);
+            }
+        }
     }
 }
