@@ -1,8 +1,8 @@
 use std::ops::{Add, Mul, Sub};
 
-use crate::has_float64_value::HasFloat64Value;
+use crate::EPSILON;
 
-pub const EPSILON: f64 = 1e-6;
+use crate::has_float64_value::HasFloat64Value;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Color {

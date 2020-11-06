@@ -1,11 +1,14 @@
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::{
+    mem::MaybeUninit,
+    ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub},
+};
 
 use crate::has_float64_value::HasFloat64Value;
 
+use crate::EPSILON;
+
 pub const POINT_TYPE: f64 = 1.0;
 pub const VECTOR_TYPE: f64 = 0.0;
-
-pub const EPSILON: f64 = 1e-6;
 
 // At this stage, is not clear is direct operation will be carried also on the type field. If so, using
 // an enum may make things more complicated, so conservatively, a float is used.
@@ -25,6 +28,28 @@ pub struct Tuple {
 }
 
 impl Tuple {
+    // Too many lulz will kill me.
+    //
+    pub fn uninitialized() -> Self {
+        unsafe {
+            Self {
+                x: MaybeUninit::uninit().assume_init(),
+                y: MaybeUninit::uninit().assume_init(),
+                z: MaybeUninit::uninit().assume_init(),
+                w: MaybeUninit::uninit().assume_init(),
+            }
+        }
+    }
+
+    pub fn new<T: HasFloat64Value>(x: T, y: T, z: T, w: T) -> Self {
+        Self {
+            x: x.as_f64(),
+            y: y.as_f64(),
+            z: z.as_f64(),
+            w: w.as_f64(),
+        }
+    }
+
     pub fn point<T: HasFloat64Value, U: HasFloat64Value, V: HasFloat64Value>(
         x: T,
         y: U,
@@ -71,6 +96,34 @@ impl Tuple {
             self.z * rhs.x - self.x * rhs.z,
             self.x * rhs.y - self.y * rhs.x,
         )
+    }
+}
+
+// Index[Mut] implementations are for the lulz, although they're actually convenient for matrix operations.
+//
+impl Index<usize> for Tuple {
+    type Output = f64;
+
+    fn index(&self, y: usize) -> &Self::Output {
+        match y {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            3 => &self.w,
+            _ => panic!("Index too high!"),
+        }
+    }
+}
+
+impl IndexMut<usize> for Tuple {
+    fn index_mut(&mut self, y: usize) -> &mut f64 {
+        match y {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
+            3 => &mut self.w,
+            _ => panic!("Index too high!"),
+        }
     }
 }
 
