@@ -8,7 +8,7 @@ pub fn practice() {
     let projectile = Projectile::with_values(start, velocity);
 
     let projectile_color = Color::new(1, 0, 0);
-    let mut interface = Sdl2Interface::init("Chapter 02 exercise", 900, 550);
+    let mut interface = Sdl2Interface::init("Chapter 02 exercise", 900, 550, (0, 0));
 
     let mut environment = Environment::new(projectile);
 

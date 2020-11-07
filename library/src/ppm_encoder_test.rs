@@ -10,7 +10,7 @@ demonstrate! {
         use super::*;
 
         it "should encode an exportable image" {
-            let mut sdl_interface = Sdl2Interface::init("test", 5, 3);
+            let mut sdl_interface = Sdl2Interface::init("test", 5, 3, (0, 0));
 
             let c1 = Color::new(1.5, 0, 0);
             let c2 = Color::new(0, 0.5, 0);

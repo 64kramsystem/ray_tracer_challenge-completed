@@ -14,6 +14,9 @@ pub struct Sdl2Interface {
     event_pump: EventPump,
     canvas: render::Canvas<Window>,
 
+    center_x: i16,
+    center_y: i16,
+
     // The SDL2 pixel reading doesn't work as intended (see history), so we keep an internal buffer.
     // The upside is that this can be used, if desired, to trivially redraw on window resize.
     //
@@ -23,7 +26,9 @@ pub struct Sdl2Interface {
 impl Sdl2Interface {
     // Initializes the canvas, and maximizes the window.
     //
-    pub fn init(window_title: &str, width: u16, height: u16) -> Self {
+    // center: (x, y), from the bottom left.
+    //
+    pub fn init(window_title: &str, width: u16, height: u16, center: (i16, i16)) -> Self {
         let sdl_context = sdl2::init().unwrap();
 
         // The resizing (due to `maximized()`) is handled below, by process_events().
@@ -62,6 +67,8 @@ impl Sdl2Interface {
         Self {
             event_pump,
             canvas,
+            center_x: center.0,
+            center_y: center.1,
             pixels_buffer,
         }
     }
@@ -70,8 +77,11 @@ impl Sdl2Interface {
     // Doesn't update the canvas; for that, must invoke update_canvas().
     // Pixels outside the canvas are ignored.
     //
-    pub fn write_pixel(&mut self, x: i16, mut y: i16, color: crate::Color) {
+    pub fn write_pixel(&mut self, mut x: i16, mut y: i16, color: crate::Color) {
         let (width, height) = self.canvas.logical_size();
+
+        x += self.center_x;
+        y += self.center_y;
 
         y = self.canvas_height() as i16 - y as i16 - 1;
 
