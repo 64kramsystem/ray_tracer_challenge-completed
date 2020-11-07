@@ -183,6 +183,14 @@ demonstrate! {
 
                 assert_eq!(tuple.translate(5, -3, 2), expected_result);
             }
+
+            it "should scale" {
+                let tuple = Tuple::point(-4, 6, 8);
+
+                let expected_result = Tuple::point(-8, 18, 32);
+
+                assert_eq!(tuple.scale(2, 3, 4), expected_result);
+            }
         }
     }
 }

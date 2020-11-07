@@ -70,6 +70,20 @@ impl Matrix {
         Self::new(&transformation_values)
     }
 
+    pub fn scaling<T: HasFloat64Value>(x: T, y: T, z: T) -> Self {
+        let (x, y, z) = (x.as_f64(), y.as_f64(), z.as_f64());
+
+        #[rustfmt::skip]
+        let transformation_values = [
+            x,   0.0, 0.0, 0.0,
+            0.0, y,   0.0, 0.0,
+            0.0, 0.0, z,   0.0,
+            0.0, 0.0, 0.0, 1.0,
+        ];
+
+        Self::new(&transformation_values)
+    }
+
     pub fn identity(order: usize) -> Self {
         let mut source_values = vec![0; order.pow(2)];
 

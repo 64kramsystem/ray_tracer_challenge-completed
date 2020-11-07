@@ -101,6 +101,10 @@ impl Tuple {
     pub fn translate<T: HasFloat64Value>(self, x: T, y: T, z: T) -> Tuple {
         Matrix::translation(x, y, z) * self
     }
+
+    pub fn scale<T: HasFloat64Value>(self, x: T, y: T, z: T) -> Tuple {
+        Matrix::scaling(x, y, z) * self
+    }
 }
 
 // Index[Mut] implementations are for the lulz, although they're actually convenient for matrix operations.
