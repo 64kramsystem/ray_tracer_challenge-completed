@@ -220,6 +220,56 @@ demonstrate! {
                     assert_eq!(tuple.rotate(Axis::Z, PI / 4.0), expected_result);
                 }
             }
+
+            context "shearing" {
+                it "should move x in proportion to y" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(5, 3, 4);
+
+                    assert_eq!(tuple.shear(1, 0, 0, 0, 0, 0), expected_result);
+                }
+
+                it "should move x in proportion to z" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(6, 3, 4);
+
+                    assert_eq!(tuple.shear(0, 1, 0, 0, 0, 0), expected_result);
+                }
+
+                it "should move y in proportion to x" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(2, 5, 4);
+
+                    assert_eq!(tuple.shear(0, 0, 1, 0, 0, 0), expected_result);
+                }
+
+                it "should move y in proportion to z" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(2, 7, 4);
+
+                    assert_eq!(tuple.shear(0, 0, 0, 1, 0, 0), expected_result);
+                }
+
+                it "should move z in proportion to x" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(2, 3, 6);
+
+                    assert_eq!(tuple.shear(0, 0, 0, 0, 1, 0), expected_result);
+                }
+
+                it "should move z in proportion to y" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(2, 3, 7);
+
+                    assert_eq!(tuple.shear(0, 0, 0, 0, 0, 1), expected_result);
+                }
+            }
         }
     }
 }

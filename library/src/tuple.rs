@@ -109,6 +109,18 @@ impl Tuple {
     pub fn rotate(self, axis: Axis, r: f64) -> Tuple {
         Matrix::rotation(axis, r) * self
     }
+
+    pub fn shear<T: HasFloat64Value>(
+        self,
+        x_py: T,
+        x_pz: T,
+        y_px: T,
+        y_pz: T,
+        z_px: T,
+        z_py: T,
+    ) -> Tuple {
+        Matrix::shearing(x_py, x_pz, y_px, y_pz, z_px, z_py) * self
+    }
 }
 
 // Index[Mut] implementations are for the lulz, although they're actually convenient for matrix operations.

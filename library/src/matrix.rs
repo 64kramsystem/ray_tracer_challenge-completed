@@ -114,6 +114,34 @@ impl Matrix {
         Self::new(&transformation_values)
     }
 
+    pub fn shearing<T: HasFloat64Value>(
+        x_py: T,
+        x_pz: T,
+        y_px: T,
+        y_pz: T,
+        z_px: T,
+        z_py: T,
+    ) -> Self {
+        let (x_py, x_pz, y_px, y_pz, z_px, z_py) = (
+            x_py.as_f64(),
+            x_pz.as_f64(),
+            y_px.as_f64(),
+            y_pz.as_f64(),
+            z_px.as_f64(),
+            z_py.as_f64(),
+        );
+
+        #[rustfmt::skip]
+        let transformation_values = [
+            1.0,  x_py, x_pz, 0.0,
+            y_px, 1.0,  y_pz, 0.0,
+            z_px, z_py, 1.0,  0.0,
+            0.0,  0.0,  0.0,  1.0,
+        ];
+
+        Self::new(&transformation_values)
+    }
+
     pub fn identity(order: usize) -> Self {
         let mut source_values = vec![0; order.pow(2)];
 
