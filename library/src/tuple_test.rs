@@ -18,7 +18,7 @@ demonstrate! {
                     }
                 }
             }
-        }
+        } // context "with w=1_0"
 
         context "with w=0_0" {
             it "is a vector" {
@@ -30,7 +30,7 @@ demonstrate! {
                     }
                 }
             }
-        }
+        } // context "with w=0_0"
 
         context "::point" {
             it "creates a tuple with w=1_0" {
@@ -42,7 +42,7 @@ demonstrate! {
                     }
                 }
             }
-        }
+        } // context "::point"
 
         context "::vector" {
             it "creates a tuple with w=0_0" {
@@ -54,7 +54,7 @@ demonstrate! {
                     }
                 }
             }
-        }
+        } // context "::vector"
 
         // For simplicity, ignore NaN.
         //
@@ -83,7 +83,7 @@ demonstrate! {
 
                 assert_eq!(tuple1 - tuple2, expected_tuple);
             }
-        }
+        } // context "as point"
 
         context "as vector" {
             it "can be subtracted from a point" {
@@ -120,7 +120,7 @@ demonstrate! {
 
                 assert_eq!(vector1.cross_product(vector2), expected_vector);
             }
-        }
+        } // context "as vector"
 
         it "can be subtracted from the zero vector" {
             let tuple1 = Tuple::vector(0.0, 0.0, 0.0);
@@ -165,7 +165,7 @@ demonstrate! {
 
                 assert!(vector.magnitude() - expected_magnitude < EPSILON);
             }
-        }
+        } // context "should have a magnitude"
 
         it "has a dot product" {
             let tuple1 = Tuple::vector(1.0, 2.0, 3.0);
@@ -219,7 +219,7 @@ demonstrate! {
 
                     assert_eq!(tuple.rotate(Axis::Z, PI / 4.0), expected_result);
                 }
-            }
+            } // context "rotation"
 
             context "shearing" {
                 it "should move x in proportion to y" {
@@ -269,7 +269,7 @@ demonstrate! {
 
                     assert_eq!(tuple.shear(0, 0, 0, 0, 0, 1), expected_result);
                 }
-            }
-        }
+            } // context "shearing"
+        } // context "transformations"
     }
 }
