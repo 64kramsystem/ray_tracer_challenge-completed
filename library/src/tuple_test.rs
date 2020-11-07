@@ -270,6 +270,22 @@ demonstrate! {
                     assert_eq!(tuple.shear(0, 0, 0, 0, 0, 1), expected_result);
                 }
             } // context "shearing"
+
+            it "should be applicable in sequence" {
+                let tuple = Tuple::point(1, 0, 1);
+
+                // "Not amazing" test data. After the rotation, the z value is 0, so that any scale
+                // z value passes the UT.
+                //
+                let current_result = tuple
+                    .rotate(Axis::X, PI / 2.0)
+                    .scale(5, 5, 5)
+                    .translate(10, 5, 7);
+
+                let expected_result = Tuple::point(15, 0, 7);
+
+                assert_eq!(current_result, expected_result);
+            }
         } // context "transformations"
     }
 }
