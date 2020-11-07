@@ -8,15 +8,14 @@ pub fn practice() {
     let projectile = Projectile::with_values(start, velocity);
 
     let projectile_color = Color::new(1, 0, 0);
-    let mut interface = Sdl2Interface::init("Chapter 02 exercise", 900, 550);
+    let mut interface = Sdl2Interface::init("Chapter 02 exercise", 900, 550, (0, 0));
 
     let mut environment = Environment::new(projectile);
 
     while environment.projectile.position.y > 0.0 {
         // Watch out the y coordinate conversion!
         let x_position = environment.projectile.position.x as i16;
-        let y_position =
-            interface.canvas_height() as i16 - environment.projectile.position.y as i16 - 1;
+        let y_position = environment.projectile.position.y as i16;
 
         interface.write_pixel(x_position, y_position, projectile_color);
 

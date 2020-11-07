@@ -3,7 +3,7 @@ use std::{
     ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub},
 };
 
-use crate::has_float64_value::HasFloat64Value;
+use crate::{has_float64_value::HasFloat64Value, Axis, Matrix};
 
 use crate::EPSILON;
 
@@ -96,6 +96,30 @@ impl Tuple {
             self.z * rhs.x - self.x * rhs.z,
             self.x * rhs.y - self.y * rhs.x,
         )
+    }
+
+    pub fn translate<T: HasFloat64Value>(self, x: T, y: T, z: T) -> Tuple {
+        Matrix::translation(x, y, z) * self
+    }
+
+    pub fn scale<T: HasFloat64Value>(self, x: T, y: T, z: T) -> Tuple {
+        Matrix::scaling(x, y, z) * self
+    }
+
+    pub fn rotate(self, axis: Axis, r: f64) -> Tuple {
+        Matrix::rotation(axis, r) * self
+    }
+
+    pub fn shear<T: HasFloat64Value>(
+        self,
+        x_py: T,
+        x_pz: T,
+        y_px: T,
+        y_pz: T,
+        z_px: T,
+        z_py: T,
+    ) -> Tuple {
+        Matrix::shearing(x_py, x_pz, y_px, y_pz, z_px, z_py) * self
     }
 }
 

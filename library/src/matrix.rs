@@ -1,5 +1,5 @@
-use crate::has_float64_value::HasFloat64Value;
 use crate::tuple::Tuple;
+use crate::{has_float64_value::HasFloat64Value, Axis};
 
 use crate::EPSILON;
 
@@ -14,6 +14,15 @@ pub struct Matrix {
 }
 
 impl Matrix {
+    // There isn't an entirely clean structure for the values to pass:
+    //
+    // - an array of arrays doesn't work, since the size must be known at compile time;
+    // - a flat list could work with by appending an empty comment to each line, but as soon as a method
+    //   is invoked on an entry (e.g. as_f64()), it alignes vertically.
+    // - using slices works, although it's quite ugly.
+    //
+    // So, screw rustfmt, and just use `#[rustfmt::skip]`.
+    //
     pub fn new<T: Copy + HasFloat64Value>(source_values: &[T]) -> Self {
         let order = (source_values.len() as f64).sqrt() as usize;
 
@@ -45,6 +54,92 @@ impl Matrix {
             .collect::<Vec<_>>();
 
         Self { values }
+    }
+
+    pub fn translation<T: HasFloat64Value>(x: T, y: T, z: T) -> Self {
+        let (x, y, z) = (x.as_f64(), y.as_f64(), z.as_f64());
+
+        #[rustfmt::skip]
+        let transformation_values = [
+            1.0, 0.0, 0.0, x,
+            0.0, 1.0, 0.0, y,
+            0.0, 0.0, 1.0, z,
+            0.0, 0.0, 0.0, 1.0,
+        ];
+
+        Self::new(&transformation_values)
+    }
+
+    pub fn scaling<T: HasFloat64Value>(x: T, y: T, z: T) -> Self {
+        let (x, y, z) = (x.as_f64(), y.as_f64(), z.as_f64());
+
+        #[rustfmt::skip]
+        let transformation_values = [
+            x,   0.0, 0.0, 0.0,
+            0.0, y,   0.0, 0.0,
+            0.0, 0.0, z,   0.0,
+            0.0, 0.0, 0.0, 1.0,
+        ];
+
+        Self::new(&transformation_values)
+    }
+
+    // r: radians.
+    //
+    pub fn rotation(axis: Axis, r: f64) -> Self {
+        let (cos_r, sin_r) = (r.cos(), r.sin());
+
+        #[rustfmt::skip]
+        let transformation_values = match axis {
+            Axis::X => [
+                1.0, 0.0,   0.0,    0.0,
+                0.0, cos_r, -sin_r, 0.0,
+                0.0, sin_r, cos_r,  0.0,
+                0.0, 0.0,   0.0,    1.0,
+            ],
+            Axis::Y => [
+                cos_r,  0.0, sin_r,  0.0,
+                0.0,    1.0, 0.0,    0.0,
+                -sin_r, 0.0, cos_r,  0.0,
+                0.0,    0.0, 0.0,    1.0,
+            ],
+            Axis::Z => [
+                cos_r,  -sin_r, 0.0, 0.0,
+                sin_r,  cos_r,  0.0, 0.0,
+                0.0,    0.0,    1.0, 0.0,
+                0.0,    0.0,    0.0, 1.0,
+            ]
+        };
+
+        Self::new(&transformation_values)
+    }
+
+    pub fn shearing<T: HasFloat64Value>(
+        x_py: T,
+        x_pz: T,
+        y_px: T,
+        y_pz: T,
+        z_px: T,
+        z_py: T,
+    ) -> Self {
+        let (x_py, x_pz, y_px, y_pz, z_px, z_py) = (
+            x_py.as_f64(),
+            x_pz.as_f64(),
+            y_px.as_f64(),
+            y_pz.as_f64(),
+            z_px.as_f64(),
+            z_py.as_f64(),
+        );
+
+        #[rustfmt::skip]
+        let transformation_values = [
+            1.0,  x_py, x_pz, 0.0,
+            y_px, 1.0,  y_pz, 0.0,
+            z_px, z_py, 1.0,  0.0,
+            0.0,  0.0,  0.0,  1.0,
+        ];
+
+        Self::new(&transformation_values)
     }
 
     pub fn identity(order: usize) -> Self {

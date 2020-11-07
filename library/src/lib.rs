@@ -15,6 +15,12 @@ pub use tuple::Tuple;
 
 pub const EPSILON: f64 = 1e-4;
 
+pub enum Axis {
+    X,
+    Y,
+    Z,
+}
+
 #[cfg(test)]
 #[macro_use]
 extern crate assert_float_eq;

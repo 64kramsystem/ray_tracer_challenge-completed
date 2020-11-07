@@ -1,7 +1,8 @@
 use demonstrate::demonstrate;
 
 use crate::tuple::{Tuple, POINT_TYPE, VECTOR_TYPE};
-use crate::EPSILON;
+use crate::{Axis, EPSILON};
+use std::f64::consts::PI;
 
 demonstrate! {
     describe "Tuple" {
@@ -17,7 +18,7 @@ demonstrate! {
                     }
                 }
             }
-        }
+        } // context "with w=1_0"
 
         context "with w=0_0" {
             it "is a vector" {
@@ -29,7 +30,7 @@ demonstrate! {
                     }
                 }
             }
-        }
+        } // context "with w=0_0"
 
         context "::point" {
             it "creates a tuple with w=1_0" {
@@ -41,7 +42,7 @@ demonstrate! {
                     }
                 }
             }
-        }
+        } // context "::point"
 
         context "::vector" {
             it "creates a tuple with w=0_0" {
@@ -53,7 +54,7 @@ demonstrate! {
                     }
                 }
             }
-        }
+        } // context "::vector"
 
         // For simplicity, ignore NaN.
         //
@@ -82,7 +83,7 @@ demonstrate! {
 
                 assert_eq!(tuple1 - tuple2, expected_tuple);
             }
-        }
+        } // context "as point"
 
         context "as vector" {
             it "can be subtracted from a point" {
@@ -119,7 +120,7 @@ demonstrate! {
 
                 assert_eq!(vector1.cross_product(vector2), expected_vector);
             }
-        }
+        } // context "as vector"
 
         it "can be subtracted from the zero vector" {
             let tuple1 = Tuple::vector(0.0, 0.0, 0.0);
@@ -164,7 +165,7 @@ demonstrate! {
 
                 assert!(vector.magnitude() - expected_magnitude < EPSILON);
             }
-        }
+        } // context "should have a magnitude"
 
         it "has a dot product" {
             let tuple1 = Tuple::vector(1.0, 2.0, 3.0);
@@ -174,5 +175,117 @@ demonstrate! {
 
             assert_eq!(tuple1.dot_product(tuple2), expected_dot_product);
         }
+
+        context "transformations" {
+            it "should translate" {
+                let tuple = Tuple::point(-3, 4, 5);
+
+                let expected_result = Tuple::point(2, 1, 7);
+
+                assert_eq!(tuple.translate(5, -3, 2), expected_result);
+            }
+
+            it "should scale" {
+                let tuple = Tuple::point(-4, 6, 8);
+
+                let expected_result = Tuple::point(-8, 18, 32);
+
+                assert_eq!(tuple.scale(2, 3, 4), expected_result);
+            }
+
+            context "rotation" {
+                before { let sqrt_2 = 2.0_f64.sqrt(); }
+
+                it "should by performed by Pi/4 around the x axis" {
+                    let tuple = Tuple::point(0, 1, 0);
+
+                    let expected_result = Tuple::point(0, sqrt_2 / 2.0, sqrt_2 / 2.0);
+
+                    assert_eq!(tuple.rotate(Axis::X, PI / 4.0), expected_result);
+                }
+
+                it "should by performed by Pi/4 around the y axis" {
+                    let tuple = Tuple::point(0, 0, 1);
+
+                    let expected_result = Tuple::point(sqrt_2 / 2.0, 0, sqrt_2 / 2.0);
+
+                    assert_eq!(tuple.rotate(Axis::Y, PI / 4.0), expected_result);
+                }
+
+                it "should by performed by Pi/4 around the z axis" {
+                    let tuple = Tuple::point(0, 1, 0);
+
+                    let expected_result = Tuple::point(-sqrt_2 / 2.0, sqrt_2 / 2.0, 0);
+
+                    assert_eq!(tuple.rotate(Axis::Z, PI / 4.0), expected_result);
+                }
+            } // context "rotation"
+
+            context "shearing" {
+                it "should move x in proportion to y" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(5, 3, 4);
+
+                    assert_eq!(tuple.shear(1, 0, 0, 0, 0, 0), expected_result);
+                }
+
+                it "should move x in proportion to z" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(6, 3, 4);
+
+                    assert_eq!(tuple.shear(0, 1, 0, 0, 0, 0), expected_result);
+                }
+
+                it "should move y in proportion to x" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(2, 5, 4);
+
+                    assert_eq!(tuple.shear(0, 0, 1, 0, 0, 0), expected_result);
+                }
+
+                it "should move y in proportion to z" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(2, 7, 4);
+
+                    assert_eq!(tuple.shear(0, 0, 0, 1, 0, 0), expected_result);
+                }
+
+                it "should move z in proportion to x" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(2, 3, 6);
+
+                    assert_eq!(tuple.shear(0, 0, 0, 0, 1, 0), expected_result);
+                }
+
+                it "should move z in proportion to y" {
+                    let tuple = Tuple::point(2, 3, 4);
+
+                    let expected_result = Tuple::point(2, 3, 7);
+
+                    assert_eq!(tuple.shear(0, 0, 0, 0, 0, 1), expected_result);
+                }
+            } // context "shearing"
+
+            it "should be applicable in sequence" {
+                let tuple = Tuple::point(1, 0, 1);
+
+                // "Not amazing" test data. After the rotation, the z value is 0, so that any scale
+                // z value passes the UT.
+                //
+                let current_result = tuple
+                    .rotate(Axis::X, PI / 2.0)
+                    .scale(5, 5, 5)
+                    .translate(10, 5, 7);
+
+                let expected_result = Tuple::point(15, 0, 7);
+
+                assert_eq!(current_result, expected_result);
+            }
+        } // context "transformations"
     }
 }
