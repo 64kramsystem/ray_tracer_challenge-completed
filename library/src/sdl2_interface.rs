@@ -66,11 +66,14 @@ impl Sdl2Interface {
         }
     }
 
+    // Writes a pixel at (x, y), where (0, 0) is the bottom left of the canvas.
     // Doesn't update the canvas; for that, must invoke update_canvas().
     // Pixels outside the canvas are ignored.
     //
-    pub fn write_pixel(&mut self, x: i16, y: i16, color: crate::Color) {
+    pub fn write_pixel(&mut self, x: i16, mut y: i16, color: crate::Color) {
         let (width, height) = self.canvas.logical_size();
+
+        y = self.canvas_height() as i16 - y as i16 - 1;
 
         if x >= 0 && x < width as i16 && y >= 0 && y < height as i16 {
             self.pixels_buffer[y as usize * width as usize + x as usize] = color;
