@@ -1,7 +1,8 @@
 use demonstrate::demonstrate;
 
 use crate::tuple::{Tuple, POINT_TYPE, VECTOR_TYPE};
-use crate::EPSILON;
+use crate::{Axis, EPSILON};
+use std::f64::consts::PI;
 
 demonstrate! {
     describe "Tuple" {
@@ -190,6 +191,34 @@ demonstrate! {
                 let expected_result = Tuple::point(-8, 18, 32);
 
                 assert_eq!(tuple.scale(2, 3, 4), expected_result);
+            }
+
+            context "rotation" {
+                before { let sqrt_2 = 2.0_f64.sqrt(); }
+
+                it "should by performed by Pi/4 around the x axis" {
+                    let tuple = Tuple::point(0, 1, 0);
+
+                    let expected_result = Tuple::point(0, sqrt_2 / 2.0, sqrt_2 / 2.0);
+
+                    assert_eq!(tuple.rotate(Axis::X, PI / 4.0), expected_result);
+                }
+
+                it "should by performed by Pi/4 around the y axis" {
+                    let tuple = Tuple::point(0, 0, 1);
+
+                    let expected_result = Tuple::point(sqrt_2 / 2.0, 0, sqrt_2 / 2.0);
+
+                    assert_eq!(tuple.rotate(Axis::Y, PI / 4.0), expected_result);
+                }
+
+                it "should by performed by Pi/4 around the z axis" {
+                    let tuple = Tuple::point(0, 1, 0);
+
+                    let expected_result = Tuple::point(-sqrt_2 / 2.0, sqrt_2 / 2.0, 0);
+
+                    assert_eq!(tuple.rotate(Axis::Z, PI / 4.0), expected_result);
+                }
             }
         }
     }

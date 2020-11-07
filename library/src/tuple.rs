@@ -3,7 +3,7 @@ use std::{
     ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub},
 };
 
-use crate::{has_float64_value::HasFloat64Value, Matrix};
+use crate::{has_float64_value::HasFloat64Value, Axis, Matrix};
 
 use crate::EPSILON;
 
@@ -104,6 +104,10 @@ impl Tuple {
 
     pub fn scale<T: HasFloat64Value>(self, x: T, y: T, z: T) -> Tuple {
         Matrix::scaling(x, y, z) * self
+    }
+
+    pub fn rotate(self, axis: Axis, r: f64) -> Tuple {
+        Matrix::rotation(axis, r) * self
     }
 }
 

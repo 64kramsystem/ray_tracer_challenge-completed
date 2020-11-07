@@ -1,5 +1,5 @@
-use crate::has_float64_value::HasFloat64Value;
 use crate::tuple::Tuple;
+use crate::{has_float64_value::HasFloat64Value, Axis};
 
 use crate::EPSILON;
 
@@ -80,6 +80,36 @@ impl Matrix {
             0.0, 0.0, z,   0.0,
             0.0, 0.0, 0.0, 1.0,
         ];
+
+        Self::new(&transformation_values)
+    }
+
+    // r: radians.
+    //
+    pub fn rotation(axis: Axis, r: f64) -> Self {
+        let (cos_r, sin_r) = (r.cos(), r.sin());
+
+        #[rustfmt::skip]
+        let transformation_values = match axis {
+            Axis::X => [
+                1.0, 0.0,   0.0,    0.0,
+                0.0, cos_r, -sin_r, 0.0,
+                0.0, sin_r, cos_r,  0.0,
+                0.0, 0.0,   0.0,    1.0,
+            ],
+            Axis::Y => [
+                cos_r,  0.0, sin_r,  0.0,
+                0.0,    1.0, 0.0,    0.0,
+                -sin_r, 0.0, cos_r,  0.0,
+                0.0,    0.0, 0.0,    1.0,
+            ],
+            Axis::Z => [
+                cos_r,  -sin_r, 0.0, 0.0,
+                sin_r,  cos_r,  0.0, 0.0,
+                0.0,    0.0,    1.0, 0.0,
+                0.0,    0.0,    0.0, 1.0,
+            ]
+        };
 
         Self::new(&transformation_values)
     }
