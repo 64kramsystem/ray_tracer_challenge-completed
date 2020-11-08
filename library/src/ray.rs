@@ -1,6 +1,6 @@
-use crate::has_float64_value::HasFloat64Value;
-use crate::Tuple;
+use crate::{has_float64_value::HasFloat64Value, Tuple};
 
+#[derive(PartialEq, Debug)]
 pub struct Ray {
     pub origin: Tuple,
     pub direction: Tuple,
@@ -9,6 +9,13 @@ pub struct Ray {
 impl Ray {
     pub fn position<T: HasFloat64Value>(&self, t: T) -> Tuple {
         self.origin + self.direction * t.as_f64()
+    }
+
+    pub fn translate<T: HasFloat64Value>(&self, x: T, y: T, z: T) -> Self {
+        Self {
+            origin: self.origin.translate(x, y, z),
+            direction: self.direction,
+        }
     }
 
     // The sphere is assumed to be located at (0, 0, 0).

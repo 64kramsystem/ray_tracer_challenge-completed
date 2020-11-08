@@ -45,5 +45,21 @@ demonstrate! {
                 assert_eq!(ray.sphere_intersections(), None);
             }
         } // context "intersects with a sphere"
+
+        context "transformations" {
+            it "should translate a ray" {
+                let ray = Ray {
+                    origin: Tuple::point(1, 2, 3),
+                    direction: Tuple::vector(0, 1, 0),
+                };
+
+                let expected_ray = Ray {
+                    origin: Tuple::point(4, 6, 8),
+                    direction: Tuple::vector(0, 1, 0),
+                };
+
+                assert_eq!(ray.translate(3, 4, 5), expected_ray);
+            }
+        } // context "transformations"
     }
 }
