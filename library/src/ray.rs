@@ -25,8 +25,8 @@ impl Ray {
         }
     }
 
-    pub fn inverse_transform(&self, tranform: Matrix) -> Self {
-        let inverse_transform = tranform.inverse();
+    pub fn inverse_transform(&self, transform: Matrix) -> Self {
+        let inverse_transform = transform.inverse();
 
         if let Some(inverse_transform) = inverse_transform {
             let inverse_transform_clone = inverse_transform.clone();
