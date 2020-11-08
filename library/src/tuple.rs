@@ -86,11 +86,11 @@ impl Tuple {
         Self::vector(self.x / magnitude, self.y / magnitude, self.z / magnitude)
     }
 
-    pub fn dot_product(&self, rhs: Tuple) -> f64 {
+    pub fn dot_product(&self, rhs: &Tuple) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z + self.w * rhs.w
     }
 
-    pub fn cross_product(&self, rhs: Tuple) -> Tuple {
+    pub fn cross_product(&self, rhs: Tuple) -> Self {
         Tuple::vector(
             self.y * rhs.z - self.z * rhs.y,
             self.z * rhs.x - self.x * rhs.z,
@@ -98,16 +98,16 @@ impl Tuple {
         )
     }
 
-    pub fn translate<T: HasFloat64Value>(&self, x: T, y: T, z: T) -> Tuple {
-        Matrix::translation(x, y, z) * *self
+    pub fn translate<T: HasFloat64Value>(&self, x: T, y: T, z: T) -> Self {
+        Matrix::translation(x, y, z) * self
     }
 
-    pub fn scale<T: HasFloat64Value>(&self, x: T, y: T, z: T) -> Tuple {
-        Matrix::scaling(x, y, z) * *self
+    pub fn scale<T: HasFloat64Value>(&self, x: T, y: T, z: T) -> Self {
+        Matrix::scaling(x, y, z) * self
     }
 
-    pub fn rotate(&self, axis: Axis, r: f64) -> Tuple {
-        Matrix::rotation(axis, r) * *self
+    pub fn rotate(&self, axis: Axis, r: f64) -> Self {
+        Matrix::rotation(axis, r) * self
     }
 
     pub fn shear<T: HasFloat64Value>(
@@ -118,12 +118,12 @@ impl Tuple {
         y_pz: T,
         z_px: T,
         z_py: T,
-    ) -> Tuple {
-        Matrix::shearing(x_py, x_pz, y_px, y_pz, z_px, z_py) * self
+    ) -> Self {
+        Matrix::shearing(x_py, x_pz, y_px, y_pz, z_px, z_py) * &self
     }
 
-    pub fn reflect(&self, normal: Tuple) -> Tuple {
-        *self - normal * 2.0 * self.dot_product(normal)
+    pub fn reflect(&self, normal: &Tuple) -> Self {
+        *self - &(*normal * 2.0 * self.dot_product(normal))
     }
 }
 
@@ -166,11 +166,11 @@ impl PartialEq for Tuple {
     }
 }
 
-impl Add for Tuple {
-    type Output = Tuple;
+impl Add<&Self> for Tuple {
+    type Output = Self;
 
-    fn add(self, rhs: Self) -> Self::Output {
-        Tuple {
+    fn add(self, rhs: &Self) -> Self::Output {
+        Self {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
             z: self.z + rhs.z,
@@ -179,11 +179,11 @@ impl Add for Tuple {
     }
 }
 
-impl Sub for Tuple {
-    type Output = Tuple;
+impl Sub<&Self> for Tuple {
+    type Output = Self;
 
-    fn sub(self, rhs: Self) -> Self::Output {
-        Tuple {
+    fn sub(self, rhs: &Self) -> Self::Output {
+        Self {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
             z: self.z - rhs.z,
@@ -193,10 +193,10 @@ impl Sub for Tuple {
 }
 
 impl Neg for Tuple {
-    type Output = Tuple;
+    type Output = Self;
 
     fn neg(self) -> Self::Output {
-        Tuple {
+        Self {
             x: -self.x,
             y: -self.y,
             z: -self.z,
@@ -206,10 +206,10 @@ impl Neg for Tuple {
 }
 
 impl Mul<f64> for Tuple {
-    type Output = Tuple;
+    type Output = Self;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Tuple {
+        Self {
             x: self.x * rhs,
             y: self.y * rhs,
             z: self.z * rhs,
@@ -219,10 +219,10 @@ impl Mul<f64> for Tuple {
 }
 
 impl Div<f64> for Tuple {
-    type Output = Tuple;
+    type Output = Self;
 
     fn div(self, rhs: f64) -> Self::Output {
-        Tuple {
+        Self {
             x: self.x / rhs,
             y: self.y / rhs,
             z: self.z / rhs,

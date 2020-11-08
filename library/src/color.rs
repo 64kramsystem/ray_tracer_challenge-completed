@@ -45,11 +45,11 @@ impl PartialEq for Color {
     }
 }
 
-impl Add for Color {
-    type Output = Color;
+impl Add<&Self> for Color {
+    type Output = Self;
 
-    fn add(self, rhs: Self) -> Self::Output {
-        Color {
+    fn add(self, rhs: &Self) -> Self::Output {
+        Self {
             r: self.r + rhs.r,
             g: self.g + rhs.g,
             b: self.b + rhs.b,
@@ -57,11 +57,11 @@ impl Add for Color {
     }
 }
 
-impl Sub for Color {
-    type Output = Color;
+impl Sub<&Self> for Color {
+    type Output = Self;
 
-    fn sub(self, rhs: Self) -> Self::Output {
-        Color {
+    fn sub(self, rhs: &Self) -> Self::Output {
+        Self {
             r: self.r - rhs.r,
             g: self.g - rhs.g,
             b: self.b - rhs.b,
@@ -72,10 +72,10 @@ impl Sub for Color {
 // The text doesn't specify the range and signedness of the scalar, so a conservative choice is made.
 //
 impl Mul<i32> for Color {
-    type Output = Color;
+    type Output = Self;
 
     fn mul(self, rhs: i32) -> Self::Output {
-        Color {
+        Self {
             r: self.r * rhs as f64,
             g: self.g * rhs as f64,
             b: self.b * rhs as f64,
@@ -84,10 +84,10 @@ impl Mul<i32> for Color {
 }
 
 impl Mul<f64> for Color {
-    type Output = Color;
+    type Output = Self;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Color {
+        Self {
             r: self.r * rhs,
             g: self.g * rhs,
             b: self.b * rhs,
@@ -97,11 +97,11 @@ impl Mul<f64> for Color {
 
 // "Hadamard product".
 //
-impl Mul<Color> for Color {
-    type Output = Color;
+impl Mul<&Self> for Color {
+    type Output = Self;
 
-    fn mul(self, rhs: Color) -> Self::Output {
-        Color {
+    fn mul(self, rhs: &Self) -> Self::Output {
+        Self {
             r: self.r * rhs.r,
             g: self.g * rhs.g,
             b: self.b * rhs.b,

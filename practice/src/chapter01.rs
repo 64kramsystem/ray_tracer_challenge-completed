@@ -23,8 +23,8 @@ impl Projectile {
     }
 
     pub fn tick(&mut self, gravity: Tuple, wind: Tuple) {
-        self.position = self.position + self.velocity;
-        self.velocity = self.velocity + gravity + wind;
+        self.position = self.position + &self.velocity;
+        self.velocity = self.velocity + &gravity + &wind;
     }
 }
 

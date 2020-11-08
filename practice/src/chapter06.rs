@@ -22,8 +22,8 @@ pub fn practice() {
     let mut sphere = Sphere::new();
     sphere.material.color = Color::new(1, 0.2, 1);
     sphere.transformation = Matrix::translation(10, 0, 0)
-        * Matrix::rotation(Axis::Z, -PI / 4.0)
-        * Matrix::scaling(6.25, 12.5, 12.5);
+        * &Matrix::rotation(Axis::Z, -PI / 4.0)
+        * &Matrix::scaling(6.25, 12.5, 12.5);
 
     let light = PointLight::new(light_position, Color::new(1, 1, 1));
 
@@ -40,14 +40,14 @@ pub fn practice() {
                 direction: eye_ray_direction,
             };
 
-            if let Some(hit) = eye_ray.hit(sphere.clone()) {
+            if let Some(hit) = eye_ray.hit(&sphere) {
                 let hit_point = eye_ray.position(hit);
-                let hit_normal = sphere.normal(hit_point);
+                let hit_normal = sphere.normal(&hit_point);
 
                 let light_color =
                     sphere
                         .material
-                        .lighting(&light, hit_point, -eye_ray.direction, hit_normal);
+                        .lighting(&light, &hit_point, &-eye_ray.direction, &hit_normal);
 
                 interface.write_pixel(x, y, light_color);
             };

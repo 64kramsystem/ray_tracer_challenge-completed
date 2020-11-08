@@ -26,14 +26,20 @@ impl Default for Material {
 }
 
 impl Material {
-    pub fn lighting(&self, light: &PointLight, point: Tuple, eyev: Tuple, normalv: Tuple) -> Color {
-        let effective_color = self.color * light.intensity;
+    pub fn lighting(
+        &self,
+        light: &PointLight,
+        point: &Tuple,
+        eyev: &Tuple,
+        normalv: &Tuple,
+    ) -> Color {
+        let effective_color = self.color * &light.intensity;
 
         let lightv = (light.position - point).normalize();
 
         let ambient = effective_color * self.ambient;
 
-        let light_dot_normal = lightv.dot_product(normalv);
+        let light_dot_normal = lightv.dot_product(&normalv);
 
         let (diffuse, specular) = if light_dot_normal < 0.0 {
             let diffuse = Color::new(0, 0, 0);
@@ -43,8 +49,8 @@ impl Material {
         } else {
             let diffuse = effective_color * self.diffuse * light_dot_normal;
 
-            let reflectv = -lightv.reflect(normalv);
-            let reflect_dot_eye = reflectv.dot_product(eyev);
+            let reflectv = -lightv.reflect(&normalv);
+            let reflect_dot_eye = reflectv.dot_product(&eyev);
 
             let specular = if reflect_dot_eye <= 0.0 {
                 Color::new(0, 0, 0)
@@ -57,6 +63,6 @@ impl Material {
             (diffuse, specular)
         };
 
-        ambient + diffuse + specular
+        ambient + &diffuse + &specular
     }
 }

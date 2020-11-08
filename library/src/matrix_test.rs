@@ -84,7 +84,7 @@ demonstrate! {
                         16, 26,  46,  42,
                     ]);
 
-                    assert_eq!(matrix1 * matrix2, expected_result);
+                    assert_eq!(matrix1 * &matrix2, expected_result);
                 }
 
                 it "should be performed against a tuple" {
@@ -109,7 +109,7 @@ demonstrate! {
                         1,
                     );
 
-                    assert_eq!(matrix * tuple, expected_result);
+                    assert_eq!(matrix * &tuple, expected_result);
                 }
 
                 it "against an identity matrix should return a matrix equal to the first one" {
@@ -120,9 +120,7 @@ demonstrate! {
                         0, 0, 0, 1,
                     ]);
 
-                    let expected_result = matrix.clone();
-
-                    assert_eq!(matrix * Matrix::identity(4), expected_result)
+                    assert_eq!(&matrix * &Matrix::identity(4), matrix)
                 }
             } // describe "multiplication"
 

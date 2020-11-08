@@ -53,7 +53,7 @@ demonstrate! {
         it "should return the normal on a transformed sphere" {
             let sphere = Sphere::new().translate(0, 1, 0);
 
-            let actual_normal = sphere.normal(Tuple::point(0.0, 1.70711, -0.70711));
+            let actual_normal = sphere.normal(&Tuple::point(0.0, 1.70711, -0.70711));
             let expected_normal = Tuple::vector(0, 0.70711, -0.70711);
 
             assert_eq!(actual_normal, expected_normal);
