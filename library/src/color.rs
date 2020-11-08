@@ -83,6 +83,18 @@ impl Mul<i32> for Color {
     }
 }
 
+impl Mul<f64> for Color {
+    type Output = Color;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Color {
+            r: self.r * rhs,
+            g: self.g * rhs,
+            b: self.b * rhs,
+        }
+    }
+}
+
 // "Hadamard product".
 //
 impl Mul<Color> for Color {
