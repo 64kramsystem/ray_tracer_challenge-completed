@@ -65,4 +65,12 @@ impl Ray {
             Some((t1, t2))
         }
     }
+
+    pub fn hits(&self, sphere: Sphere) -> bool {
+        if let Some((t1, t2)) = self.intersections(sphere) {
+            t2 >= 0.0 || t1 >= 0.0
+        } else {
+            false
+        }
+    }
 }

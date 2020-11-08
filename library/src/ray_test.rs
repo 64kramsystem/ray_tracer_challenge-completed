@@ -2,7 +2,6 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Ray" {
-        use crate::matrix::Matrix;
         use crate::ray::Ray;
         use crate::sphere::Sphere;
         use crate::tuple::Tuple;
@@ -27,7 +26,7 @@ demonstrate! {
                         direction: Tuple::vector(0, 0, 1)
                     };
 
-                    let sphere = Sphere::new(None);
+                    let sphere = Sphere::new();
 
                     assert_eq!(ray.intersections(sphere), Some((4.0, 6.0)));
                 }
@@ -38,7 +37,7 @@ demonstrate! {
                         direction: Tuple::vector(0, 0, 1)
                     };
 
-                    let sphere = Sphere::new(None);
+                    let sphere = Sphere::new();
 
                     assert_eq!(ray.intersections(sphere), Some((5.0, 5.0)));
                 }
@@ -49,7 +48,7 @@ demonstrate! {
                         direction: Tuple::vector(0, 0, 1)
                     };
 
-                    let sphere = Sphere::new(None);
+                    let sphere = Sphere::new();
 
                     assert_eq!(ray.intersections(sphere), None);
                 }
@@ -62,7 +61,7 @@ demonstrate! {
                         direction: Tuple::vector(0, 0, 1)
                     };
 
-                    let sphere = Sphere::new(Some(Matrix::scaling(2, 2, 2)));
+                    let sphere = Sphere::new().scale(2, 2, 2);
 
                     assert_eq!(ray.intersections(sphere), Some((3.0, 7.0)));
                 }
@@ -73,7 +72,7 @@ demonstrate! {
                         direction: Tuple::vector(0, 0, 1)
                     };
 
-                    let sphere = Sphere::new(Some(Matrix::translation(5, 0, 0)));
+                    let sphere = Sphere::new().translate(5, 0, 0);
 
                     assert_eq!(ray.intersections(sphere), None);
                 }
