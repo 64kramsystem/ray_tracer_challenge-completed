@@ -60,6 +60,20 @@ demonstrate! {
 
                 assert_eq!(ray.translate(3, 4, 5), expected_ray);
             }
+
+            it "should scale a ray" {
+                let ray = Ray {
+                    origin: Tuple::point(1, 2, 3),
+                    direction: Tuple::vector(0, 1, 0),
+                };
+
+                let expected_ray = Ray {
+                    origin: Tuple::point(2, 6, 12),
+                    direction: Tuple::vector(0, 3, 0),
+                };
+
+                assert_eq!(ray.scale(2, 3, 4), expected_ray);
+            }
         } // context "transformations"
     }
 }

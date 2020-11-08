@@ -18,6 +18,13 @@ impl Ray {
         }
     }
 
+    pub fn scale<T: HasFloat64Value + Copy>(&self, x: T, y: T, z: T) -> Self {
+        Self {
+            origin: self.origin.scale(x, y, z),
+            direction: self.direction.scale(x, y, z),
+        }
+    }
+
     // The sphere is assumed to be located at (0, 0, 0).
     //
     pub fn sphere_intersections(&self) -> Option<(f64, f64)> {
