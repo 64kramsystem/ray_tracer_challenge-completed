@@ -3,14 +3,18 @@ mod export_to_pixels;
 mod has_float64_value;
 mod matrix;
 mod ppm_encoder;
+mod ray;
 mod sdl2_interface;
+mod sphere;
 mod tuple;
 
 pub use color::Color;
 pub use export_to_pixels::ExportToPixels;
 pub use matrix::Matrix;
 pub use ppm_encoder::PpmEncoder;
+pub use ray::Ray;
 pub use sdl2_interface::Sdl2Interface;
+pub use sphere::Sphere;
 pub use tuple::Tuple;
 
 pub const EPSILON: f64 = 1e-4;
@@ -36,3 +40,9 @@ mod ppm_encoder_test;
 
 #[cfg(test)]
 mod matrix_test;
+
+#[cfg(test)]
+mod ray_test;
+
+#[cfg(test)]
+mod sphere_test;
