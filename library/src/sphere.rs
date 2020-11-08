@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use crate::{has_float64_value::HasFloat64Value, Axis, Matrix, Tuple};
+use crate::{has_float64_value::HasFloat64Value, Axis, Material, Matrix, Tuple};
 
 lazy_static::lazy_static! {
   static ref NEXT_ID: Mutex<u32> = Mutex::new(1);
@@ -11,6 +11,7 @@ pub struct Sphere {
     pub id: u32,
     // Defaults to an identity matrix of order 4.
     pub transformation: Matrix,
+    pub material: Material,
 }
 
 impl Sphere {
@@ -25,6 +26,7 @@ impl Sphere {
         Self {
             id: next_id,
             transformation,
+            material: Material::default(),
         }
     }
 

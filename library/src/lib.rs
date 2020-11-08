@@ -1,7 +1,9 @@
 mod color;
 mod export_to_pixels;
 mod has_float64_value;
+mod material;
 mod matrix;
+mod point_light;
 mod ppm_encoder;
 mod ray;
 mod sdl2_interface;
@@ -10,7 +12,9 @@ mod tuple;
 
 pub use color::Color;
 pub use export_to_pixels::ExportToPixels;
+pub use material::Material;
 pub use matrix::Matrix;
+pub use point_light::PointLight;
 pub use ppm_encoder::PpmEncoder;
 pub use ray::Ray;
 pub use sdl2_interface::Sdl2Interface;
@@ -46,3 +50,6 @@ mod ray_test;
 
 #[cfg(test)]
 mod sphere_test;
+
+#[cfg(test)]
+mod material_test;
