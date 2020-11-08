@@ -121,6 +121,10 @@ impl Tuple {
     ) -> Tuple {
         Matrix::shearing(x_py, x_pz, y_px, y_pz, z_px, z_py) * self
     }
+
+    pub fn reflect(&self, normal: Tuple) -> Tuple {
+        *self - normal * 2.0 * self.dot_product(normal)
+    }
 }
 
 // Index[Mut] implementations are for the lulz, although they're actually convenient for matrix operations.

@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use crate::{has_float64_value::HasFloat64Value, Axis, Matrix};
+use crate::{has_float64_value::HasFloat64Value, Axis, Matrix, Tuple};
 
 lazy_static::lazy_static! {
   static ref NEXT_ID: Mutex<u32> = Mutex::new(1);
@@ -50,5 +50,31 @@ impl Sphere {
         let new_transformation = transformation * self.transformation;
         self.transformation = new_transformation;
         self
+    }
+
+    // Not clear if this is actually useful (it's used once in world normal()).
+    //
+    // pub fn normal<T: HasFloat64Value>(point_x: T, point_y: T, point_z: T) -> Tuple {
+    //     Tuple::point(point_x, point_y, point_z) - Tuple::point(0, 0, 0)
+    // }
+
+    pub fn normal(&self, world_point: Tuple) -> Tuple {
+        let object_point = if let Some(inverse) = self.transformation.inverse() {
+            inverse * world_point
+        } else {
+            panic!()
+        };
+
+        let object_normal = object_point - Tuple::point(0, 0, 0);
+
+        let mut world_normal = if let Some(inverse) = self.transformation.inverse() {
+            inverse.transpose() * object_normal
+        } else {
+            panic!()
+        };
+
+        world_normal.w = 0.0;
+
+        world_normal.normalize()
     }
 }

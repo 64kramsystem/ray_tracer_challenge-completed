@@ -287,5 +287,14 @@ demonstrate! {
                 assert_eq!(current_result, expected_result);
             }
         } // context "transformations"
+
+        it "should reflect" {
+            let vector = Tuple::vector(1, -1, 0);
+            let normal = Tuple::vector(0, 1, 0);
+
+            let expected_reflection = Tuple::vector(1, 1, 0);
+
+            assert_eq!(vector.reflect(normal), expected_reflection);
+        }
     }
 }
