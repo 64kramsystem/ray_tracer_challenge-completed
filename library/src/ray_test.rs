@@ -2,7 +2,9 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Ray" {
+        use crate::matrix::Matrix;
         use crate::ray::Ray;
+        use crate::sphere::Sphere;
         use crate::tuple::Tuple;
 
         it "should compute a position at t" {
@@ -17,34 +19,66 @@ demonstrate! {
             assert_eq!(ray.position(2.5), Tuple::point(4.5, 3, 4));
         }
 
-        context "intersects with a sphere" {
-            it "at two points" {
-                let ray = Ray {
-                    origin: Tuple::point(0, 0, -5),
-                    direction: Tuple::vector(0, 0, 1)
-                };
+        context "returns the intersections" {
+            context "with an untransformed sphere" {
+                it "at two points" {
+                    let ray = Ray {
+                        origin: Tuple::point(0, 0, -5),
+                        direction: Tuple::vector(0, 0, 1)
+                    };
 
-                assert_eq!(ray.sphere_intersections(), Some((4.0, 6.0)));
-            }
+                    let sphere = Sphere::new(None);
 
-            it "at a tangent" {
-                let ray = Ray {
-                    origin: Tuple::point(0, 1, -5),
-                    direction: Tuple::vector(0, 0, 1)
-                };
+                    assert_eq!(ray.intersections(sphere), Some((4.0, 6.0)));
+                }
 
-                assert_eq!(ray.sphere_intersections(), Some((5.0, 5.0)));
-            }
+                it "at a tangent" {
+                    let ray = Ray {
+                        origin: Tuple::point(0, 1, -5),
+                        direction: Tuple::vector(0, 0, 1)
+                    };
 
-            it "at no point (miss)" {
-                let ray = Ray {
-                    origin: Tuple::point(0, 2, -5),
-                    direction: Tuple::vector(0, 0, 1)
-                };
+                    let sphere = Sphere::new(None);
 
-                assert_eq!(ray.sphere_intersections(), None);
-            }
-        } // context "intersects with a sphere"
+                    assert_eq!(ray.intersections(sphere), Some((5.0, 5.0)));
+                }
+
+                it "at no point (miss)" {
+                    let ray = Ray {
+                        origin: Tuple::point(0, 2, -5),
+                        direction: Tuple::vector(0, 0, 1)
+                    };
+
+                    let sphere = Sphere::new(None);
+
+                    assert_eq!(ray.intersections(sphere), None);
+                }
+            } // context "with an untransformed sphere"
+
+            context "with a transformed sphere" {
+                it "scaled" {
+                    let ray = Ray {
+                        origin: Tuple::point(0, 0, -5),
+                        direction: Tuple::vector(0, 0, 1)
+                    };
+
+                    let sphere = Sphere::new(Some(Matrix::scaling(2, 2, 2)));
+
+                    assert_eq!(ray.intersections(sphere), Some((3.0, 7.0)));
+                }
+
+                it "translated" {
+                    let ray = Ray {
+                        origin: Tuple::point(0, 0, -5),
+                        direction: Tuple::vector(0, 0, 1)
+                    };
+
+                    let sphere = Sphere::new(Some(Matrix::translation(5, 0, 0)));
+
+                    assert_eq!(ray.intersections(sphere), None);
+                }
+            } // context "with a transformed sphere"
+        } // context "returns the intersections"
 
         context "transformations" {
             it "should translate a ray" {

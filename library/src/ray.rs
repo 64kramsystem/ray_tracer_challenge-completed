@@ -1,4 +1,4 @@
-use crate::{has_float64_value::HasFloat64Value, Tuple};
+use crate::{has_float64_value::HasFloat64Value, Matrix, Sphere, Tuple};
 
 #[derive(PartialEq, Debug)]
 pub struct Ray {
@@ -25,14 +25,33 @@ impl Ray {
         }
     }
 
+    pub fn inverse_transform(&self, tranform: Matrix) -> Self {
+        let inverse_transform = tranform.inverse();
+
+        if let Some(inverse_transform) = inverse_transform {
+            let inverse_transform_clone = inverse_transform.clone();
+
+            Self {
+                origin: inverse_transform * self.origin,
+                direction: inverse_transform_clone * self.direction,
+            }
+        } else {
+            panic!("Non-invertible transform matrix!")
+        }
+    }
+
     // The sphere is assumed to be located at (0, 0, 0).
     //
-    pub fn sphere_intersections(&self) -> Option<(f64, f64)> {
-        let sphere_location = Tuple::point(0, 0, 0);
-        let sphere_to_ray = self.origin - sphere_location;
+    pub fn intersections(&self, sphere: Sphere) -> Option<(f64, f64)> {
+        let transformed_ray = self.inverse_transform(sphere.transformation);
 
-        let a = self.direction.dot_product(self.direction);
-        let b = 2.0 * self.direction.dot_product(sphere_to_ray);
+        let sphere_location = Tuple::point(0, 0, 0);
+        let sphere_to_ray = transformed_ray.origin - sphere_location;
+
+        let a = transformed_ray
+            .direction
+            .dot_product(transformed_ray.direction);
+        let b = 2.0 * transformed_ray.direction.dot_product(sphere_to_ray);
         let c = sphere_to_ray.dot_product(sphere_to_ray) - 1.0;
 
         let discriminant = b.powi(2) - 4.0 * a * c;
