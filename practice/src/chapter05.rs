@@ -44,7 +44,7 @@ pub fn practice() {
                 direction: ray_direction,
             };
 
-            if ray.hits(sphere.clone()) {
+            if let Some(_) = ray.hit(sphere.clone()) {
                 interface.write_pixel(x, y, hit_color);
             };
         }

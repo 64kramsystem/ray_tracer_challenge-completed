@@ -66,11 +66,23 @@ impl Ray {
         }
     }
 
-    pub fn hits(&self, sphere: Sphere) -> bool {
+    pub fn hit(&self, sphere: Sphere) -> Option<f64> {
         if let Some((t1, t2)) = self.intersections(sphere) {
-            t2 >= 0.0 || t1 >= 0.0
+            if t1 >= 0.0 {
+                if t2 >= 0.0 {
+                    Some(f64::min(t1, t2))
+                } else {
+                    Some(t1)
+                }
+            } else {
+                if t2 >= 0.0 {
+                    Some(t2)
+                } else {
+                    None
+                }
+            }
         } else {
-            false
+            None
         }
     }
 }
