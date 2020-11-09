@@ -1,4 +1,4 @@
-use crate::{has_float64_value::HasFloat64Value, Matrix, Sphere, Tuple};
+use crate::{has_float64_value::HasFloat64Value, IntersectionState, Matrix, Sphere, Tuple};
 
 #[derive(PartialEq, Debug)]
 pub struct Ray {
@@ -62,6 +62,20 @@ impl Ray {
             let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
 
             Some((t1, t2))
+        }
+    }
+
+    pub fn intersection_state<'a>(&self, t: f64, object: &'a Sphere) -> IntersectionState<'a> {
+        let point = self.position(t);
+        let eyev = -self.direction;
+        let normalv = object.normal(&point);
+
+        IntersectionState {
+            t,
+            object,
+            point,
+            eyev,
+            normalv,
         }
     }
 

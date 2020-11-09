@@ -2,6 +2,7 @@ mod color;
 mod export_to_pixels;
 mod has_float64_value;
 mod intersection;
+mod intersection_state;
 mod material;
 mod matrix;
 mod point_light;
@@ -10,10 +11,11 @@ mod ray;
 mod sdl2_interface;
 mod sphere;
 mod tuple;
+mod world;
 
 pub use color::Color;
 pub use export_to_pixels::ExportToPixels;
-use intersection::Intersection;
+pub use intersection_state::IntersectionState;
 pub use material::Material;
 pub use matrix::Matrix;
 pub use point_light::PointLight;
@@ -22,6 +24,7 @@ pub use ray::Ray;
 pub use sdl2_interface::Sdl2Interface;
 pub use sphere::Sphere;
 pub use tuple::Tuple;
+pub use world::World;
 
 pub const EPSILON: f64 = 1e-4;
 
@@ -55,3 +58,6 @@ mod sphere_test;
 
 #[cfg(test)]
 mod material_test;
+
+#[cfg(test)]
+mod world_test;

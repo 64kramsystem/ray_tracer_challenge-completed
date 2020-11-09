@@ -6,7 +6,7 @@ lazy_static::lazy_static! {
   static ref NEXT_ID: Mutex<u32> = Mutex::new(1);
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Sphere {
     pub id: u32,
     // Defaults to an identity matrix of order 4.

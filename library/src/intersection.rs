@@ -6,8 +6,8 @@ use crate::Sphere;
 //
 #[derive(Debug)]
 pub struct Intersection<'a> {
-    t: f64,
-    object: &'a Sphere,
+    pub t: f64,
+    pub object: &'a Sphere,
 }
 
 // This only informs the compiler that the type supports (full) equivalence.

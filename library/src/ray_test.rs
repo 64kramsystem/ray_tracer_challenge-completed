@@ -5,6 +5,7 @@ demonstrate! {
         use crate::ray::Ray;
         use crate::sphere::Sphere;
         use crate::tuple::Tuple;
+        use crate::intersection_state::IntersectionState;
 
         it "should compute a position at t" {
             let ray = Ray {
@@ -78,6 +79,27 @@ demonstrate! {
                 }
             } // context "with a transformed sphere"
         } // context "returns the intersections"
+
+        context "intersection state" {
+            it "should be computed from an intersection and an object" {
+                let ray = Ray {
+                    origin: Tuple::point(0, 0, -5),
+                    direction: Tuple::vector(0, 0, 1)
+                };
+                let object = &Sphere::new();
+                let t = 4.0;
+
+                let expected_intersection_state = IntersectionState {
+                    t,
+                    object,
+                    point: Tuple::point(0, 0, -1),
+                    eyev: Tuple::vector(0, 0, -1),
+                    normalv: Tuple::vector(0, 0, -1),
+                };
+
+                assert_eq!(ray.intersection_state(t, &object), expected_intersection_state);
+            }
+        } // context "intersection state"
 
         context "transformations" {
             it "should translate a ray" {
