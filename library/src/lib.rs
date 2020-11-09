@@ -1,6 +1,7 @@
 mod color;
 mod export_to_pixels;
 mod has_float64_value;
+mod intersection;
 mod material;
 mod matrix;
 mod point_light;
@@ -12,6 +13,7 @@ mod tuple;
 
 pub use color::Color;
 pub use export_to_pixels::ExportToPixels;
+use intersection::Intersection;
 pub use material::Material;
 pub use matrix::Matrix;
 pub use point_light::PointLight;
