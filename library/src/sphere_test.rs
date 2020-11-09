@@ -19,11 +19,25 @@ demonstrate! {
             assert_eq!(sphere.transformation, expected_transformation);
         }
 
-        it "should return consecutive ids for each new Sphere" {
+        // There's no simple solution to this. The `serial_test` crate can't be used with `demonstrate!`.
+        // If we make the lock public, we still can't acquire it inside the UT, because the acquisition
+        // inside Sphere::new() will wait.
+        // Therefore, without adhoc modifications (which are not worth), it seems that we can't test the
+        // increase by one unit.
+        //
+        // Unfortunately, this must be made public for testing purposes; the new() method can be invoked from
+        // anywhere, so there's no way to isolate UTs requiring locking.
+        //
+        it "should return monotonically incrementing ids for each new Sphere" {
             let start_id = Sphere::new().id;
 
-            assert_eq!(Sphere::new().id, start_id + 1);
-            assert_eq!(Sphere::new().id, start_id + 2);
+            let next_id = Sphere::new().id;
+
+            assert!(next_id > start_id);
+
+            let next_id_2 = Sphere::new().id;
+
+            assert!(next_id_2 > next_id);
         }
 
         // See note on the method.
