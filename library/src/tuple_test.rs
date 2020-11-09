@@ -71,7 +71,7 @@ demonstrate! {
 
             let expected_tuple = Tuple { x: 1.0, y: 1.0, z: 6.0, w: 1.0 };
 
-            assert_eq!(tuple1 + tuple2, expected_tuple);
+            assert_eq!(tuple1 + &tuple2, expected_tuple);
         }
 
         context "as point" {
@@ -81,7 +81,7 @@ demonstrate! {
 
                 let expected_tuple = Tuple::vector(-2.0, -4.0, -6.0);
 
-                assert_eq!(tuple1 - tuple2, expected_tuple);
+                assert_eq!(tuple1 - &tuple2, expected_tuple);
             }
         } // context "as point"
 
@@ -92,7 +92,7 @@ demonstrate! {
 
                 let expected_tuple = Tuple::point(-2.0, -4.0, -6.0);
 
-                assert_eq!(tuple1 - tuple2, expected_tuple);
+                assert_eq!(tuple1 - &tuple2, expected_tuple);
             }
 
             it "can be subtracted from a vector" {
@@ -101,7 +101,7 @@ demonstrate! {
 
                 let expected_tuple = Tuple::vector(-2.0, -4.0, -6.0);
 
-                assert_eq!(tuple1 - tuple2, expected_tuple);
+                assert_eq!(tuple1 - &tuple2, expected_tuple);
             }
 
             it "can be normalized" {
@@ -128,7 +128,7 @@ demonstrate! {
 
             let expected_tuple = Tuple::vector(-5.0, -6.0, -7.0);
 
-            assert_eq!(tuple1 - tuple2, expected_tuple);
+            assert_eq!(tuple1 - &tuple2, expected_tuple);
         }
 
         // At this stage of the book, it's unclear why the book negates a non-meaningful tuple.
@@ -173,7 +173,7 @@ demonstrate! {
 
             let expected_dot_product = 20.0;
 
-            assert_eq!(tuple1.dot_product(tuple2), expected_dot_product);
+            assert_eq!(tuple1.dot_product(&tuple2), expected_dot_product);
         }
 
         context "transformations" {
@@ -287,5 +287,14 @@ demonstrate! {
                 assert_eq!(current_result, expected_result);
             }
         } // context "transformations"
+
+        it "should reflect" {
+            let vector = Tuple::vector(1, -1, 0);
+            let normal = Tuple::vector(0, 1, 0);
+
+            let expected_reflection = Tuple::vector(1, 1, 0);
+
+            assert_eq!(vector.reflect(&normal), expected_reflection);
+        }
     }
 }

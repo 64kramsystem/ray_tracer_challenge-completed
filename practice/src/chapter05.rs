@@ -27,8 +27,8 @@ pub fn practice() {
 
     let mut sphere = Sphere::new();
     let transformation = Matrix::translation(10, 0, 0)
-        * Matrix::rotation(Axis::Z, -PI / 4.0)
-        * Matrix::scaling(6.25, 12.5, 12.5);
+        * &Matrix::rotation(Axis::Z, -PI / 4.0)
+        * &Matrix::scaling(6.25, 12.5, 12.5);
     sphere.transformation = transformation;
 
     let ray_origin = Tuple::point(0, 0, eye_z);
@@ -44,7 +44,7 @@ pub fn practice() {
                 direction: ray_direction,
             };
 
-            if ray.hits(sphere.clone()) {
+            if let Some(_) = ray.hit(&sphere) {
                 interface.write_pixel(x, y, hit_color);
             };
         }

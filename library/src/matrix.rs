@@ -153,12 +153,12 @@ impl Matrix {
     }
 
     pub fn transpose(&self) -> Self {
-        let mut result = self.values.clone();
         let order = self.values.len();
+        let mut result = vec![Vec::with_capacity(order); order];
 
-        for y in 0..order {
+        for (y, result_row) in result.iter_mut().enumerate() {
             for x in 0..order {
-                result[y][x] = self[x][y];
+                result_row.push(self[x][y]);
             }
         }
 
@@ -177,7 +177,7 @@ impl Matrix {
         }
     }
 
-    pub fn submatrix(&self, y: usize, x: usize) -> Matrix {
+    pub fn submatrix(&self, y: usize, x: usize) -> Self {
         let order = self.values.len();
 
         let mut result = Vec::with_capacity(order - 1);
@@ -223,7 +223,7 @@ impl Matrix {
         unsafe { transmute::<_, f64>(minor_bits ^ sign_bits) }
     }
 
-    pub fn inverse(&self) -> Option<Matrix> {
+    pub fn inverse(&self) -> Option<Self> {
         let determinant = self.determinant();
 
         if determinant == 0.0 {
@@ -275,10 +275,18 @@ impl PartialEq for Matrix {
     }
 }
 
-impl Mul<Matrix> for Matrix {
+impl Mul<&Matrix> for Matrix {
+    type Output = Self;
+
+    fn mul(self, rhs: &Matrix) -> Self::Output {
+        &self * rhs
+    }
+}
+
+impl Mul<&Matrix> for &Matrix {
     type Output = Matrix;
 
-    fn mul(self, rhs: Matrix) -> Self::Output {
+    fn mul(self, rhs: &Matrix) -> Self::Output {
         let order = self.values.len();
 
         // Pre-initializing makes the multiplication logic easier to understand.
@@ -295,10 +303,18 @@ impl Mul<Matrix> for Matrix {
     }
 }
 
-impl Mul<Tuple> for Matrix {
+impl Mul<&Tuple> for Matrix {
     type Output = Tuple;
 
-    fn mul(self, rhs: Tuple) -> Self::Output {
+    fn mul(self, rhs: &Tuple) -> Self::Output {
+        &self * rhs
+    }
+}
+
+impl Mul<&Tuple> for &Matrix {
+    type Output = Tuple;
+
+    fn mul(self, rhs: &Tuple) -> Self::Output {
         let order = self.values.len();
 
         if order != 4 {

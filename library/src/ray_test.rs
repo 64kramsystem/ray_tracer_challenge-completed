@@ -28,7 +28,7 @@ demonstrate! {
 
                     let sphere = Sphere::new();
 
-                    assert_eq!(ray.intersections(sphere), Some((4.0, 6.0)));
+                    assert_eq!(ray.intersections(&sphere), Some((4.0, 6.0)));
                 }
 
                 it "at a tangent" {
@@ -39,7 +39,7 @@ demonstrate! {
 
                     let sphere = Sphere::new();
 
-                    assert_eq!(ray.intersections(sphere), Some((5.0, 5.0)));
+                    assert_eq!(ray.intersections(&sphere), Some((5.0, 5.0)));
                 }
 
                 it "at no point (miss)" {
@@ -50,7 +50,7 @@ demonstrate! {
 
                     let sphere = Sphere::new();
 
-                    assert_eq!(ray.intersections(sphere), None);
+                    assert_eq!(ray.intersections(&sphere), None);
                 }
             } // context "with an untransformed sphere"
 
@@ -63,7 +63,7 @@ demonstrate! {
 
                     let sphere = Sphere::new().scale(2, 2, 2);
 
-                    assert_eq!(ray.intersections(sphere), Some((3.0, 7.0)));
+                    assert_eq!(ray.intersections(&sphere), Some((3.0, 7.0)));
                 }
 
                 it "translated" {
@@ -74,7 +74,7 @@ demonstrate! {
 
                     let sphere = Sphere::new().translate(5, 0, 0);
 
-                    assert_eq!(ray.intersections(sphere), None);
+                    assert_eq!(ray.intersections(&sphere), None);
                 }
             } // context "with a transformed sphere"
         } // context "returns the intersections"

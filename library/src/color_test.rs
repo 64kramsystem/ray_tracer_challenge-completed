@@ -12,7 +12,7 @@ demonstrate! {
 
             let expected_color = Color { r: 1.6, g: 0.7, b: 1.0 };
 
-            assert_eq!(color1 + color2, expected_color);
+            assert_eq!(color1 + &color2, expected_color);
         }
 
         it "can be subtracted from another color" {
@@ -21,7 +21,7 @@ demonstrate! {
 
             let expected_color = Color { r: 0.2, g: 0.5, b: 0.5};
 
-            assert_eq!(color1 - color2, expected_color);
+            assert_eq!(color1 - &color2, expected_color);
         }
 
         it "can be multiplied by a scalar" {
@@ -38,7 +38,7 @@ demonstrate! {
 
             let expected_color = Color { r: 0.06, g: 0.03, b: 0.2 };
 
-            assert_eq!(color1 * color2, expected_color);
+            assert_eq!(color1 * &color2, expected_color);
         }
     }
 }
