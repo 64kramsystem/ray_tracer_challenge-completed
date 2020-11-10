@@ -39,6 +39,7 @@ impl Ray {
     }
 
     // The sphere is assumed to be located at (0, 0, 0).
+    // Intersections are returned in order.
     //
     pub fn intersections(&self, sphere: &Sphere) -> Option<(f64, f64)> {
         let transformed_ray = self.inverse_transform(&sphere.transformation);
@@ -67,17 +68,11 @@ impl Ray {
     pub fn hit(&self, sphere: &Sphere) -> Option<f64> {
         if let Some((t1, t2)) = self.intersections(sphere) {
             if t1 >= 0.0 {
-                if t2 >= 0.0 {
-                    Some(f64::min(t1, t2))
-                } else {
-                    Some(t1)
-                }
+                Some(t1)
+            } else if t2 >= 0.0 {
+                Some(t2)
             } else {
-                if t2 >= 0.0 {
-                    Some(t2)
-                } else {
-                    None
-                }
+                None
             }
         } else {
             None
