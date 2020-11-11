@@ -5,7 +5,8 @@ demonstrate! {
         use crate::*;
 
         before {
-            let world = World {
+            #[allow(unused_mut)]
+            let mut world = World {
                 objects: vec![
                     Sphere::from(
                         None,
@@ -51,5 +52,32 @@ demonstrate! {
 
             assert_eq!(world.shade_hit(intersection_state), expected_shade);
         }
+
+        context "color of a ray intersection" {
+            it "when a ray misses" {
+                let ray =  Ray::new((0, 0, -5), (0, 1, 0));
+                let expected_color = Color::new(0, 0, 0);
+
+                assert_eq!(world.color_at(&ray), expected_color);
+            }
+
+            it "when a ray hits" {
+                let ray = Ray::new((0, 0, -5), (0, 0, 1));
+                let expected_color = Color::new(0.38066, 0.47583, 0.2855);
+
+                assert_eq!(world.color_at(&ray), expected_color);
+            }
+
+            it "with the intersection behind the ray" {
+                let ray = Ray::new((0.0, 0.0, 0.75), (0, 0, -1));
+
+                world.objects[0].material.ambient = 1.0;
+                world.objects[1].material.ambient = 1.0;
+
+                let expected_color = world.objects[1].material.color;
+
+                assert_eq!(world.color_at(&ray), expected_color);
+            }
+        } // context "color of a ray intersection"
     }
 }

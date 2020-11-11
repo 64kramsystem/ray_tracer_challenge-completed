@@ -54,4 +54,15 @@ impl World {
             &intersection_state.normalv,
         )
     }
+
+    pub fn color_at(&self, ray: &Ray) -> Color {
+        let intersections = self.intersections(ray);
+
+        if let Some(Intersection { t, object }) = intersections.first() {
+            let intersection_state = ray.intersection_state(*t, object);
+            self.shade_hit(intersection_state)
+        } else {
+            Color::new(0, 0, 0)
+        }
+    }
 }
