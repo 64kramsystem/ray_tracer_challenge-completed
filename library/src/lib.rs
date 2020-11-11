@@ -1,3 +1,4 @@
+mod camera;
 mod color;
 mod export_to_pixels;
 mod has_float64_value;
@@ -13,6 +14,7 @@ mod sphere;
 mod tuple;
 mod world;
 
+pub use camera::Camera;
 pub use color::Color;
 pub use export_to_pixels::ExportToPixels;
 pub use intersection_state::IntersectionState;
@@ -61,3 +63,6 @@ mod material_test;
 
 #[cfg(test)]
 mod world_test;
+
+#[cfg(test)]
+mod camera_test;
