@@ -41,5 +41,15 @@ demonstrate! {
 
             assert_eq!(intersections, expected_intersections);
         }
+
+        it "should shade an intersection" {
+            let ray = Ray::new((0, 0, -5), (0, 0, 1));
+            let sphere = &world.objects[0];
+            let intersection_state = ray.intersection_state(4.0, sphere);
+
+            let expected_shade = Color::new(0.38066, 0.47583, 0.2855);
+
+            assert_eq!(world.shade_hit(intersection_state), expected_shade);
+        }
     }
 }

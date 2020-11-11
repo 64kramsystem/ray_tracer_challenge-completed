@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use crate::{intersection::Intersection, Color, PointLight, Ray, Sphere, Tuple};
+use crate::{intersection::Intersection, Color, IntersectionState, PointLight, Ray, Sphere, Tuple};
 
 pub struct World {
     pub objects: Vec<Sphere>,
@@ -44,5 +44,14 @@ impl World {
         }
 
         all_intersections.into_iter().collect::<Vec<_>>()
+    }
+
+    pub fn shade_hit(&self, intersection_state: IntersectionState) -> Color {
+        intersection_state.object.material.lighting(
+            &self.light_source,
+            &intersection_state.point,
+            &intersection_state.eyev,
+            &intersection_state.normalv,
+        )
     }
 }
