@@ -78,7 +78,14 @@ impl Ray {
     pub fn intersection_state<'a>(&self, t: f64, object: &'a Sphere) -> IntersectionState<'a> {
         let point = self.position(t);
         let eyev = -self.direction;
-        let normalv = object.normal(&point);
+        let mut normalv = object.normal(&point);
+
+        let inside = if normalv.dot_product(&eyev) >= 0.0 {
+            false
+        } else {
+            normalv = -normalv;
+            true
+        };
 
         IntersectionState {
             t,
@@ -86,6 +93,7 @@ impl Ray {
             point,
             eyev,
             normalv,
+            inside,
         }
     }
 

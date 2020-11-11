@@ -7,4 +7,5 @@ pub struct IntersectionState<'a> {
     pub point: Tuple,
     pub eyev: Tuple,
     pub normalv: Tuple,
+    pub inside: bool,
 }

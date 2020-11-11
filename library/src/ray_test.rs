@@ -60,21 +60,41 @@ demonstrate! {
         } // context "returns the intersections"
 
         context "intersection state" {
-            it "should be computed from an intersection and an object" {
-                let ray = Ray::new((0, 0, -5), (0, 0, 1));
-                let object = &Sphere::new();
-                let t = 4.0;
+            context "should be computed from an intersection and an object" {
+                it "with the ray outside the object" {
+                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
+                    let object = &Sphere::new();
+                    let t = 4.0;
 
-                let expected_intersection_state = IntersectionState {
-                    t,
-                    object,
-                    point: Tuple::point(0, 0, -1),
-                    eyev: Tuple::vector(0, 0, -1),
-                    normalv: Tuple::vector(0, 0, -1),
-                };
+                    let expected_intersection_state = IntersectionState {
+                        t,
+                        object,
+                        point: Tuple::point(0, 0, -1),
+                        eyev: Tuple::vector(0, 0, -1),
+                        normalv: Tuple::vector(0, 0, -1),
+                        inside: false,
+                    };
 
-                assert_eq!(ray.intersection_state(t, &object), expected_intersection_state);
-            }
+                    assert_eq!(ray.intersection_state(t, &object), expected_intersection_state);
+                }
+
+                it "with the ray inside the object" {
+                    let ray = Ray::new((0, 0, 0), (0, 0, 1));
+                    let object = &Sphere::new();
+                    let t = 1.0;
+
+                    let expected_intersection_state = IntersectionState {
+                        t,
+                        object,
+                        point: Tuple::point(0, 0, 1),
+                        eyev: Tuple::vector(0, 0, -1),
+                        normalv: Tuple::vector(0, 0, -1),
+                        inside: true,
+                    };
+
+                    assert_eq!(ray.intersection_state(t, &object), expected_intersection_state);
+                }
+            } // context "should be computed from an intersection and an object"
         } // context "intersection state"
 
         context "transformations" {
