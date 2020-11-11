@@ -1,13 +1,9 @@
 use demonstrate::demonstrate;
-use indoc::indoc;
-
-use crate::color::Color;
-use crate::PpmEncoder;
-use crate::Sdl2Interface;
 
 demonstrate! {
     describe "PpmEncoder" {
-        use super::*;
+        use crate::*;
+        use indoc::indoc;
 
         it "should encode an exportable image" {
             let mut sdl_interface = Sdl2Interface::init("test", 5, 3, (0, 0));

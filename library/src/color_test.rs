@@ -1,10 +1,8 @@
 use demonstrate::demonstrate;
 
-use crate::color::Color;
-
 demonstrate! {
     describe "Color" {
-        use super::*;
+        use crate::*;
 
         it "can be added to another color" {
             let color1 = Color { r: 0.9, g: 0.6, b: 0.75 };

@@ -2,10 +2,7 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Ray" {
-        use crate::ray::Ray;
-        use crate::sphere::Sphere;
-        use crate::tuple::Tuple;
-        use crate::intersection_state::IntersectionState;
+        use crate::*;
 
         it "should compute a position at t" {
             let ray = Ray {

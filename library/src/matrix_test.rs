@@ -2,8 +2,7 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Matrices" {
-        use crate::tuple::Tuple;
-        use crate::matrix::Matrix;
+        use crate::*;
 
         describe "Matrix (order 4)" {
             it "should construct a matrix (order: 4) from values, and access them" {
