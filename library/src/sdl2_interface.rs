@@ -1,6 +1,6 @@
 use sdl2::{event::Event, pixels, rect::Point, render, video::Window, EventPump};
 
-use crate::export_to_pixels::ExportToPixels;
+use crate::{export_to_pixels::ExportToPixels, Color};
 
 // Interface for drawing to a canvas, and waiting a keypress, intentionally designed to be as simple
 // as  possible.
@@ -77,16 +77,11 @@ impl Sdl2Interface {
     // Doesn't update the canvas; for that, must invoke update_canvas().
     // Pixels outside the canvas are ignored.
     //
-    pub fn write_pixel(&mut self, mut x: i16, mut y: i16, color: crate::Color) {
-        let (width, height) = self.canvas.logical_size();
+    pub fn write_pixel(&mut self, x: i16, y: i16, color: crate::Color) {
+        let (x, y) = self.adjust_coordinates(x, y);
 
-        x += self.center_x;
-        y += self.center_y;
-
-        y = self.canvas_height() as i16 - y as i16 - 1;
-
-        if x >= 0 && x < width as i16 && y >= 0 && y < height as i16 {
-            self.pixels_buffer[y as usize * width as usize + x as usize] = color;
+        if let Some(pixel_buffer_index) = self.pixel_buffer_index(x, y) {
+            self.pixels_buffer[pixel_buffer_index] = color;
 
             let (r, g, b) = color.u8_components();
             let pixel = pixels::Color::RGB(r, g, b);
@@ -122,6 +117,32 @@ impl Sdl2Interface {
     pub fn canvas_height(&self) -> u16 {
         self.canvas.logical_size().1 as u16
     }
+
+    // Adjust in two ways:
+    //
+    // - recenter according to (center_x, center_y)
+    // - turn the y coordinate upside down (Sdl starts at top left; bottom left is more intuitive)
+    //
+    fn adjust_coordinates(&self, mut x: i16, mut y: i16) -> (i16, i16) {
+        x += self.center_x;
+        y += self.center_y;
+
+        y = self.canvas_height() as i16 - y as i16 - 1;
+
+        (x, y)
+    }
+
+    // Returns the index of the pixel in the buffer; if the pixel is outside the canvas, None is returned.
+    //
+    fn pixel_buffer_index(&self, x: i16, y: i16) -> Option<usize> {
+        let (width, height) = self.canvas.logical_size();
+
+        if x >= 0 && x < width as i16 && y >= 0 && y < height as i16 {
+            Some(y as usize * width as usize + x as usize)
+        } else {
+            None
+        }
+    }
 }
 
 impl ExportToPixels for Sdl2Interface {
@@ -129,5 +150,15 @@ impl ExportToPixels for Sdl2Interface {
         let (width, _) = self.canvas.logical_size();
 
         (&self.pixels_buffer, width as u16)
+    }
+
+    fn pixel_at(&self, x: i16, y: i16) -> Option<Color> {
+        let pixel_buffer_index = self.pixel_buffer_index(x, y);
+
+        if let Some(pixel_index) = pixel_buffer_index {
+            Some(self.pixels_buffer[pixel_index])
+        } else {
+            None
+        }
     }
 }
