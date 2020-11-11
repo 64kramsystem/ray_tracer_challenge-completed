@@ -7,6 +7,16 @@ pub struct Ray {
 }
 
 impl Ray {
+    pub fn new<T: HasFloat64Value, U: HasFloat64Value>(
+        origin: (T, T, T),
+        direction: (U, U, U),
+    ) -> Self {
+        Ray {
+            origin: Tuple::point(origin.0, origin.1, origin.2),
+            direction: Tuple::vector(direction.0, direction.1, direction.2),
+        }
+    }
+
     pub fn position<T: HasFloat64Value>(&self, t: T) -> Tuple {
         self.origin + &(self.direction * t.as_f64())
     }

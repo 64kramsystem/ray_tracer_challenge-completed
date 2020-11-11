@@ -30,10 +30,7 @@ demonstrate! {
         }
 
         it "should intersect with a ray" {
-            let ray = Ray {
-                origin: Tuple::point(0, 0, -5),
-                direction: Tuple::vector(0, 0, 1),
-            };
+            let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
             let intersections = world
                 .intersections(&ray)

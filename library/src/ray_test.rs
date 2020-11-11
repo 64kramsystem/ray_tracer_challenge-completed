@@ -5,10 +5,7 @@ demonstrate! {
         use crate::*;
 
         it "should compute a position at t" {
-            let ray = Ray {
-                origin: Tuple::point(2, 3, 4),
-                direction: Tuple::vector(1, 0, 0),
-            };
+            let ray = Ray::new((2, 3, 4), (1, 0, 0));
 
             assert_eq!(ray.position(0), Tuple::point(2, 3, 4));
             assert_eq!(ray.position(1), Tuple::point(3, 3, 4));
@@ -19,10 +16,7 @@ demonstrate! {
         context "returns the intersections" {
             context "with an untransformed sphere" {
                 it "at two points" {
-                    let ray = Ray {
-                        origin: Tuple::point(0, 0, -5),
-                        direction: Tuple::vector(0, 0, 1)
-                    };
+                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
                     let sphere = Sphere::new();
 
@@ -30,10 +24,7 @@ demonstrate! {
                 }
 
                 it "at a tangent" {
-                    let ray = Ray {
-                        origin: Tuple::point(0, 1, -5),
-                        direction: Tuple::vector(0, 0, 1)
-                    };
+                    let ray = Ray::new((0, 1, -5), (0, 0, 1));
 
                     let sphere = Sphere::new();
 
@@ -41,10 +32,7 @@ demonstrate! {
                 }
 
                 it "at no point (miss)" {
-                    let ray = Ray {
-                        origin: Tuple::point(0, 2, -5),
-                        direction: Tuple::vector(0, 0, 1)
-                    };
+                    let ray = Ray::new((0, 2, -5), (0, 0, 1));
 
                     let sphere = Sphere::new();
 
@@ -54,10 +42,7 @@ demonstrate! {
 
             context "with a transformed sphere" {
                 it "scaled" {
-                    let ray = Ray {
-                        origin: Tuple::point(0, 0, -5),
-                        direction: Tuple::vector(0, 0, 1)
-                    };
+                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
                     let sphere = Sphere::new().scale(2, 2, 2);
 
@@ -65,10 +50,7 @@ demonstrate! {
                 }
 
                 it "translated" {
-                    let ray = Ray {
-                        origin: Tuple::point(0, 0, -5),
-                        direction: Tuple::vector(0, 0, 1)
-                    };
+                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
                     let sphere = Sphere::new().translate(5, 0, 0);
 
@@ -79,10 +61,7 @@ demonstrate! {
 
         context "intersection state" {
             it "should be computed from an intersection and an object" {
-                let ray = Ray {
-                    origin: Tuple::point(0, 0, -5),
-                    direction: Tuple::vector(0, 0, 1)
-                };
+                let ray = Ray::new((0, 0, -5), (0, 0, 1));
                 let object = &Sphere::new();
                 let t = 4.0;
 
@@ -100,29 +79,17 @@ demonstrate! {
 
         context "transformations" {
             it "should translate a ray" {
-                let ray = Ray {
-                    origin: Tuple::point(1, 2, 3),
-                    direction: Tuple::vector(0, 1, 0),
-                };
+                let ray = Ray::new((1, 2, 3), (0, 1, 0));
 
-                let expected_ray = Ray {
-                    origin: Tuple::point(4, 6, 8),
-                    direction: Tuple::vector(0, 1, 0),
-                };
+                let expected_ray = Ray::new((4, 6, 8), (0, 1, 0));
 
                 assert_eq!(ray.translate(3, 4, 5), expected_ray);
             }
 
             it "should scale a ray" {
-                let ray = Ray {
-                    origin: Tuple::point(1, 2, 3),
-                    direction: Tuple::vector(0, 1, 0),
-                };
+                let ray = Ray::new((1, 2, 3), (0, 1, 0));
 
-                let expected_ray = Ray {
-                    origin: Tuple::point(2, 6, 12),
-                    direction: Tuple::vector(0, 3, 0),
-                };
+                let expected_ray = Ray::new((2, 6, 12), (0, 3, 0));
 
                 assert_eq!(ray.scale(2, 3, 4), expected_ray);
             }
