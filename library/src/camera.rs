@@ -1,4 +1,4 @@
-use crate::Matrix;
+use crate::{Matrix, Ray, Tuple};
 
 pub struct Camera {
     pub hsize: u16,
@@ -40,5 +40,26 @@ impl Camera {
             transform: Matrix::identity(4),
             pixel_size,
         }
+    }
+
+    pub fn ray_for_pixel(&self, px: u16, py: u16) -> Ray {
+        // Offset from the canvas edge to the pixel's center
+        //
+        let x_offset = (px as f64 + 0.5) * self.pixel_size;
+        let y_offset = (py as f64 + 0.5) * self.pixel_size;
+
+        let world_x = self.half_width - x_offset;
+        let world_y = self.half_height - y_offset;
+
+        let camera_inverse_transform = self.transform.inverse().unwrap();
+
+        // The canvas's z is -1!!
+        //
+        let pixel = &camera_inverse_transform * &Tuple::point(world_x, world_y, -1);
+        let origin = &camera_inverse_transform * &Tuple::point(0, 0, 0);
+
+        let direction = (pixel - &origin).normalize();
+
+        Ray { origin, direction }
     }
 }
