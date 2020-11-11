@@ -16,17 +16,22 @@ pub struct Sphere {
 
 impl Sphere {
     pub fn new() -> Self {
+        Self::from(Some(Matrix::identity(4)), Some(Material::default()))
+    }
+
+    pub fn from(transformation: Option<Matrix>, material: Option<Material>) -> Self {
         let mut next_id_mtx = NEXT_ID.lock().unwrap();
 
         let next_id = *next_id_mtx;
         *next_id_mtx += 1;
 
-        let transformation = Matrix::identity(4);
+        let transformation = transformation.unwrap_or_else(|| Matrix::identity(4));
+        let material = material.unwrap_or_default();
 
         Self {
             id: next_id,
             transformation,
-            material: Material::default(),
+            material,
         }
     }
 
