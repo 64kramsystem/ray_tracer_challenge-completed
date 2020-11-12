@@ -199,6 +199,43 @@ demonstrate! {
                     assert_eq!(matrix.inverse(), expected_result);
                 }
             } // context "inversion"
+
+            context "view tranformation" {
+                it "should return the identity matrix when looking at positive z" {
+                    let from = Tuple::point(0, 0, 0);
+                    let to = Tuple::point(0, 0, 1);
+                    let up = Tuple::vector(0, 1, 0);
+
+                    let expected_matrix = Matrix::scaling(-1, 1, -1);
+
+                    assert_eq!(Matrix::view_transform(&from, &to, &up), expected_matrix);
+                }
+
+                it "should mirror x and z when looking at negative z" {
+                    let from = Tuple::point(0, 0, 8);
+                    let to = Tuple::point(0, 0, 0);
+                    let up = Tuple::vector(0, 1, 0);
+
+                    let expected_matrix = Matrix::translation(0, 0, -8);
+
+                    assert_eq!(Matrix::view_transform(&from, &to, &up), expected_matrix);
+                }
+
+                it "applies an arbitrary transformation" {
+                    let from = Tuple::point(1, 3, 2);
+                    let to = Tuple::point(4, -2, 8);
+                    let up = Tuple::vector(1, 1, 0);
+
+                    let expected_matrix = Matrix::new(&[
+                        -0.50709, 0.50709,  0.67612, -2.36643,
+                         0.76772, 0.60609,  0.12122, -2.82843,
+                        -0.35857, 0.59761, -0.71714,  0.00000,
+                         0.00000, 0.00000,  0.00000,  1.00000,
+                    ]);
+
+                    assert_eq!(Matrix::view_transform(&from, &to, &up), expected_matrix);
+                }
+            } // context "view tranformation"
         } // describe "Matrix (order 4)"
 
         describe "Matrix (order 2)" {

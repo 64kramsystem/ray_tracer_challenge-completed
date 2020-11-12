@@ -152,6 +152,23 @@ impl Matrix {
         Self::new(&source_values)
     }
 
+    pub fn view_transform(from: &Tuple, to: &Tuple, up: &Tuple) -> Self {
+        let forward = (*to - from).normalize();
+        let normalized_up = up.normalize();
+        let left = forward.cross_product(normalized_up);
+        let true_up = left.cross_product(forward);
+
+        #[rustfmt::skip]
+        let orientation_values = [
+            left.x,     left.y,     left.z,     0.0,
+            true_up.x,  true_up.y,  true_up.z,  0.0,
+            -forward.x, -forward.y, -forward.z, 0.0,
+            0.0,        0.0,        0.0,        1.0,
+        ];
+
+        Self::new(&orientation_values) * &Matrix::translation(-from.x, -from.y, -from.z)
+    }
+
     pub fn transpose(&self) -> Self {
         let order = self.values.len();
         let mut result = vec![Vec::with_capacity(order); order];
