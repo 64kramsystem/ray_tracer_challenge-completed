@@ -114,8 +114,8 @@ impl Sdl2Interface {
 
     // Convenience method.
     //
-    pub fn canvas_height(&self) -> u16 {
-        self.canvas.logical_size().1 as u16
+    fn canvas_height(&self) -> i16 {
+        self.canvas.logical_size().1 as i16
     }
 
     // Adjust in two ways:
@@ -127,7 +127,7 @@ impl Sdl2Interface {
         x += self.center_x;
         y += self.center_y;
 
-        y = self.canvas_height() as i16 - y as i16 - 1;
+        y = self.canvas_height() - y - 1;
 
         (x, y)
     }
