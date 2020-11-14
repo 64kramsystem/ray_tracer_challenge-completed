@@ -73,6 +73,11 @@ impl Sdl2Interface {
         }
     }
 
+    pub fn set_center(&mut self, x: i16, y: i16) {
+        self.center_x = x;
+        self.center_y = y;
+    }
+
     // Writes a pixel at (x, y), where (0, 0) is the bottom left of the canvas.
     // Doesn't update the canvas; for that, must invoke update_canvas().
     // Pixels outside the canvas are ignored.
