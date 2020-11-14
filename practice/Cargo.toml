@@ -8,3 +8,4 @@ version = "0.1.0"
 [dependencies]
 
 library = {path = "../library"}
+rayon = "1.5.0"
