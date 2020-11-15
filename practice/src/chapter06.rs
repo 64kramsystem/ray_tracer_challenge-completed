@@ -72,7 +72,7 @@ pub fn practice() {
             pixels_buffer[buffer_y] = row_buffer;
         });
 
-    interface.set_center(0, 0);
+    interface.set_origin(0, 0);
 
     for (y, row) in pixels_buffer.iter().enumerate() {
         for (x, pixel_color) in row.iter().enumerate() {

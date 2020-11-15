@@ -14,8 +14,8 @@ pub struct Sdl2Interface {
     event_pump: EventPump,
     canvas: render::Canvas<Window>,
 
-    center_x: i16,
-    center_y: i16,
+    origin_x: i16,
+    origin_y: i16,
 
     // The SDL2 pixel reading doesn't work as intended (see history), so we keep an internal buffer.
     // The upside is that this can be used, if desired, to trivially redraw on window resize.
@@ -26,9 +26,9 @@ pub struct Sdl2Interface {
 impl Sdl2Interface {
     // Initializes the canvas, and maximizes the window.
     //
-    // center: (x, y), from the bottom left.
+    // origin: (x, y), from the bottom left.
     //
-    pub fn init(window_title: &str, width: u16, height: u16, center: (i16, i16)) -> Self {
+    pub fn init(window_title: &str, width: u16, height: u16, origin: (i16, i16)) -> Self {
         let sdl_context = sdl2::init().unwrap();
 
         // The resizing (due to `maximized()`) is handled below, by process_events().
@@ -67,15 +67,15 @@ impl Sdl2Interface {
         Self {
             event_pump,
             canvas,
-            center_x: center.0,
-            center_y: center.1,
+            origin_x: origin.0,
+            origin_y: origin.1,
             pixels_buffer,
         }
     }
 
-    pub fn set_center(&mut self, x: i16, y: i16) {
-        self.center_x = x;
-        self.center_y = y;
+    pub fn set_origin(&mut self, x: i16, y: i16) {
+        self.origin_x = x;
+        self.origin_y = y;
     }
 
     // Writes a pixel at (x, y), where (0, 0) is the bottom left of the canvas.
@@ -125,12 +125,12 @@ impl Sdl2Interface {
 
     // Adjust in two ways:
     //
-    // - recenter according to (center_x, center_y)
+    // - recenter according to (origin_x, origin_y)
     // - turn the y coordinate upside down (Sdl starts at top left; bottom left is more intuitive)
     //
     fn adjust_coordinates(&self, mut x: i16, mut y: i16) -> (i16, i16) {
-        x += self.center_x;
-        y += self.center_y;
+        x += self.origin_x;
+        y += self.origin_y;
 
         y = self.canvas_height() - y - 1;
 
