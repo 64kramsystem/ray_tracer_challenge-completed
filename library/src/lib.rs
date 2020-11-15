@@ -1,7 +1,7 @@
 mod camera;
 mod color;
-mod export_to_pixels;
 mod has_float64_value;
+mod image;
 mod intersection;
 mod intersection_state;
 mod material;
@@ -16,7 +16,7 @@ mod world;
 
 pub use camera::Camera;
 pub use color::Color;
-pub use export_to_pixels::ExportToPixels;
+pub use image::Image;
 pub use intersection_state::IntersectionState;
 pub use material::Material;
 pub use matrix::Matrix;

@@ -1,6 +1,6 @@
 use sdl2::{event::Event, pixels, rect::Point, render, video::Window, EventPump};
 
-use crate::{export_to_pixels::ExportToPixels, Color};
+use crate::{image::Image, Color};
 
 // Interface for drawing to a canvas, and waiting a keypress, intentionally designed to be as simple
 // as  possible.
@@ -150,7 +150,7 @@ impl Sdl2Interface {
     }
 }
 
-impl ExportToPixels for Sdl2Interface {
+impl Image for Sdl2Interface {
     fn to_pixels(&self) -> (&Vec<crate::Color>, u16) {
         let (width, _) = self.canvas.logical_size();
 
