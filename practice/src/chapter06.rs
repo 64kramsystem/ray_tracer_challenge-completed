@@ -20,7 +20,7 @@ pub fn practice() {
         (center_x, center_y),
     );
 
-    let mut sphere = Sphere::new();
+    let mut sphere = Sphere::default();
     sphere.material.color = Color::new(1, 0.2, 1);
     sphere.transformation = Matrix::translation(10, 0, 0)
         * &Matrix::rotation(Axis::Z, -PI / 4.0)

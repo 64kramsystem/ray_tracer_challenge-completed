@@ -25,7 +25,7 @@ pub fn practice() {
     //     .rotate(Axis::Z, -PI / 4.0)
     //     .translate(10, 0, 0);
 
-    let mut sphere = Sphere::new();
+    let mut sphere = Sphere::default();
     let transformation = Matrix::translation(10, 0, 0)
         * &Matrix::rotation(Axis::Z, -PI / 4.0)
         * &Matrix::scaling(6.25, 12.5, 12.5);

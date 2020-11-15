@@ -6,33 +6,24 @@ lazy_static::lazy_static! {
   static ref NEXT_ID: Mutex<u32> = Mutex::new(1);
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, SmartDefault)]
 pub struct Sphere {
+    #[default(_code = "Self::new_id()")]
     pub id: u32,
-    // Defaults to an identity matrix of order 4.
+    #[default(Matrix::identity(4))]
     pub transformation: Matrix,
+    #[default(Material::default())]
     pub material: Material,
 }
 
 impl Sphere {
-    pub fn new() -> Self {
-        Self::from(Some(Matrix::identity(4)), Some(Material::default()))
-    }
-
-    pub fn from(transformation: Option<Matrix>, material: Option<Material>) -> Self {
+    fn new_id() -> u32 {
         let mut next_id_mtx = NEXT_ID.lock().unwrap();
 
         let next_id = *next_id_mtx;
         *next_id_mtx += 1;
 
-        let transformation = transformation.unwrap_or_else(|| Matrix::identity(4));
-        let material = material.unwrap_or_default();
-
-        Self {
-            id: next_id,
-            transformation,
-            material,
-        }
+        next_id
     }
 
     pub fn scale<T: HasFloat64Value>(self, x: T, y: T, z: T) -> Self {

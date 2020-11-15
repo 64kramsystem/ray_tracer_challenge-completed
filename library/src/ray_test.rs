@@ -18,7 +18,7 @@ demonstrate! {
                 it "at two points" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
-                    let sphere = Sphere::new();
+                    let sphere = Sphere::default();
 
                     assert_eq!(ray.intersections(&sphere), Some((4.0, 6.0)));
                 }
@@ -26,7 +26,7 @@ demonstrate! {
                 it "at a tangent" {
                     let ray = Ray::new((0, 1, -5), (0, 0, 1));
 
-                    let sphere = Sphere::new();
+                    let sphere = Sphere::default();
 
                     assert_eq!(ray.intersections(&sphere), Some((5.0, 5.0)));
                 }
@@ -34,7 +34,7 @@ demonstrate! {
                 it "at no point (miss)" {
                     let ray = Ray::new((0, 2, -5), (0, 0, 1));
 
-                    let sphere = Sphere::new();
+                    let sphere = Sphere::default();
 
                     assert_eq!(ray.intersections(&sphere), None);
                 }
@@ -44,7 +44,7 @@ demonstrate! {
                 it "scaled" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
-                    let sphere = Sphere::new().scale(2, 2, 2);
+                    let sphere = Sphere::default().scale(2, 2, 2);
 
                     assert_eq!(ray.intersections(&sphere), Some((3.0, 7.0)));
                 }
@@ -52,7 +52,7 @@ demonstrate! {
                 it "translated" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
-                    let sphere = Sphere::new().translate(5, 0, 0);
+                    let sphere = Sphere::default().translate(5, 0, 0);
 
                     assert_eq!(ray.intersections(&sphere), None);
                 }
@@ -63,7 +63,7 @@ demonstrate! {
             context "should be computed from an intersection and an object" {
                 it "with the ray outside the object" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
-                    let object = &Sphere::new();
+                    let object = &Sphere::default();
                     let t = 4.0;
 
                     let expected_intersection_state = IntersectionState {
@@ -80,7 +80,7 @@ demonstrate! {
 
                 it "with the ray inside the object" {
                     let ray = Ray::new((0, 0, 0), (0, 0, 1));
-                    let object = &Sphere::new();
+                    let object = &Sphere::default();
                     let t = 1.0;
 
                     let expected_intersection_state = IntersectionState {
