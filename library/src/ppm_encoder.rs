@@ -9,10 +9,9 @@ const MAX_COLOR_VALUE: u8 = 255;
 
 impl PpmEncoder {
     pub fn export_image<T: Image, U: Write>(image: &T, out: &mut U) {
-        let (pixels, width) = image.to_pixels();
-        let height = pixels.len() as u16 / width;
+        let pixels = image.to_pixels();
 
-        let mut buffer = Self::build_header(width, height);
+        let mut buffer = Self::build_header(image.width(), image.height());
 
         let mut current_line = String::new();
 

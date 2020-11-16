@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use library::{Axis, Color, Sdl2Interface, Tuple};
+use library::{Axis, Color, Image, Sdl2Interface, Tuple};
 
 pub fn practice() {
     let mut interface = Sdl2Interface::init("Chapter 02 exercise", 1024, 600, (512, 300));
@@ -23,6 +23,6 @@ pub fn practice() {
         point = point.rotate(Axis::Z, -2.0 * PI / 12.0);
     }
 
-    interface.update_canvas();
+    interface.update();
     interface.wait_keypress();
 }

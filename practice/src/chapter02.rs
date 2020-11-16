@@ -1,4 +1,4 @@
-use library::{Color, Sdl2Interface, Tuple};
+use library::{Color, Image, Sdl2Interface, Tuple};
 
 use crate::chapter01::{Environment, Projectile};
 
@@ -24,7 +24,7 @@ pub fn practice() {
         environment.tick();
     }
 
-    interface.update_canvas();
+    interface.update();
 
     interface.wait_keypress();
 }

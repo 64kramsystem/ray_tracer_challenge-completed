@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use library::{Axis, Color, Matrix, Ray, Sdl2Interface, Sphere, Tuple};
+use library::{Axis, Color, Image, Matrix, Ray, Sdl2Interface, Sphere, Tuple};
 
 pub fn practice() {
     let display_size: u16 = 100;
@@ -50,6 +50,6 @@ pub fn practice() {
         }
     }
 
-    interface.update_canvas();
+    interface.update();
     interface.wait_keypress();
 }

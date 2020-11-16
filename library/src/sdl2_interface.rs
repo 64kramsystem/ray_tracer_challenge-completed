@@ -16,6 +16,9 @@ pub struct Sdl2Interface {
     event_pump: EventPump,
     canvas: render::Canvas<Window>,
 
+    width: u16,
+    height: u16,
+
     origin_x: i16,
     origin_y: i16,
 
@@ -69,6 +72,8 @@ impl Sdl2Interface {
         Self {
             event_pump,
             canvas,
+            width,
+            height,
             origin_x: origin.0,
             origin_y: origin.1,
             pixels_buffer,
@@ -78,31 +83,6 @@ impl Sdl2Interface {
     pub fn set_origin(&mut self, x: i16, y: i16) {
         self.origin_x = x;
         self.origin_y = y;
-    }
-
-    // Writes a pixel at (x, y), where (0, 0) is the bottom left of the canvas.
-    // Doesn't update the canvas; for that, must invoke update_canvas().
-    // Pixels outside the canvas are ignored.
-    //
-    pub fn write_pixel(&mut self, x: i16, y: i16, color: crate::Color) {
-        let (x, y) = self.adjust_coordinates(x, y);
-
-        if let Some(pixel_buffer_index) = self.pixel_buffer_index(x, y) {
-            self.pixels_buffer[pixel_buffer_index] = color;
-
-            let (r, g, b) = color.u8_components();
-            let pixel = pixels::Color::RGB(r, g, b);
-
-            self.canvas.set_draw_color(pixel);
-
-            self.canvas
-                .draw_point(Point::new(x as i32, y as i32))
-                .unwrap();
-        }
-    }
-
-    pub fn update_canvas(&mut self) {
-        self.canvas.present();
     }
 
     // Wait for keypress; if a quit event is received (e.g. Alt+F4 or window close), the program will
@@ -125,12 +105,6 @@ impl Sdl2Interface {
         }
     }
 
-    // Convenience method.
-    //
-    fn canvas_height(&self) -> i16 {
-        self.canvas.logical_size().1 as i16
-    }
-
     // Adjust in two ways:
     //
     // - recenter according to (origin_x, origin_y)
@@ -140,7 +114,7 @@ impl Sdl2Interface {
         x += self.origin_x;
         y += self.origin_y;
 
-        y = self.canvas_height() - y - 1;
+        y = self.height() as i16 - y - 1;
 
         (x, y)
     }
@@ -148,10 +122,8 @@ impl Sdl2Interface {
     // Returns the index of the pixel in the buffer; if the pixel is outside the canvas, None is returned.
     //
     fn pixel_buffer_index(&self, x: i16, y: i16) -> Option<usize> {
-        let (width, height) = self.canvas.logical_size();
-
-        if x >= 0 && x < width as i16 && y >= 0 && y < height as i16 {
-            Some(y as usize * width as usize + x as usize)
+        if x >= 0 && x < self.width as i16 && y >= 0 && y < self.height as i16 {
+            Some(y as usize * self.width as usize + x as usize)
         } else {
             None
         }
@@ -159,17 +131,59 @@ impl Sdl2Interface {
 }
 
 impl Image for Sdl2Interface {
-    fn to_pixels(&self) -> (&Vec<crate::Color>, u16) {
-        let (width, _) = self.canvas.logical_size();
-
-        (&self.pixels_buffer, width as u16)
+    fn new(width: u16, height: u16) -> Self {
+        Self::init("Sdl2Interface", width, height, (0, 0))
     }
 
-    fn pixel_at(&self, x: i16, y: i16) -> Option<Color> {
+    fn width(&self) -> u16 {
+        self.width
+    }
+
+    fn height(&self) -> u16 {
+        self.height
+    }
+
+    // Doesn't update the canvas; for that, must invoke update_canvas().
+    // Pixels outside the canvas are ignored.
+    //
+    fn write_pixel(&mut self, x: i16, y: i16, color: crate::Color) {
+        let (x, y) = self.adjust_coordinates(x, y);
+
+        if let Some(pixel_buffer_index) = self.pixel_buffer_index(x, y) {
+            self.pixels_buffer[pixel_buffer_index] = color;
+
+            let (r, g, b) = color.u8_components();
+            let pixel = pixels::Color::RGB(r, g, b);
+
+            self.canvas.set_draw_color(pixel);
+
+            self.canvas
+                .draw_point(Point::new(x as i32, y as i32))
+                .unwrap();
+        }
+    }
+
+    // Required after writing pixels.
+    //
+    fn update(&mut self) {
+        self.canvas.present();
+    }
+
+    fn to_pixels(&self) -> Vec<&crate::Color> {
+        // Inverts the y axis, using rev().
+        //
+        self.pixels_buffer
+            .chunks_exact(self.width as usize)
+            .rev()
+            .flatten()
+            .collect::<Vec<_>>()
+    }
+
+    fn pixel_at(&self, x: i16, y: i16) -> Option<&Color> {
         let pixel_buffer_index = self.pixel_buffer_index(x, y);
 
         if let Some(pixel_index) = pixel_buffer_index {
-            Some(self.pixels_buffer[pixel_index])
+            Some(&self.pixels_buffer[pixel_index])
         } else {
             None
         }

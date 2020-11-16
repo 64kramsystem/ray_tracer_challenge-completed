@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 use std::{f64::consts::PI, sync::Mutex};
 
-use library::{Axis, Color, Matrix, PointLight, Ray, Sdl2Interface, Sphere, Tuple};
+use library::{Axis, Color, Image, Matrix, PointLight, Ray, Sdl2Interface, Sphere, Tuple};
 use rayon::prelude::*;
 
 pub fn practice() {
@@ -77,6 +77,6 @@ pub fn practice() {
         }
     }
 
-    interface.update_canvas();
+    interface.update();
     interface.wait_keypress();
 }
