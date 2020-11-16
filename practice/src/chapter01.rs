@@ -16,10 +16,7 @@ impl Projectile {
     // Used in/from Chapter 2.
     //
     pub fn with_values(position: Tuple, velocity: Tuple) -> Self {
-        Projectile {
-            position: position,
-            velocity: velocity,
-        }
+        Projectile { position, velocity }
     }
 
     pub fn tick(&mut self, gravity: Tuple, wind: Tuple) {
@@ -40,8 +37,7 @@ impl Environment {
         Environment {
             gravity: Tuple::vector(0.0, -0.1, 0.0),
             wind: Tuple::vector(-0.01, 0.0, 0.0),
-
-            projectile: projectile,
+            projectile,
         }
     }
 
