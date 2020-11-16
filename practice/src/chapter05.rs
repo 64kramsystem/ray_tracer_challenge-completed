@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use library::{Axis, Color, Matrix, Ray, Sdl2Interface, Sphere, Tuple};
+use library::{Axis, Color, Image, Matrix, Ray, Sdl2Interface, Sphere, Tuple};
 
 pub fn practice() {
     let display_size: u16 = 100;
@@ -9,12 +9,9 @@ pub fn practice() {
 
     let (center_x, center_y) = ((display_size / 2) as i16, (display_size / 2) as i16);
 
-    let mut interface = Sdl2Interface::init(
-        "Chapter 05 exercise",
-        display_size,
-        display_size,
-        (center_x, center_y),
-    );
+    let mut interface = Sdl2Interface::init("Chapter 05 exercise", display_size, display_size);
+    interface.invert_y = true;
+    interface.origin = (center_x, center_y);
 
     let hit_color = Color::new(1, 0, 0);
 
@@ -25,7 +22,7 @@ pub fn practice() {
     //     .rotate(Axis::Z, -PI / 4.0)
     //     .translate(10, 0, 0);
 
-    let mut sphere = Sphere::new();
+    let mut sphere = Sphere::default();
     let transformation = Matrix::translation(10, 0, 0)
         * &Matrix::rotation(Axis::Z, -PI / 4.0)
         * &Matrix::scaling(6.25, 12.5, 12.5);
@@ -50,6 +47,6 @@ pub fn practice() {
         }
     }
 
-    interface.update_canvas();
+    interface.update();
     interface.wait_keypress();
 }

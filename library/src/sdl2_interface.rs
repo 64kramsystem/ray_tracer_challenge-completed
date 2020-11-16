@@ -1,6 +1,8 @@
-use sdl2::{event::Event, pixels, rect::Point, render, video::Window, EventPump};
+use sdl2::{
+    event::Event, keyboard::Keycode, pixels, rect::Point, render, video::Window, EventPump,
+};
 
-use crate::export_to_pixels::ExportToPixels;
+use crate::{image::Image, Color};
 
 // Interface for drawing to a canvas, and waiting a keypress, intentionally designed to be as simple
 // as  possible.
@@ -14,8 +16,14 @@ pub struct Sdl2Interface {
     event_pump: EventPump,
     canvas: render::Canvas<Window>,
 
-    center_x: i16,
-    center_y: i16,
+    width: u16,
+    height: u16,
+
+    // For simple applications. They'd be cool if set by method chaining, however, they're not needed
+    // anymore with camera rendering.
+    //
+    pub invert_y: bool,
+    pub origin: (i16, i16),
 
     // The SDL2 pixel reading doesn't work as intended (see history), so we keep an internal buffer.
     // The upside is that this can be used, if desired, to trivially redraw on window resize.
@@ -26,9 +34,9 @@ pub struct Sdl2Interface {
 impl Sdl2Interface {
     // Initializes the canvas, and maximizes the window.
     //
-    // center: (x, y), from the bottom left.
+    // origin: (x, y), from the bottom left.
     //
-    pub fn init(window_title: &str, width: u16, height: u16, center: (i16, i16)) -> Self {
+    pub fn init(window_title: &str, width: u16, height: u16) -> Self {
         let sdl_context = sdl2::init().unwrap();
 
         // The resizing (due to `maximized()`) is handled below, by process_events().
@@ -67,26 +75,82 @@ impl Sdl2Interface {
         Self {
             event_pump,
             canvas,
-            center_x: center.0,
-            center_y: center.1,
+            width,
+            height,
+            invert_y: false,
+            origin: (0, 0),
             pixels_buffer,
         }
     }
 
-    // Writes a pixel at (x, y), where (0, 0) is the bottom left of the canvas.
+    // Wait for keypress; if a quit event is received (e.g. Alt+F4 or window close), the program will
+    // exit.
+    //
+    pub fn wait_keypress(&mut self) {
+        for event in self.event_pump.wait_iter() {
+            match event {
+                Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break,
+                Event::KeyUp {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break,
+                Event::Quit { .. } => std::process::exit(0),
+                _ => {}
+            }
+        }
+    }
+
+    // Adjust in two ways:
+    //
+    // - recenter according to (origin_x, origin_y)
+    // - turn the y coordinate upside down, if set (Sdl starts at top left; bottom left is more intuitive)
+    //
+    fn adjust_coordinates(&self, mut x: i16, mut y: i16) -> (i16, i16) {
+        x += self.origin.0;
+        y += self.origin.1;
+
+        if self.invert_y {
+            y = self.height() as i16 - y - 1
+        };
+
+        (x, y)
+    }
+
+    // Returns the index of the pixel in the buffer; if the pixel is outside the canvas, None is returned.
+    //
+    fn pixel_buffer_index(&self, x: i16, y: i16) -> Option<usize> {
+        if x >= 0 && x < self.width as i16 && y >= 0 && y < self.height as i16 {
+            Some(y as usize * self.width as usize + x as usize)
+        } else {
+            None
+        }
+    }
+}
+
+impl Image for Sdl2Interface {
+    fn new(width: u16, height: u16) -> Self {
+        Self::init("Sdl2Interface", width, height)
+    }
+
+    fn width(&self) -> u16 {
+        self.width
+    }
+
+    fn height(&self) -> u16 {
+        self.height
+    }
+
     // Doesn't update the canvas; for that, must invoke update_canvas().
     // Pixels outside the canvas are ignored.
     //
-    pub fn write_pixel(&mut self, mut x: i16, mut y: i16, color: crate::Color) {
-        let (width, height) = self.canvas.logical_size();
+    fn write_pixel(&mut self, x: i16, y: i16, color: crate::Color) {
+        let (x, y) = self.adjust_coordinates(x, y);
 
-        x += self.center_x;
-        y += self.center_y;
-
-        y = self.canvas_height() as i16 - y as i16 - 1;
-
-        if x >= 0 && x < width as i16 && y >= 0 && y < height as i16 {
-            self.pixels_buffer[y as usize * width as usize + x as usize] = color;
+        if let Some(pixel_buffer_index) = self.pixel_buffer_index(x, y) {
+            self.pixels_buffer[pixel_buffer_index] = color;
 
             let (r, g, b) = color.u8_components();
             let pixel = pixels::Color::RGB(r, g, b);
@@ -99,35 +163,29 @@ impl Sdl2Interface {
         }
     }
 
-    pub fn update_canvas(&mut self) {
+    // Required after writing pixels.
+    //
+    fn update(&mut self) {
         self.canvas.present();
     }
 
-    // Wait for keypress; if a quit event is received (e.g. Alt+F4 or window close), the program will
-    // exit.
-    //
-    pub fn wait_keypress(&mut self) {
-        for event in self.event_pump.wait_iter() {
-            match event {
-                Event::KeyDown { .. } => break,
-                Event::KeyUp { .. } => break,
-                Event::Quit { .. } => std::process::exit(0),
-                _ => {}
-            }
+    fn to_pixels(&self) -> Vec<&crate::Color> {
+        // Inverts the y axis, using rev().
+        //
+        self.pixels_buffer
+            .chunks_exact(self.width as usize)
+            .rev()
+            .flatten()
+            .collect::<Vec<_>>()
+    }
+
+    fn pixel_at(&self, x: i16, y: i16) -> Option<&Color> {
+        let pixel_buffer_index = self.pixel_buffer_index(x, y);
+
+        if let Some(pixel_index) = pixel_buffer_index {
+            Some(&self.pixels_buffer[pixel_index])
+        } else {
+            None
         }
-    }
-
-    // Convenience method.
-    //
-    pub fn canvas_height(&self) -> u16 {
-        self.canvas.logical_size().1 as u16
-    }
-}
-
-impl ExportToPixels for Sdl2Interface {
-    fn to_pixels(&self) -> (&Vec<crate::Color>, u16) {
-        let (width, _) = self.canvas.logical_size();
-
-        (&self.pixels_buffer, width as u16)
     }
 }

@@ -5,6 +5,7 @@ mod chapter03;
 mod chapter04;
 mod chapter05;
 mod chapter06;
+mod chapter07;
 
 fn main() {
     // chapter01::practice();
@@ -12,5 +13,6 @@ fn main() {
     // chapter03::practice();
     // chapter04::practice();
     // chapter05::practice();
-    chapter06::practice();
+    // chapter06::practice();
+    chapter07::practice();
 }

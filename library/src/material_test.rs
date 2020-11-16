@@ -2,10 +2,7 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Material" {
-        use crate::material::Material;
-        use crate::tuple::Tuple;
-        use crate::point_light::PointLight;
-        use crate::color::Color;
+        use crate::*;
 
         describe "Material" {
             context "lighting" {

@@ -1,12 +1,10 @@
 use demonstrate::demonstrate;
 
-use crate::tuple::{Tuple, POINT_TYPE, VECTOR_TYPE};
-use crate::{Axis, EPSILON};
-use std::f64::consts::PI;
-
 demonstrate! {
     describe "Tuple" {
-        use super::*;
+        use crate::*;
+        use crate::tuple::{POINT_TYPE, VECTOR_TYPE};
+        use std::f64::consts::PI;
 
         context "with w=1_0" {
             it "is a point" {

@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use crate::export_to_pixels::ExportToPixels;
+use crate::image::Image;
 
 pub struct PpmEncoder {}
 
@@ -8,11 +8,10 @@ const MAX_LINE_LENGHT: usize = 70;
 const MAX_COLOR_VALUE: u8 = 255;
 
 impl PpmEncoder {
-    pub fn export_image<T: ExportToPixels, U: Write>(image: &T, out: &mut U) {
-        let (pixels, width) = image.to_pixels();
-        let height = pixels.len() as u16 / width;
+    pub fn export_image<T: Image, U: Write>(image: &T, out: &mut U) {
+        let pixels = image.to_pixels();
 
-        let mut buffer = Self::build_header(width, height);
+        let mut buffer = Self::build_header(image.width(), image.height());
 
         let mut current_line = String::new();
 
@@ -40,7 +39,7 @@ impl PpmEncoder {
             buffer += "\n"
         }
 
-        out.write(buffer.as_bytes()).unwrap();
+        out.write_all(buffer.as_bytes()).unwrap();
     }
 
     fn build_header(width: u16, height: u16) -> String {

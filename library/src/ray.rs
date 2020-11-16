@@ -1,4 +1,4 @@
-use crate::{has_float64_value::HasFloat64Value, Matrix, Sphere, Tuple};
+use crate::{has_float64_value::HasFloat64Value, IntersectionState, Matrix, Sphere, Tuple};
 
 #[derive(PartialEq, Debug)]
 pub struct Ray {
@@ -7,6 +7,16 @@ pub struct Ray {
 }
 
 impl Ray {
+    pub fn new<T: HasFloat64Value, U: HasFloat64Value>(
+        origin: (T, T, T),
+        direction: (U, U, U),
+    ) -> Self {
+        Ray {
+            origin: Tuple::point(origin.0, origin.1, origin.2),
+            direction: Tuple::vector(direction.0, direction.1, direction.2),
+        }
+    }
+
     pub fn position<T: HasFloat64Value>(&self, t: T) -> Tuple {
         self.origin + &(self.direction * t.as_f64())
     }
@@ -39,6 +49,7 @@ impl Ray {
     }
 
     // The sphere is assumed to be located at (0, 0, 0).
+    // Intersections are returned in order.
     //
     pub fn intersections(&self, sphere: &Sphere) -> Option<(f64, f64)> {
         let transformed_ray = self.inverse_transform(&sphere.transformation);
@@ -55,7 +66,7 @@ impl Ray {
         let discriminant = b.powi(2) - 4.0 * a * c;
 
         if discriminant < 0.0 {
-            return None;
+            None
         } else {
             let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
             let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
@@ -64,20 +75,36 @@ impl Ray {
         }
     }
 
+    pub fn intersection_state<'a>(&self, t: f64, object: &'a Sphere) -> IntersectionState<'a> {
+        let point = self.position(t);
+        let eyev = -self.direction;
+        let mut normalv = object.normal(&point);
+
+        let inside = if normalv.dot_product(&eyev) >= 0.0 {
+            false
+        } else {
+            normalv = -normalv;
+            true
+        };
+
+        IntersectionState {
+            t,
+            object,
+            point,
+            eyev,
+            normalv,
+            inside,
+        }
+    }
+
     pub fn hit(&self, sphere: &Sphere) -> Option<f64> {
         if let Some((t1, t2)) = self.intersections(sphere) {
             if t1 >= 0.0 {
-                if t2 >= 0.0 {
-                    Some(f64::min(t1, t2))
-                } else {
-                    Some(t1)
-                }
+                Some(t1)
+            } else if t2 >= 0.0 {
+                Some(t2)
             } else {
-                if t2 >= 0.0 {
-                    Some(t2)
-                } else {
-                    None
-                }
+                None
             }
         } else {
             None

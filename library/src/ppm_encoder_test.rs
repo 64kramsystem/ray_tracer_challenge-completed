@@ -1,16 +1,12 @@
 use demonstrate::demonstrate;
-use indoc::indoc;
-
-use crate::color::Color;
-use crate::PpmEncoder;
-use crate::Sdl2Interface;
 
 demonstrate! {
     describe "PpmEncoder" {
-        use super::*;
+        use crate::*;
+        use indoc::indoc;
 
         it "should encode an exportable image" {
-            let mut sdl_interface = Sdl2Interface::init("test", 5, 3, (0, 0));
+            let mut sdl_interface = VirtualImage::new(5, 3);
 
             let c1 = Color::new(1.5, 0, 0);
             let c2 = Color::new(0, 0.5, 0);
@@ -30,8 +26,8 @@ demonstrate! {
                 P3
                 5 3
                 255
-                0 0 0 0 0 0 0 0 0 0 0 0 0 0 255 0 0 0 0 0 0 0 128 0 0 0 0 0 0 0 255 0
-                0 0 0 0 0 0 0 0 0 0 0 0 0
+                255 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 128 0 0 0 0 0 0 0 0 0 0
+                0 0 0 0 0 0 0 0 0 0 0 255
             "};
 
             assert_eq!(buffer_string, expected_string);

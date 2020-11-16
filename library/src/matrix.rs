@@ -4,7 +4,7 @@ use crate::{has_float64_value::HasFloat64Value, Axis};
 use crate::EPSILON;
 
 use std::{
-    mem::{transmute, MaybeUninit},
+    mem::MaybeUninit,
     ops::{Index, IndexMut, Mul},
 };
 
@@ -152,6 +152,23 @@ impl Matrix {
         Self::new(&source_values)
     }
 
+    pub fn view_transform(from: &Tuple, to: &Tuple, up: &Tuple) -> Self {
+        let forward = (*to - from).normalize();
+        let normalized_up = up.normalize();
+        let left = forward.cross_product(normalized_up);
+        let true_up = left.cross_product(forward);
+
+        #[rustfmt::skip]
+        let orientation_values = [
+            left.x,     left.y,     left.z,     0.0,
+            true_up.x,  true_up.y,  true_up.z,  0.0,
+            -forward.x, -forward.y, -forward.z, 0.0,
+            0.0,        0.0,        0.0,        1.0,
+        ];
+
+        Self::new(&orientation_values) * &Matrix::translation(-from.x, -from.y, -from.z)
+    }
+
     pub fn transpose(&self) -> Self {
         let order = self.values.len();
         let mut result = vec![Vec::with_capacity(order); order];
@@ -211,16 +228,16 @@ impl Matrix {
         // The data type is irrelevant here, as long as it supports bit shifts (float doesn't).
         // usize is used for convenience on the next operation.
         //
-        let minor_bits = unsafe { transmute::<_, usize>(minor) };
+        let minor_bits = minor.to_bits();
 
         // This is (0 for even/1 for odd), shifted to be the leftmost bit, so that it's in the sign position
         // of f64 values.
         //
-        let sign_bits = (x + y) << 63;
+        let sign_bits = ((x + y) << 63) as u64;
 
         // Xor keeps the <destination sign> if the <sign operand> is 0, and changes it, if the <sign operand> is 1.
         //
-        unsafe { transmute::<_, f64>(minor_bits ^ sign_bits) }
+        f64::from_bits(minor_bits ^ sign_bits)
     }
 
     pub fn inverse(&self) -> Option<Self> {
