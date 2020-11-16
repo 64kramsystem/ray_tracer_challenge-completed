@@ -1,7 +1,4 @@
-use std::{
-    mem::MaybeUninit,
-    ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub},
-};
+use std::ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub};
 
 use crate::{has_float64_value::HasFloat64Value, Axis, Matrix};
 
@@ -28,19 +25,6 @@ pub struct Tuple {
 }
 
 impl Tuple {
-    // Too many lulz will kill me.
-    //
-    pub fn uninitialized() -> Self {
-        unsafe {
-            Self {
-                x: MaybeUninit::uninit().assume_init(),
-                y: MaybeUninit::uninit().assume_init(),
-                z: MaybeUninit::uninit().assume_init(),
-                w: MaybeUninit::uninit().assume_init(),
-            }
-        }
-    }
-
     pub fn new<T: HasFloat64Value>(x: T, y: T, z: T, w: T) -> Self {
         Self {
             x: x.as_f64(),

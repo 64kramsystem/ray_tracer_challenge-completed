@@ -3,10 +3,7 @@ use crate::{has_float64_value::HasFloat64Value, Axis};
 
 use crate::EPSILON;
 
-use std::{
-    mem::MaybeUninit,
-    ops::{Index, IndexMut, Mul},
-};
+use std::ops::{Index, IndexMut, Mul};
 
 #[derive(Clone, Debug)]
 pub struct Matrix {
@@ -40,18 +37,6 @@ impl Matrix {
                     .collect::<Vec<_>>(),
             );
         }
-
-        Self { values }
-    }
-
-    // For the lulz.
-    //
-    pub fn uninitialized(order: usize) -> Self {
-        let values = (0..order)
-            // Tee-hee-hee
-            //
-            .map(|_| vec![unsafe { MaybeUninit::<f64>::uninit().assume_init() }; order])
-            .collect::<Vec<_>>();
 
         Self { values }
     }
@@ -306,17 +291,20 @@ impl Mul<&Matrix> for &Matrix {
     fn mul(self, rhs: &Matrix) -> Self::Output {
         let order = self.values.len();
 
-        // Pre-initializing makes the multiplication logic easier to understand.
-        //
-        let mut result = Matrix::uninitialized(order);
+        let values = (0..order)
+            .map(|y| {
+                //
+                (0..order)
+                    .map(|x| {
+                        //
+                        (0..order).map(|k| self[y][k] * rhs[k][x]).sum()
+                    })
+                    .collect::<Vec<f64>>()
+                //
+            })
+            .collect::<Vec<Vec<f64>>>();
 
-        for y in 0..order {
-            for x in 0..order {
-                result[y][x] = (0..order).map(|k| self[y][k] * rhs[k][x]).sum();
-            }
-        }
-
-        result
+        Self::Output { values }
     }
 }
 
@@ -338,7 +326,12 @@ impl Mul<&Tuple> for &Matrix {
             panic!("Only matrices of order 4 are allowed to be multiplied by a Tuple");
         }
 
-        let mut result = Tuple::uninitialized();
+        let mut result = Tuple {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+            w: 0.0,
+        };
 
         for y in 0..order {
             result[y] = (0..order).map(|k| self[y][k] * rhs[k]).sum();
