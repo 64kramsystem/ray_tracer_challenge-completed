@@ -40,7 +40,7 @@ impl PpmEncoder {
             buffer += "\n"
         }
 
-        out.write(buffer.as_bytes()).unwrap();
+        out.write_all(buffer.as_bytes()).unwrap();
     }
 
     fn build_header(width: u16, height: u16) -> String {

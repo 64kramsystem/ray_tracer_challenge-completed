@@ -4,7 +4,7 @@ use crate::{has_float64_value::HasFloat64Value, Axis};
 use crate::EPSILON;
 
 use std::{
-    mem::{transmute, MaybeUninit},
+    mem::MaybeUninit,
     ops::{Index, IndexMut, Mul},
 };
 
@@ -211,16 +211,16 @@ impl Matrix {
         // The data type is irrelevant here, as long as it supports bit shifts (float doesn't).
         // usize is used for convenience on the next operation.
         //
-        let minor_bits = unsafe { transmute::<_, usize>(minor) };
+        let minor_bits = minor.to_bits();
 
         // This is (0 for even/1 for odd), shifted to be the leftmost bit, so that it's in the sign position
         // of f64 values.
         //
-        let sign_bits = (x + y) << 63;
+        let sign_bits = ((x + y) << 63) as u64;
 
         // Xor keeps the <destination sign> if the <sign operand> is 0, and changes it, if the <sign operand> is 1.
         //
-        unsafe { transmute::<_, f64>(minor_bits ^ sign_bits) }
+        f64::from_bits(minor_bits ^ sign_bits)
     }
 
     pub fn inverse(&self) -> Option<Self> {
