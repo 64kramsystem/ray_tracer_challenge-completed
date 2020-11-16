@@ -60,7 +60,7 @@ demonstrate! {
         } // context "constructs a ray"
 
         it "should render a world" {
-            let world = World::new();
+            let world = World::default();
 
             let mut camera = Camera::new(11, 11, PI / 2.0);
 

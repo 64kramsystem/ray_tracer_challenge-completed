@@ -1,6 +1,9 @@
 use std::collections::BTreeSet;
 
-use crate::{intersection::Intersection, Color, IntersectionState, PointLight, Ray, Sphere, Tuple};
+use crate::{
+    intersection::Intersection, Color, IntersectionState, Material, Matrix, PointLight, Ray,
+    Sphere, Tuple,
+};
 
 pub struct World {
     pub objects: Vec<Sphere>,
@@ -8,9 +11,24 @@ pub struct World {
 }
 
 impl World {
-    pub fn new() -> Self {
+    pub fn default() -> Self {
         World {
-            objects: vec![],
+            objects: vec![
+                Sphere {
+                    material: Material {
+                        color: Color::new(0.8, 1.0, 0.6),
+                        ambient: 0.1,
+                        diffuse: 0.7,
+                        specular: 0.2,
+                        shininess: 200.0,
+                    },
+                    ..Sphere::default()
+                },
+                Sphere {
+                    transformation: Matrix::scaling(0.5, 0.5, 0.5),
+                    ..Sphere::default()
+                },
+            ],
             light_source: PointLight {
                 position: Tuple::point(-10, 10, -10),
                 intensity: Color::new(1, 1, 1),

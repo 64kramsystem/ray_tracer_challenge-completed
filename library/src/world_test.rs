@@ -6,28 +6,7 @@ demonstrate! {
 
         before {
             #[allow(unused_mut)]
-            let mut world = World {
-                objects: vec![
-                    Sphere {
-                        material: Material {
-                            color: Color::new(0.8, 1.0, 0.6),
-                            ambient: 0.1,
-                            diffuse: 0.7,
-                            specular: 0.2,
-                            shininess: 200.0,
-                        },
-                        ..Sphere::default()
-                    },
-                    Sphere{
-                        transformation: Matrix::scaling(0.5, 0.5, 0.5),
-                        ..Sphere::default()
-                    },
-                ],
-                light_source: PointLight {
-                    position: Tuple::point(-10, 10, -10),
-                    intensity: Color::new(1, 1, 1)
-                },
-            };
+            let mut world = World::default();
         }
 
         it "should intersect with a ray" {
