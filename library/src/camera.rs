@@ -1,4 +1,4 @@
-use crate::{Matrix, Ray, Tuple};
+use crate::{Image, Matrix, Ray, Tuple, World};
 
 pub struct Camera {
     pub hsize: u16,
@@ -61,5 +61,24 @@ impl Camera {
         let direction = (pixel - &origin).normalize();
 
         Ray { origin, direction }
+    }
+
+    // Updates the Image before returning it.
+    //
+    pub fn render<T: Image>(&self, world: &World) -> T {
+        let mut image = T::new(self.hsize, self.vsize);
+
+        for y in 0..self.vsize {
+            for x in 0..self.hsize {
+                let ray = self.ray_for_pixel(x, y);
+                let color = world.color_at(&ray);
+
+                image.write_pixel(x as i16, y as i16, color)
+            }
+        }
+
+        image.update();
+
+        image
     }
 }

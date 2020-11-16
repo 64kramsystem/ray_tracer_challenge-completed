@@ -58,5 +58,23 @@ demonstrate! {
                 assert_eq!(ray.direction, Tuple::vector(sqrt_2 / 2.0, 0, -sqrt_2 / 2.0));
             }
         } // context "constructs a ray"
+
+        it "should render a world" {
+            let world = World::new();
+
+            let mut camera = Camera::new(11, 11, PI / 2.0);
+
+            camera.transform = Matrix::view_transform(
+                &Tuple::point(0, 0, -5),
+                &Tuple::point(0, 0, 0),
+                &Tuple::vector(0, 1, 0),
+            );
+
+            let image: VirtualImage = camera.render(&world);
+
+            let expected_color = &Color::new(0.38066, 0.47583, 0.2855);
+
+            assert_eq!(image.pixel_at(5, 5).unwrap(), expected_color);
+        }
     }
 }
