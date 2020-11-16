@@ -12,6 +12,7 @@ mod ray;
 mod sdl2_interface;
 mod sphere;
 mod tuple;
+mod virtual_image;
 mod world;
 
 pub use camera::Camera;
@@ -26,6 +27,7 @@ pub use ray::Ray;
 pub use sdl2_interface::Sdl2Interface;
 pub use sphere::Sphere;
 pub use tuple::Tuple;
+pub use virtual_image::VirtualImage;
 pub use world::World;
 
 pub const EPSILON: f64 = 1e-4;
