@@ -1,4 +1,6 @@
-use sdl2::{event::Event, pixels, rect::Point, render, video::Window, EventPump};
+use sdl2::{
+    event::Event, keyboard::Keycode, pixels, rect::Point, render, video::Window, EventPump,
+};
 
 use crate::{image::Image, Color};
 
@@ -109,8 +111,14 @@ impl Sdl2Interface {
     pub fn wait_keypress(&mut self) {
         for event in self.event_pump.wait_iter() {
             match event {
-                Event::KeyDown { .. } => break,
-                Event::KeyUp { .. } => break,
+                Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break,
+                Event::KeyUp {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break,
                 Event::Quit { .. } => std::process::exit(0),
                 _ => {}
             }
