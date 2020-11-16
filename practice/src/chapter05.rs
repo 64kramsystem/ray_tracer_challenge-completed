@@ -9,12 +9,9 @@ pub fn practice() {
 
     let (center_x, center_y) = ((display_size / 2) as i16, (display_size / 2) as i16);
 
-    let mut interface = Sdl2Interface::init(
-        "Chapter 05 exercise",
-        display_size,
-        display_size,
-        (center_x, center_y),
-    );
+    let mut interface = Sdl2Interface::init("Chapter 05 exercise", display_size, display_size);
+    interface.invert_y = true;
+    interface.origin = (center_x, center_y);
 
     let hit_color = Color::new(1, 0, 0);
 

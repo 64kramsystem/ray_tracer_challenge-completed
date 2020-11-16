@@ -69,7 +69,8 @@ pub fn practice() {
 
     println!();
 
-    let mut interface = Sdl2Interface::init(file!(), WALL_SIZE, WALL_SIZE, (0, 0));
+    let mut interface = Sdl2Interface::init(file!(), WALL_SIZE, WALL_SIZE);
+    interface.invert_y = true;
 
     for (y, row) in pixels_buffer.iter().enumerate() {
         for (x, pixel_color) in row.iter().enumerate() {

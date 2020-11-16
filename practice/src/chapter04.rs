@@ -3,7 +3,9 @@ use std::f64::consts::PI;
 use library::{Axis, Color, Image, Sdl2Interface, Tuple};
 
 pub fn practice() {
-    let mut interface = Sdl2Interface::init("Chapter 02 exercise", 1024, 600, (512, 300));
+    let mut interface = Sdl2Interface::init("Chapter 02 exercise", 1024, 600);
+    interface.invert_y = true;
+    interface.origin = (512, 300);
     let point_color = Color::new(1, 0, 0);
 
     let mut point = Tuple::point(0, 0, 0);

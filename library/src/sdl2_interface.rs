@@ -19,8 +19,11 @@ pub struct Sdl2Interface {
     width: u16,
     height: u16,
 
-    origin_x: i16,
-    origin_y: i16,
+    // For simple applications. They'd be cool if set by method chaining, however, they're not needed
+    // anymore with camera rendering.
+    //
+    pub invert_y: bool,
+    pub origin: (i16, i16),
 
     // The SDL2 pixel reading doesn't work as intended (see history), so we keep an internal buffer.
     // The upside is that this can be used, if desired, to trivially redraw on window resize.
@@ -33,7 +36,7 @@ impl Sdl2Interface {
     //
     // origin: (x, y), from the bottom left.
     //
-    pub fn init(window_title: &str, width: u16, height: u16, origin: (i16, i16)) -> Self {
+    pub fn init(window_title: &str, width: u16, height: u16) -> Self {
         let sdl_context = sdl2::init().unwrap();
 
         // The resizing (due to `maximized()`) is handled below, by process_events().
@@ -74,15 +77,10 @@ impl Sdl2Interface {
             canvas,
             width,
             height,
-            origin_x: origin.0,
-            origin_y: origin.1,
+            invert_y: false,
+            origin: (0, 0),
             pixels_buffer,
         }
-    }
-
-    pub fn set_origin(&mut self, x: i16, y: i16) {
-        self.origin_x = x;
-        self.origin_y = y;
     }
 
     // Wait for keypress; if a quit event is received (e.g. Alt+F4 or window close), the program will
@@ -108,13 +106,15 @@ impl Sdl2Interface {
     // Adjust in two ways:
     //
     // - recenter according to (origin_x, origin_y)
-    // - turn the y coordinate upside down (Sdl starts at top left; bottom left is more intuitive)
+    // - turn the y coordinate upside down, if set (Sdl starts at top left; bottom left is more intuitive)
     //
     fn adjust_coordinates(&self, mut x: i16, mut y: i16) -> (i16, i16) {
-        x += self.origin_x;
-        y += self.origin_y;
+        x += self.origin.0;
+        y += self.origin.1;
 
-        y = self.height() as i16 - y - 1;
+        if self.invert_y {
+            y = self.height() as i16 - y - 1
+        };
 
         (x, y)
     }
@@ -132,7 +132,7 @@ impl Sdl2Interface {
 
 impl Image for Sdl2Interface {
     fn new(width: u16, height: u16) -> Self {
-        Self::init("Sdl2Interface", width, height, (0, 0))
+        Self::init("Sdl2Interface", width, height)
     }
 
     fn width(&self) -> u16 {
