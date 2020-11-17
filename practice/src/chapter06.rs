@@ -24,7 +24,7 @@ pub fn practice() {
 
     let eye_position = Tuple::point(0, 0, eye_z);
 
-    let mut pixels_buffer = vec![[Color::new(0, 0, 0); WALL_SIZE as usize]; WALL_SIZE as usize];
+    let mut pixels_buffer = vec![vec![Color::new(0, 0, 0); WALL_SIZE as usize]; WALL_SIZE as usize];
     let pixels_buffer_mtx = Mutex::new(&mut pixels_buffer);
 
     // buffer_y/x are just for convenience.
@@ -33,7 +33,7 @@ pub fn practice() {
         .into_par_iter()
         .enumerate()
         .for_each(|(buffer_y, interface_y)| {
-            let mut row_buffer = [Color::new(0, 0, 0); WALL_SIZE as usize];
+            let mut row_buffer = vec![Color::new(0, 0, 0); WALL_SIZE as usize];
 
             for (buffer_x, interface_x) in (-origin_x..origin_x).enumerate() {
                 let eye_ray_direction =
@@ -69,15 +69,8 @@ pub fn practice() {
 
     println!();
 
-    let mut interface = Sdl2Interface::init(file!(), WALL_SIZE, WALL_SIZE);
-    interface.invert_y = true;
+    let mut interface: Sdl2Interface =
+        Sdl2Interface::from_pixels(pixels_buffer, WALL_SIZE, WALL_SIZE);
 
-    for (y, row) in pixels_buffer.iter().enumerate() {
-        for (x, pixel_color) in row.iter().enumerate() {
-            interface.write_pixel(x as i16, y as i16, *pixel_color);
-        }
-    }
-
-    interface.update();
     interface.wait_keypress();
 }

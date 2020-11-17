@@ -67,8 +67,6 @@ impl Camera {
         Ray { origin, direction }
     }
 
-    // Updates the Image before returning it.
-    //
     pub fn render<T: Image>(&self, world: &World) -> T {
         let mut pixels_buffer =
             vec![vec![Color::new(0, 0, 0); self.hsize as usize]; self.vsize as usize];
@@ -84,16 +82,6 @@ impl Camera {
             }
         });
 
-        let mut image = T::new(self.hsize, self.vsize);
-
-        for (y, row) in pixels_buffer.iter().enumerate() {
-            for (x, pixel_color) in row.iter().enumerate() {
-                image.write_pixel(x as i16, y as i16, *pixel_color);
-            }
-        }
-
-        image.update();
-
-        image
+        T::from_pixels(pixels_buffer, self.hsize, self.vsize)
     }
 }
