@@ -66,14 +66,12 @@ demonstrate! {
                     let object = &Sphere::default();
                     let t = 4.0;
 
-                    let expected_intersection_state = IntersectionState {
+                    let expected_intersection_state = IntersectionState::new(
                         t,
                         object,
-                        point: Tuple::point(0, 0, -1),
-                        eyev: Tuple::vector(0, 0, -1),
-                        normalv: Tuple::vector(0, 0, -1),
-                        inside: false,
-                    };
+                        Tuple::point(0, 0, -1),
+                        Tuple::vector(0, 0, -1)
+                    );
 
                     assert_eq!(ray.intersection_state(t, &object), expected_intersection_state);
                 }
@@ -83,14 +81,12 @@ demonstrate! {
                     let object = &Sphere::default();
                     let t = 1.0;
 
-                    let expected_intersection_state = IntersectionState {
+                    let expected_intersection_state = IntersectionState::new(
                         t,
                         object,
-                        point: Tuple::point(0, 0, 1),
-                        eyev: Tuple::vector(0, 0, -1),
-                        normalv: Tuple::vector(0, 0, -1),
-                        inside: true,
-                    };
+                        Tuple::point(0, 0, 1),
+                        Tuple::vector(0, 0, -1)
+                    );
 
                     assert_eq!(ray.intersection_state(t, &object), expected_intersection_state);
                 }
