@@ -68,7 +68,7 @@ fn prepare_world() -> World {
 
     World {
         objects: vec![floor, left_wall, right_wall, middle, right, left],
-        light_source: PointLight::new(Tuple::point(-10, 10, -10), Color::new(1, 1, 1)),
+        light_source: PointLight::new((-10, 10, -10), (1, 1, 1)),
     }
 }
 
