@@ -54,6 +54,7 @@ pub fn practice() {
                         &hit_point,
                         &-eye_ray.direction,
                         &hit_normal,
+                        false,
                     );
 
                     row_buffer[buffer_x] = light_color;
