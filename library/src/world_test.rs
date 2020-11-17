@@ -5,7 +5,7 @@ demonstrate! {
         use crate::*;
 
         before {
-            #[allow(unused_mut)]
+            #[allow(unused_mut,unused_variables)]
             let mut world = World::default();
         }
 
@@ -22,15 +22,45 @@ demonstrate! {
             assert_eq!(intersections, expected_intersections);
         }
 
-        it "should shade an intersection" {
-            let ray = Ray::new((0, 0, -5), (0, 0, 1));
-            let sphere = &world.objects[0];
-            let intersection_state = ray.intersection_state(4.0, sphere);
+        context "intersection shading" {
+            it "should be performed in direct light" {
+                let ray = Ray::new((0, 0, -5), (0, 0, 1));
+                let sphere = &world.objects[0];
+                let intersection_state = ray.intersection_state(4.0, sphere);
 
-            let expected_shade = Color::new(0.38066, 0.47583, 0.2855);
+                let expected_shade = Color::new(0.38066, 0.47583, 0.2855);
 
-            assert_eq!(world.shade_hit(intersection_state), expected_shade);
-        }
+                assert_eq!(world.shade_hit(intersection_state), expected_shade);
+            }
+
+            it "should be performed in the shadow" {
+                let sphere1 = Sphere::default();
+                let sphere2 = Sphere {
+                    transformation: Matrix::translation(0, 0, 10),
+                    ..Sphere::default()
+                };
+
+                let objects = vec![sphere1, sphere2.clone()];
+
+                let light_source = PointLight::new(
+                    Tuple::point(0, 0, -10),
+                    Color::new(1, 1, 1),
+                );
+
+                let world = World { objects, light_source };
+
+                let ray = Ray::new(
+                    (0, 0, 5),
+                    (0, 0, 1),
+                );
+
+                let intersection_state = ray.intersection_state(4.0, &sphere2);
+
+                let expected_color = Color::new(0.1, 0.1, 0.1);
+
+                assert_eq!(world.shade_hit(intersection_state), expected_color);
+            }
+        } // context "intersection shading"
 
         context "color of a ray intersection" {
             it "when a ray misses" {
@@ -58,5 +88,19 @@ demonstrate! {
                 assert_eq!(world.color_at(&ray), expected_color);
             }
         } // context "color of a ray intersection"
+
+        context "shadowing" {
+            it "should find when a point is not in the shadow" {
+                let point = Tuple::point(10, -10, 10);
+
+                assert!(world.is_shadowed(&point));
+            }
+
+            it "should find when a point is in the shadow" {
+                let point = Tuple::point(-20, 20, -20);
+
+                assert!(!world.is_shadowed(&point));
+            }
+        } // context "shadowing"
     }
 }

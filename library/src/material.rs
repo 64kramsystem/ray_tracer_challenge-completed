@@ -32,6 +32,7 @@ impl Material {
         point: &Tuple,
         eyev: &Tuple,
         normalv: &Tuple,
+        in_shadow: bool,
     ) -> Color {
         let effective_color = self.color * &light.intensity;
 
@@ -41,7 +42,7 @@ impl Material {
 
         let light_dot_normal = lightv.dot_product(&normalv);
 
-        let (diffuse, specular) = if light_dot_normal < 0.0 {
+        let (diffuse, specular) = if in_shadow || light_dot_normal < 0.0 {
             let diffuse = Color::new(0, 0, 0);
             let specular = Color::new(0, 0, 0);
 

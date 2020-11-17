@@ -65,11 +65,14 @@ impl World {
     }
 
     pub fn shade_hit(&self, intersection_state: IntersectionState) -> Color {
+        let is_shadowed = self.is_shadowed(&intersection_state.over_point);
+
         intersection_state.object.material.lighting(
             &self.light_source,
             &intersection_state.point,
             &intersection_state.eyev,
             &intersection_state.normalv,
+            is_shadowed,
         )
     }
 
@@ -82,5 +85,26 @@ impl World {
         } else {
             Color::new(0, 0, 0)
         }
+    }
+
+    pub fn is_shadowed(&self, point: &Tuple) -> bool {
+        let lightv = self.light_source.position - point;
+        let distance = lightv.magnitude();
+        let direction = lightv.normalize();
+
+        let ray = Ray {
+            origin: *point,
+            direction,
+        };
+
+        let intersections = self.intersections(&ray);
+
+        if let Some(hit) = intersections.first() {
+            if hit.t < distance {
+                return true;
+            }
+        }
+
+        false
     }
 }
