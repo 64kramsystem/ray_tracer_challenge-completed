@@ -6,10 +6,10 @@ pub struct PointLight {
 }
 
 impl PointLight {
-    pub fn new(position: Tuple, intensity: Color) -> Self {
+    pub fn new(position: (i32, i32, i32), intensity: (i32, i32, i32)) -> Self {
         Self {
-            position,
-            intensity,
+            position: Tuple::point(position.0, position.1, position.2),
+            intensity: Color::new(intensity.0, intensity.1, intensity.2),
         }
     }
 }

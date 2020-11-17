@@ -43,8 +43,8 @@ demonstrate! {
                 let objects = vec![sphere1, sphere2.clone()];
 
                 let light_source = PointLight::new(
-                    Tuple::point(0, 0, -10),
-                    Color::new(1, 1, 1),
+                    (0, 0, -10),
+                    (1, 1, 1),
                 );
 
                 let world = World { objects, light_source };

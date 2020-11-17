@@ -10,7 +10,7 @@ pub fn practice() {
     const WALL_SIZE: u16 = 100;
     let eye_z = -50.0;
     let wall_z = 50.0;
-    let light_position = Tuple::point(-20, 30, -50);
+    let light_position = (-20, 30, -50);
 
     let (origin_x, origin_y) = ((WALL_SIZE / 2) as i16, (WALL_SIZE / 2) as i16);
 
@@ -20,7 +20,7 @@ pub fn practice() {
         * &Matrix::rotation(Axis::Z, -PI / 4.0)
         * &Matrix::scaling(6.25, 12.5, 12.5);
 
-    let light = PointLight::new(light_position, Color::new(1, 1, 1));
+    let light = PointLight::new(light_position, (1, 1, 1));
 
     let eye_position = Tuple::point(0, 0, eye_z);
 

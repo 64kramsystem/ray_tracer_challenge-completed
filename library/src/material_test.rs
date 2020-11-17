@@ -14,7 +14,7 @@ demonstrate! {
                 it "should be computed when the eye is between the light and the surface" {
                     let eyev = Tuple::vector(0, 0, -1);
                     let normalv = Tuple::vector(0, 0, -1);
-                    let light = PointLight::new(Tuple::point(0, 0, -10), Color::new(1, 1, 1));
+                    let light = PointLight::new((0, 0, -10), (1, 1, 1));
 
                     let actual_result  = material.lighting(&light, &position, &eyev, &normalv, false);
                     let expected_result = Color::new(1.9, 1.9, 1.9);
@@ -25,7 +25,7 @@ demonstrate! {
                 it "should be computed when the eye is in the path of the reflection vector" {
                     let eyev = Tuple::vector(0, -2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
                     let normalv = Tuple::vector(0, 0, -1);
-                    let light = PointLight::new(Tuple::point(0, 10, -10), Color::new(1, 1, 1));
+                    let light = PointLight::new((0, 10, -10), (1, 1, 1));
 
                     let actual_result  = material.lighting(&light, &position, &eyev, &normalv, false);
                     let expected_result = Color::new(1.6364, 1.6364, 1.6364);
@@ -36,7 +36,7 @@ demonstrate! {
                 it "should be computed in the shadow" {
                     let eyev = Tuple::vector(0, 0, -1);
                     let normalv = Tuple::vector(0, 0, -1);
-                    let light = PointLight::new(Tuple::point(0, 10, -10), Color::new(1, 1, 1));
+                    let light = PointLight::new((0, 10, -10), (1, 1, 1));
 
                     let actual_result  = material.lighting(&light, &position, &eyev, &normalv, true);
                     let expected_result = Color::new(0.1, 0.1, 0.1);
