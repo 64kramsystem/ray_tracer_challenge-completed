@@ -64,6 +64,24 @@ impl World {
         all_intersections.into_iter().collect::<Vec<_>>()
     }
 
+    // Optimized version of intersections(), which stops at the first obstructing intersection.
+    //
+    pub fn is_ray_obstructed(&self, ray: &Ray, distance: f64) -> bool {
+        for object in self.objects.iter() {
+            let object_intersections = ray.intersections(object);
+
+            if let Some((intersection_1, intersection_2)) = object_intersections {
+                if (intersection_1 >= 0.0 && intersection_1 < distance)
+                    || (intersection_2 >= 0.0 && intersection_2 < distance)
+                {
+                    return true;
+                }
+            }
+        }
+
+        false
+    }
+
     pub fn shade_hit(&self, intersection_state: IntersectionState) -> Color {
         let is_shadowed = self.is_shadowed(&intersection_state.over_point);
 
@@ -97,14 +115,6 @@ impl World {
             direction,
         };
 
-        let intersections = self.intersections(&ray);
-
-        if let Some(hit) = intersections.first() {
-            if hit.t < distance {
-                return true;
-            }
-        }
-
-        false
+        self.is_ray_obstructed(&ray, distance)
     }
 }
