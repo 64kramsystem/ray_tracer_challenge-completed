@@ -73,3 +73,6 @@ mod world_test;
 
 #[cfg(test)]
 mod camera_test;
+
+#[cfg(test)]
+mod shape_test;

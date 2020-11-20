@@ -34,15 +34,6 @@ demonstrate! {
             assert!(next_id_2 > next_id);
         }
 
-        it "should return the normal on a transformed sphere" {
-            let sphere = Sphere::default().translate(0, 1, 0);
-
-            let actual_normal = sphere.normal(&Tuple::point(0.0, 1.70711, -0.70711));
-            let expected_normal = Tuple::vector(0, 0.70711, -0.70711);
-
-            assert_eq!(actual_normal, expected_normal);
-        }
-
         context "returns the intersections" {
             context "with an untransformed sphere" {
                 it "at two points" {
@@ -69,24 +60,6 @@ demonstrate! {
                     assert_eq!(sphere.intersections(&ray), None);
                 }
             } // context "with an untransformed sphere"
-
-            context "with a transformed sphere" {
-                it "scaled" {
-                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
-
-                    let sphere = Sphere::default().scale(2, 2, 2);
-
-                    assert_eq!(sphere.intersections(&ray), Some((3.0, 7.0)));
-                }
-
-                it "translated" {
-                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
-
-                    let sphere = Sphere::default().translate(5, 0, 0);
-
-                    assert_eq!(sphere.intersections(&ray), None);
-                }
-            } // context "with a transformed sphere"
         } // context "returns the intersections"
     }
 }
