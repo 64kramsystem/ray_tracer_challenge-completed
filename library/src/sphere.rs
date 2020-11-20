@@ -1,14 +1,12 @@
-use std::sync::Mutex;
+use crate::{
+    has_float64_value::HasFloat64Value,
+    shape::{self, private::ShapeLocal},
+    Axis, Material, Matrix, Shape, Tuple,
+};
 
-use crate::{has_float64_value::HasFloat64Value, Axis, Material, Matrix, Tuple};
-
-lazy_static::lazy_static! {
-  static ref NEXT_ID: Mutex<u32> = Mutex::new(1);
-}
-
-#[derive(Clone, Debug, PartialEq, SmartDefault)]
+#[derive(Clone, Debug, SmartDefault)]
 pub struct Sphere {
-    #[default(_code = "Self::new_id()")]
+    #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
     #[default(Matrix::identity(4))]
     pub transformation: Matrix,
@@ -17,15 +15,6 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    fn new_id() -> u32 {
-        let mut next_id_mtx = NEXT_ID.lock().unwrap();
-
-        let next_id = *next_id_mtx;
-        *next_id_mtx += 1;
-
-        next_id
-    }
-
     pub fn scale<T: HasFloat64Value>(self, x: T, y: T, z: T) -> Self {
         self.transform(&Matrix::scaling(x, y, z))
     }
@@ -49,24 +38,24 @@ impl Sphere {
         self.transformation = new_transformation;
         self
     }
+}
 
-    pub fn normal(&self, world_point: &Tuple) -> Tuple {
-        let object_point = if let Some(inverse) = self.transformation.inverse() {
-            inverse * world_point
-        } else {
-            panic!()
-        };
+impl ShapeLocal for Sphere {
+    fn local_normal(&self, object_point: &Tuple) -> Tuple {
+        object_point - &Tuple::point(0, 0, 0)
+    }
+}
 
-        let object_normal = object_point - &Tuple::point(0, 0, 0);
+impl Shape for Sphere {
+    fn id(&self) -> u32 {
+        self.id
+    }
 
-        let mut world_normal = if let Some(inverse) = self.transformation.inverse() {
-            inverse.transpose() * &object_normal
-        } else {
-            panic!()
-        };
+    fn transformation(&self) -> &Matrix {
+        &self.transformation
+    }
 
-        world_normal.w = 0.0;
-
-        world_normal.normalize()
+    fn material(&self) -> &Material {
+        &self.material
     }
 }
