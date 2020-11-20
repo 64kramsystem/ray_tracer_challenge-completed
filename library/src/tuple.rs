@@ -167,7 +167,15 @@ impl Sub<&Self> for Tuple {
     type Output = Self;
 
     fn sub(self, rhs: &Self) -> Self::Output {
-        Self {
+        &self - rhs
+    }
+}
+
+impl Sub<&Tuple> for &Tuple {
+    type Output = Tuple;
+
+    fn sub(self, rhs: &Tuple) -> Self::Output {
+        Tuple {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
             z: self.z - rhs.z,
