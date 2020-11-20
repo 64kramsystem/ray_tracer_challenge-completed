@@ -50,12 +50,6 @@ impl Sphere {
         self
     }
 
-    // Not clear if this is actually useful (it's used once in world normal()).
-    //
-    // pub fn normal<T: HasFloat64Value>(point_x: T, point_y: T, point_z: T) -> Tuple {
-    //     Tuple::point(point_x, point_y, point_z) - Tuple::point(0, 0, 0)
-    // }
-
     pub fn normal(&self, world_point: &Tuple) -> Tuple {
         let object_point = if let Some(inverse) = self.transformation.inverse() {
             inverse * world_point

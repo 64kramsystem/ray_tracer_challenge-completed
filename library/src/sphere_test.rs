@@ -34,16 +34,6 @@ demonstrate! {
             assert!(next_id_2 > next_id);
         }
 
-        // See note on the method.
-        //
-        // it "should return the normal" {
-        //     let value = 3.0_f64.powf(-0.5);
-        //
-        //     let expected_normal = Tuple::vector(value, value, value);
-        //
-        //     assert_eq!(Sphere::normal(value, value, value), expected_normal);
-        // }
-
         it "should return the normal on a transformed sphere" {
             let sphere = Sphere::default().translate(0, 1, 0);
 
