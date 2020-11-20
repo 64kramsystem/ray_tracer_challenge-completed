@@ -1,13 +1,13 @@
 use std::{cmp::Ordering, fmt::Debug};
 
-use crate::Sphere;
+use crate::Shape;
 
 // Setting NaN values for t is invalid; it will cause undefined behavior when sorting, likely panic.
 //
 #[derive(Debug)]
 pub struct Intersection<'a> {
     pub t: f64,
-    pub object: &'a Sphere,
+    pub object: &'a dyn Shape,
 }
 
 // This only informs the compiler that the type supports (full) equivalence.

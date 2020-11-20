@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 use library::{
-    Axis, Camera, Color, Material, Matrix, PointLight, Sdl2Interface, Sphere, Tuple, World,
+    Axis, Camera, Color, Material, Matrix, PointLight, Sdl2Interface, Shape, Sphere, Tuple, World,
 };
 
 fn prepare_world() -> World {
@@ -66,8 +66,17 @@ fn prepare_world() -> World {
         ..Sphere::default()
     };
 
+    let objects: Vec<Box<dyn Shape>> = vec![
+        Box::new(floor),
+        Box::new(left_wall),
+        Box::new(right_wall),
+        Box::new(middle),
+        Box::new(right),
+        Box::new(left),
+    ];
+
     World {
-        objects: vec![floor, left_wall, right_wall, middle, right, left],
+        objects,
         light_source: PointLight::new((-10, 10, -10), (1, 1, 1)),
     }
 }

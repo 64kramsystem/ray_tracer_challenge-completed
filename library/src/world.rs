@@ -1,12 +1,12 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    intersection::Intersection, Color, IntersectionState, Material, Matrix, PointLight, Ray,
+    intersection::Intersection, Color, IntersectionState, Material, Matrix, PointLight, Ray, Shape,
     Sphere, Tuple,
 };
 
 pub struct World {
-    pub objects: Vec<Sphere>,
+    pub objects: Vec<Box<dyn Shape>>,
     pub light_source: PointLight,
 }
 
@@ -14,7 +14,7 @@ impl World {
     pub fn default() -> Self {
         World {
             objects: vec![
-                Sphere {
+                Box::new(Sphere {
                     material: Material {
                         color: Color::new(0.8, 1.0, 0.6),
                         ambient: 0.1,
@@ -23,11 +23,11 @@ impl World {
                         shininess: 200.0,
                     },
                     ..Sphere::default()
-                },
-                Sphere {
+                }),
+                Box::new(Sphere {
                     transformation: Matrix::scaling(0.5, 0.5, 0.5),
                     ..Sphere::default()
-                },
+                }),
             ],
             light_source: PointLight {
                 position: Tuple::point(-10, 10, -10),
@@ -42,20 +42,20 @@ impl World {
         let mut all_intersections = BTreeSet::new();
 
         for object in self.objects.iter() {
-            let object_intersections = ray.intersections(object);
+            let object_intersections = object.intersections(ray);
 
             if let Some((intersection_1, intersection_2)) = object_intersections {
                 if intersection_1 >= 0.0 {
                     all_intersections.insert(Intersection {
                         t: intersection_1,
-                        object,
+                        object: object.as_ref(),
                     });
                 }
 
                 if intersection_2 >= 0.0 {
                     all_intersections.insert(Intersection {
                         t: intersection_2,
-                        object,
+                        object: object.as_ref(),
                     });
                 }
             }
@@ -68,7 +68,7 @@ impl World {
     //
     pub fn is_ray_obstructed(&self, ray: &Ray, distance: f64) -> bool {
         for object in self.objects.iter() {
-            let object_intersections = ray.intersections(object);
+            let object_intersections = object.intersections(ray);
 
             if let Some((intersection_1, intersection_2)) = object_intersections {
                 if (intersection_1 >= 0.0 && intersection_1 < distance)
@@ -98,7 +98,7 @@ impl World {
         let intersections = self.intersections(ray);
 
         if let Some(Intersection { t, object }) = intersections.first() {
-            let intersection_state = ray.intersection_state(*t, object);
+            let intersection_state = ray.intersection_state(*t, *object);
             self.shade_hit(intersection_state)
         } else {
             Color::new(0, 0, 0)

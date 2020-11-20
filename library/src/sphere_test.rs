@@ -42,5 +42,51 @@ demonstrate! {
 
             assert_eq!(actual_normal, expected_normal);
         }
+
+        context "returns the intersections" {
+            context "with an untransformed sphere" {
+                it "at two points" {
+                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
+
+                    let sphere = Sphere::default();
+
+                    assert_eq!(sphere.intersections(&ray), Some((4.0, 6.0)));
+                }
+
+                it "at a tangent" {
+                    let ray = Ray::new((0, 1, -5), (0, 0, 1));
+
+                    let sphere = Sphere::default();
+
+                    assert_eq!(sphere.intersections(&ray), Some((5.0, 5.0)));
+                }
+
+                it "at no point (miss)" {
+                    let ray = Ray::new((0, 2, -5), (0, 0, 1));
+
+                    let sphere = Sphere::default();
+
+                    assert_eq!(sphere.intersections(&ray), None);
+                }
+            } // context "with an untransformed sphere"
+
+            context "with a transformed sphere" {
+                it "scaled" {
+                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
+
+                    let sphere = Sphere::default().scale(2, 2, 2);
+
+                    assert_eq!(sphere.intersections(&ray), Some((3.0, 7.0)));
+                }
+
+                it "translated" {
+                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
+
+                    let sphere = Sphere::default().translate(5, 0, 0);
+
+                    assert_eq!(sphere.intersections(&ray), None);
+                }
+            } // context "with a transformed sphere"
+        } // context "returns the intersections"
     }
 }

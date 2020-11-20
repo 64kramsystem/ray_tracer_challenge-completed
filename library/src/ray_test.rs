@@ -13,52 +13,6 @@ demonstrate! {
             assert_eq!(ray.position(2.5), Tuple::point(4.5, 3, 4));
         }
 
-        context "returns the intersections" {
-            context "with an untransformed sphere" {
-                it "at two points" {
-                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
-
-                    let sphere = Sphere::default();
-
-                    assert_eq!(ray.intersections(&sphere), Some((4.0, 6.0)));
-                }
-
-                it "at a tangent" {
-                    let ray = Ray::new((0, 1, -5), (0, 0, 1));
-
-                    let sphere = Sphere::default();
-
-                    assert_eq!(ray.intersections(&sphere), Some((5.0, 5.0)));
-                }
-
-                it "at no point (miss)" {
-                    let ray = Ray::new((0, 2, -5), (0, 0, 1));
-
-                    let sphere = Sphere::default();
-
-                    assert_eq!(ray.intersections(&sphere), None);
-                }
-            } // context "with an untransformed sphere"
-
-            context "with a transformed sphere" {
-                it "scaled" {
-                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
-
-                    let sphere = Sphere::default().scale(2, 2, 2);
-
-                    assert_eq!(ray.intersections(&sphere), Some((3.0, 7.0)));
-                }
-
-                it "translated" {
-                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
-
-                    let sphere = Sphere::default().translate(5, 0, 0);
-
-                    assert_eq!(ray.intersections(&sphere), None);
-                }
-            } // context "with a transformed sphere"
-        } // context "returns the intersections"
-
         context "intersection state" {
             context "should be computed from an intersection and an object" {
                 it "with the ray outside the object" {
@@ -73,7 +27,7 @@ demonstrate! {
                         Tuple::vector(0, 0, -1)
                     );
 
-                    assert_eq!(ray.intersection_state(t, &object), expected_intersection_state);
+                    assert_eq!(ray.intersection_state(t, object), expected_intersection_state);
                 }
 
                 it "with the ray inside the object" {
@@ -88,7 +42,7 @@ demonstrate! {
                         Tuple::vector(0, 0, -1)
                     );
 
-                    assert_eq!(ray.intersection_state(t, &object), expected_intersection_state);
+                    assert_eq!(ray.intersection_state(t, object), expected_intersection_state);
                 }
             } // context "should be computed from an intersection and an object"
         } // context "intersection state"

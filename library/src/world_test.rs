@@ -26,7 +26,7 @@ demonstrate! {
             it "should be performed in direct light" {
                 let ray = Ray::new((0, 0, -5), (0, 0, 1));
                 let sphere = &world.objects[0];
-                let intersection_state = ray.intersection_state(4.0, sphere);
+                let intersection_state = ray.intersection_state(4.0, &**sphere);
 
                 let expected_shade = Color::new(0.38066, 0.47583, 0.2855);
 
@@ -40,7 +40,7 @@ demonstrate! {
                     ..Sphere::default()
                 };
 
-                let objects = vec![sphere1, sphere2.clone()];
+                let objects: Vec<Box<dyn Shape>> = vec![Box::new(sphere1), Box::new(sphere2.clone())];
 
                 let light_source = PointLight::new(
                     (0, 0, -10),
@@ -80,10 +80,10 @@ demonstrate! {
             it "with the intersection behind the ray" {
                 let ray = Ray::new((0.0, 0.0, 0.75), (0, 0, -1));
 
-                world.objects[0].material.ambient = 1.0;
-                world.objects[1].material.ambient = 1.0;
+                (*world.objects[0].material_mut()).ambient = 1.0;
+                (*world.objects[1].material_mut()).ambient = 1.0;
 
-                let expected_color = world.objects[1].material.color;
+                let expected_color = world.objects[1].material().color;
 
                 assert_eq!(world.color_at(&ray), expected_color);
             }

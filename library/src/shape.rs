@@ -1,6 +1,6 @@
 use std::{fmt, sync::Mutex};
 
-use crate::{Material, Matrix, Tuple};
+use crate::{Material, Matrix, Ray, Tuple};
 
 lazy_static::lazy_static! {
   static ref NEXT_ID: Mutex<u32> = Mutex::new(1);
@@ -16,17 +16,20 @@ pub(crate) fn new_shape_id() -> u32 {
 }
 
 pub(crate) mod private {
-    use crate::Tuple;
+    use crate::{Ray, Tuple};
 
     pub trait ShapeLocal {
         fn local_normal(&self, world_point: &Tuple) -> Tuple;
+        fn local_intersections(&self, transformed_ray: &Ray) -> Option<(f64, f64)>;
     }
 }
 
-pub trait Shape: private::ShapeLocal + fmt::Debug {
+pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
     fn id(&self) -> u32;
     fn transformation(&self) -> &Matrix;
+    fn transformation_mut(&mut self) -> &mut Matrix;
     fn material(&self) -> &Material;
+    fn material_mut(&mut self) -> &mut Material;
 
     fn normal(&self, world_point: &Tuple) -> Tuple {
         let object_point = if let Some(inverse) = self.transformation().inverse() {
@@ -46,6 +49,13 @@ pub trait Shape: private::ShapeLocal + fmt::Debug {
         world_normal.w = 0.0;
 
         world_normal.normalize()
+    }
+
+    // Intersections are returned in order.
+    //
+    fn intersections(&self, ray: &Ray) -> Option<(f64, f64)> {
+        let transformed_ray = ray.inverse_transform(self.transformation());
+        self.local_intersections(&transformed_ray)
     }
 }
 

@@ -44,6 +44,28 @@ impl ShapeLocal for Sphere {
     fn local_normal(&self, object_point: &Tuple) -> Tuple {
         object_point - &Tuple::point(0, 0, 0)
     }
+
+    fn local_intersections(&self, transformed_ray: &crate::Ray) -> Option<(f64, f64)> {
+        let sphere_location = Tuple::point(0, 0, 0);
+        let sphere_to_ray = transformed_ray.origin - &sphere_location;
+
+        let a = transformed_ray
+            .direction
+            .dot_product(&transformed_ray.direction);
+        let b = 2.0 * transformed_ray.direction.dot_product(&sphere_to_ray);
+        let c = sphere_to_ray.dot_product(&sphere_to_ray) - 1.0;
+
+        let discriminant = b.powi(2) - 4.0 * a * c;
+
+        if discriminant < 0.0 {
+            None
+        } else {
+            let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
+            let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
+
+            Some((t1, t2))
+        }
+    }
 }
 
 impl Shape for Sphere {
@@ -55,7 +77,15 @@ impl Shape for Sphere {
         &self.transformation
     }
 
+    fn transformation_mut(&mut self) -> &mut Matrix {
+        &mut self.transformation
+    }
+
     fn material(&self) -> &Material {
         &self.material
+    }
+
+    fn material_mut(&mut self) -> &mut Material {
+        &mut self.material
     }
 }
