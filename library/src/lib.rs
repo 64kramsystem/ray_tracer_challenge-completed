@@ -1,17 +1,12 @@
 mod color;
 mod has_float64_value;
-mod image;
+pub mod interface;
 mod material;
 pub mod math;
-mod sdl2_interface;
 pub mod space;
-mod virtual_image;
 
 pub use color::Color;
-pub use image::Image;
 pub use material::Material;
-pub use sdl2_interface::Sdl2Interface;
-pub use virtual_image::VirtualImage;
 
 pub enum Axis {
     X,

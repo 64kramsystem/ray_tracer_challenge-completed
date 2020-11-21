@@ -2,7 +2,8 @@ use sdl2::{
     event::Event, keyboard::Keycode, pixels, rect::Point, render, video::Window, EventPump,
 };
 
-use crate::{image::Image, Color};
+use super::image::Image;
+use crate::Color;
 
 // Interface for drawing to a canvas, and waiting a keypress, intentionally designed to be as simple
 // as  possible.

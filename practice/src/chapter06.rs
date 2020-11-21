@@ -2,9 +2,10 @@ use std::io::{self, Write};
 use std::{f64::consts::PI, sync::Mutex};
 
 use library::{
+    interface::{Image, Sdl2Interface},
     math::{Matrix, Tuple},
     space::{PointLight, Ray, Shape, Sphere},
-    Axis, Color, Image, Sdl2Interface,
+    Axis, Color,
 };
 use rayon::prelude::*;
 

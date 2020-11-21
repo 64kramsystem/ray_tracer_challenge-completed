@@ -1,4 +1,5 @@
-use crate::{Color, Image};
+use super::Image;
+use crate::Color;
 
 // An image that has no phisical representation, usable for testing rendering.
 //

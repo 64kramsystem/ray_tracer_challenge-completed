@@ -1,9 +1,10 @@
 use std::f64::consts::PI;
 
 use library::{
+    interface::Sdl2Interface,
     math::{Matrix, Tuple},
     space::{Camera, PointLight, Shape, Sphere, World},
-    Axis, Color, Material, Sdl2Interface,
+    Axis, Color, Material,
 };
 
 fn prepare_world() -> World {
