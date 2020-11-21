@@ -2,7 +2,8 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Sphere" {
-        use crate::*;
+        use crate::space::*;
+        use crate::math::*;
 
         it "should have an identity transformation of order 4 as default" {
             assert_eq!(Sphere::default().transformation, Matrix::identity(4));
@@ -34,23 +35,32 @@ demonstrate! {
             assert!(next_id_2 > next_id);
         }
 
-        // See note on the method.
-        //
-        // it "should return the normal" {
-        //     let value = 3.0_f64.powf(-0.5);
-        //
-        //     let expected_normal = Tuple::vector(value, value, value);
-        //
-        //     assert_eq!(Sphere::normal(value, value, value), expected_normal);
-        // }
+        context "returns the intersections" {
+            context "with an untransformed sphere" {
+                it "at two points" {
+                    let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
-        it "should return the normal on a transformed sphere" {
-            let sphere = Sphere::default().translate(0, 1, 0);
+                    let sphere = Sphere::default();
 
-            let actual_normal = sphere.normal(&Tuple::point(0.0, 1.70711, -0.70711));
-            let expected_normal = Tuple::vector(0, 0.70711, -0.70711);
+                    assert_eq!(sphere.intersections(&ray), Some((4.0, 6.0)));
+                }
 
-            assert_eq!(actual_normal, expected_normal);
-        }
+                it "at a tangent" {
+                    let ray = Ray::new((0, 1, -5), (0, 0, 1));
+
+                    let sphere = Sphere::default();
+
+                    assert_eq!(sphere.intersections(&ray), Some((5.0, 5.0)));
+                }
+
+                it "at no point (miss)" {
+                    let ray = Ray::new((0, 2, -5), (0, 0, 1));
+
+                    let sphere = Sphere::default();
+
+                    assert_eq!(sphere.intersections(&ray), None);
+                }
+            } // context "with an untransformed sphere"
+        } // context "returns the intersections"
     }
 }

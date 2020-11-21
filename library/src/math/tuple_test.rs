@@ -3,7 +3,7 @@ use demonstrate::demonstrate;
 demonstrate! {
     describe "Tuple" {
         use crate::*;
-        use crate::tuple::{POINT_TYPE, VECTOR_TYPE};
+        use crate::math::{*, tuple::{POINT_TYPE, VECTOR_TYPE}};
         use std::f64::consts::PI;
 
         context "with w=1_0" {

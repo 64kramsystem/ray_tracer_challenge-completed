@@ -1,6 +1,11 @@
 use std::f64::consts::PI;
 
-use library::{Axis, Color, Image, Sdl2Interface, Tuple};
+use library::{
+    interface::{Image, Sdl2Interface},
+    math::Tuple,
+    properties::Color,
+    Axis,
+};
 
 pub fn practice() {
     let mut interface = Sdl2Interface::init("Chapter 02 exercise", 1024, 600);

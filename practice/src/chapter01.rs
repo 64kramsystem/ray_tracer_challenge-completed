@@ -1,4 +1,4 @@
-use library::Tuple;
+use library::math::Tuple;
 
 pub struct Projectile {
     pub position: Tuple, // Point

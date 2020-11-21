@@ -1,8 +1,7 @@
 use std::ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub};
 
-use crate::{has_float64_value::HasFloat64Value, Axis, Matrix};
-
-use crate::EPSILON;
+use super::{Matrix, EPSILON};
+use crate::{lang::HasFloat64Value, Axis};
 
 pub const POINT_TYPE: f64 = 1.0;
 pub const VECTOR_TYPE: f64 = 0.0;
@@ -167,7 +166,15 @@ impl Sub<&Self> for Tuple {
     type Output = Self;
 
     fn sub(self, rhs: &Self) -> Self::Output {
-        Self {
+        &self - rhs
+    }
+}
+
+impl Sub<&Tuple> for &Tuple {
+    type Output = Tuple;
+
+    fn sub(self, rhs: &Tuple) -> Self::Output {
+        Tuple {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
             z: self.z - rhs.z,

@@ -1,4 +1,4 @@
-use crate::Color;
+use crate::properties::Color;
 
 pub trait Image {
     fn new(width: u16, height: u16) -> Self;

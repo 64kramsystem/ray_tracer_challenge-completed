@@ -2,7 +2,8 @@ use sdl2::{
     event::Event, keyboard::Keycode, pixels, rect::Point, render, video::Window, EventPump,
 };
 
-use crate::{image::Image, Color};
+use super::image::Image;
+use crate::properties::Color;
 
 // Interface for drawing to a canvas, and waiting a keypress, intentionally designed to be as simple
 // as  possible.
@@ -28,7 +29,7 @@ pub struct Sdl2Interface {
     // The SDL2 pixel reading doesn't work as intended (see history), so we keep an internal buffer.
     // The upside is that this can be used, if desired, to trivially redraw on window resize.
     //
-    pixels_buffer: Vec<crate::Color>,
+    pixels_buffer: Vec<Color>,
 }
 
 impl Sdl2Interface {
@@ -64,7 +65,7 @@ impl Sdl2Interface {
         event_pump.pump_events();
 
         let pixels_buffer = vec![
-            crate::Color {
+            Color {
                 r: 0.0,
                 g: 0.0,
                 b: 0.0,
@@ -146,7 +147,7 @@ impl Image for Sdl2Interface {
     // Doesn't update the canvas; for that, must invoke update_canvas().
     // Pixels outside the canvas are ignored.
     //
-    fn write_pixel(&mut self, x: i16, y: i16, color: crate::Color) {
+    fn write_pixel(&mut self, x: i16, y: i16, color: Color) {
         let (x, y) = self.adjust_coordinates(x, y);
 
         if let Some(pixel_buffer_index) = self.pixel_buffer_index(x, y) {
@@ -169,7 +170,7 @@ impl Image for Sdl2Interface {
         self.canvas.present();
     }
 
-    fn to_pixels(&self) -> Vec<&crate::Color> {
+    fn to_pixels(&self) -> Vec<&Color> {
         // Inverts the y axis, using rev().
         //
         self.pixels_buffer

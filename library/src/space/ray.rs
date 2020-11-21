@@ -1,4 +1,9 @@
-use crate::{has_float64_value::HasFloat64Value, IntersectionState, Matrix, Sphere, Tuple};
+use super::IntersectionState;
+use crate::{
+    lang::HasFloat64Value,
+    math::{Matrix, Tuple},
+    space::Shape,
+};
 
 #[derive(PartialEq, Debug)]
 pub struct Ray {
@@ -48,42 +53,15 @@ impl Ray {
         }
     }
 
-    // The sphere is assumed to be located at (0, 0, 0).
-    // Intersections are returned in order.
-    //
-    pub fn intersections(&self, sphere: &Sphere) -> Option<(f64, f64)> {
-        let transformed_ray = self.inverse_transform(&sphere.transformation);
-
-        let sphere_location = Tuple::point(0, 0, 0);
-        let sphere_to_ray = transformed_ray.origin - &sphere_location;
-
-        let a = transformed_ray
-            .direction
-            .dot_product(&transformed_ray.direction);
-        let b = 2.0 * transformed_ray.direction.dot_product(&sphere_to_ray);
-        let c = sphere_to_ray.dot_product(&sphere_to_ray) - 1.0;
-
-        let discriminant = b.powi(2) - 4.0 * a * c;
-
-        if discriminant < 0.0 {
-            None
-        } else {
-            let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
-            let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
-
-            Some((t1, t2))
-        }
-    }
-
-    pub fn intersection_state<'a>(&self, t: f64, object: &'a Sphere) -> IntersectionState<'a> {
+    pub fn intersection_state<'a>(&self, t: f64, object: &'a dyn Shape) -> IntersectionState<'a> {
         let point = self.position(t);
         let eyev = -self.direction;
 
         IntersectionState::new(t, object, point, eyev)
     }
 
-    pub fn hit(&self, sphere: &Sphere) -> Option<f64> {
-        if let Some((t1, t2)) = self.intersections(sphere) {
+    pub fn hit(&self, sphere: &dyn Shape) -> Option<f64> {
+        if let Some((t1, t2)) = sphere.intersections(self) {
             if t1 >= 0.0 {
                 Some(t1)
             } else if t2 >= 0.0 {

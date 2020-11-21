@@ -4,37 +4,37 @@ use library::{
     interface::Sdl2Interface,
     math::{Matrix, Tuple},
     properties::{Color, Material},
+    space::Plane,
     space::{Camera, PointLight, Shape, Sphere, World},
     Axis,
 };
 
 fn prepare_world() -> World {
-    let floor = Sphere {
-        transformation: Matrix::scaling(10.0, 0.01, 10.0),
+    let light_source = PointLight::new((-10, 10, -10), (1, 1, 1));
+
+    let floor = Plane {
         material: Material {
             color: Color::new(1, 0.9, 0.9),
             specular: 0.0,
             ..Material::default()
         },
-        ..Sphere::default()
+        ..Plane::default()
     };
 
-    let left_wall = Sphere {
+    let left_wall = Plane {
         transformation: Matrix::translation(0, 0, 5)
             * &Matrix::rotation(Axis::Y, -PI / 4.0)
-            * &Matrix::rotation(Axis::X, PI / 2.0)
-            * &Matrix::scaling(10.0, 0.01, 10.0),
+            * &Matrix::rotation(Axis::X, -PI / 2.0),
         material: floor.material.clone(),
-        ..Sphere::default()
+        ..Plane::default()
     };
 
-    let right_wall = Sphere {
+    let right_wall = Plane {
         transformation: Matrix::translation(0, 0, 5)
             * &Matrix::rotation(Axis::Y, PI / 4.0)
-            * &Matrix::rotation(Axis::X, PI / 2.0)
-            * &Matrix::scaling(10.0, 0.01, 10.0),
+            * &Matrix::rotation(Axis::X, -PI / 2.0),
         material: floor.material.clone(),
-        ..Sphere::default()
+        ..Plane::default()
     };
 
     let middle = Sphere {
@@ -81,12 +81,12 @@ fn prepare_world() -> World {
 
     World {
         objects,
-        light_source: PointLight::new((-10, 10, -10), (1, 1, 1)),
+        light_source,
     }
 }
 
 fn prepare_camera() -> Camera {
-    let mut camera = Camera::new(100, 50, PI / 3.0);
+    let mut camera = Camera::new(400, 200, PI / 3.0);
 
     camera.transform = Matrix::view_transform(
         &Tuple::point(0, 1.5, -5),

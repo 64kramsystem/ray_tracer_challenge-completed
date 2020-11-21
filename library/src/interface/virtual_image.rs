@@ -1,9 +1,10 @@
-use crate::{Color, Image};
+use super::Image;
+use crate::properties::Color;
 
 // An image that has no phisical representation, usable for testing rendering.
 //
 pub struct VirtualImage {
-    pub pixels_buffer: Vec<crate::Color>,
+    pub pixels_buffer: Vec<Color>,
     pub width: u16,
     pub height: u16,
 }
@@ -19,7 +20,7 @@ impl VirtualImage {
 impl Image for VirtualImage {
     fn new(width: u16, height: u16) -> Self {
         let pixels_buffer = vec![
-            crate::Color {
+            Color {
                 r: 0.0,
                 g: 0.0,
                 b: 0.0,
