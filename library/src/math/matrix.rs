@@ -1,5 +1,5 @@
 use super::{Tuple, EPSILON};
-use crate::{has_float64_value::HasFloat64Value, Axis};
+use crate::{lang::HasFloat64Value, Axis};
 
 use std::ops::{Index, IndexMut, Mul};
 

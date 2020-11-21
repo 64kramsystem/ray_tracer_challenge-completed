@@ -2,7 +2,7 @@ use std::ops::{Add, Mul, Sub};
 
 use crate::math::EPSILON;
 
-use crate::has_float64_value::HasFloat64Value;
+use crate::lang::HasFloat64Value;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Color {

@@ -1,6 +1,6 @@
 use super::IntersectionState;
 use crate::{
-    has_float64_value::HasFloat64Value,
+    lang::HasFloat64Value,
     math::{Matrix, Tuple},
     space::Shape,
 };
