@@ -1,12 +1,8 @@
-mod color;
 mod has_float64_value;
 pub mod interface;
-mod material;
 pub mod math;
+pub mod properties;
 pub mod space;
-
-pub use color::Color;
-pub use material::Material;
 
 pub enum Axis {
     X,
@@ -20,9 +16,3 @@ extern crate smart_default;
 #[cfg(test)]
 #[macro_use]
 extern crate assert_float_eq;
-
-#[cfg(test)]
-mod color_test;
-
-#[cfg(test)]
-mod material_test;

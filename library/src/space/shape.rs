@@ -3,7 +3,7 @@ use std::{fmt, sync::Mutex};
 use super::Ray;
 use crate::{
     math::{Matrix, Tuple},
-    Material, 
+    properties::Material,
 };
 
 lazy_static::lazy_static! {

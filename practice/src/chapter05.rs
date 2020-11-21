@@ -3,8 +3,9 @@ use std::f64::consts::PI;
 use library::{
     interface::{Image, Sdl2Interface},
     math::{Matrix, Tuple},
+    properties::Color,
     space::{Ray, Sphere},
-    Axis, Color,
+    Axis,
 };
 
 pub fn practice() {

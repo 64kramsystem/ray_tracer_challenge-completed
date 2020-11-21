@@ -4,8 +4,9 @@ use std::{f64::consts::PI, sync::Mutex};
 use library::{
     interface::{Image, Sdl2Interface},
     math::{Matrix, Tuple},
+    properties::Color,
     space::{PointLight, Ray, Shape, Sphere},
-    Axis, Color,
+    Axis,
 };
 use rayon::prelude::*;
 

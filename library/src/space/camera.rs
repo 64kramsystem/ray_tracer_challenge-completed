@@ -4,7 +4,7 @@ use super::{Ray, World};
 use crate::{
     interface::Image,
     math::{Matrix, Tuple},
-    Color,
+    properties::Color,
 };
 
 use rayon::prelude::*;

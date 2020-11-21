@@ -2,7 +2,7 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Color" {
-        use crate::*;
+        use crate::properties::*;
 
         it "can be added to another color" {
             let color1 = Color { r: 0.9, g: 0.6, b: 0.75 };

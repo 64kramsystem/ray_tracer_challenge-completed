@@ -5,6 +5,7 @@ demonstrate! {
         use crate::*;
         use crate::interface::*;
         use crate::math::*;
+        use crate::properties::*;
         use crate::space::*;
         use std::f64::consts::PI;
 

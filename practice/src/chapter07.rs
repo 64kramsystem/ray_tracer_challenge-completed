@@ -3,8 +3,9 @@ use std::f64::consts::PI;
 use library::{
     interface::Sdl2Interface,
     math::{Matrix, Tuple},
+    properties::{Color, Material},
     space::{Camera, PointLight, Shape, Sphere, World},
-    Axis, Color, Material,
+    Axis,
 };
 
 fn prepare_world() -> World {

@@ -1,4 +1,4 @@
-use crate::{math::Tuple, Color};
+use crate::{math::Tuple, properties::Color};
 
 pub struct PointLight {
     pub position: Tuple,

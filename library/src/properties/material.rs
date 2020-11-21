@@ -1,4 +1,4 @@
-use crate::{math::Tuple, Color, space::PointLight};
+use crate::{math::Tuple, properties::Color, space::PointLight};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Material {

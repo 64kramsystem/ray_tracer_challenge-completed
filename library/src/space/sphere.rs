@@ -2,7 +2,8 @@ use super::{shape, shape::private::ShapeLocal, Shape};
 use crate::{
     has_float64_value::HasFloat64Value,
     math::{Matrix, Tuple},
-    Axis, Material,
+    properties::Material,
+    Axis,
 };
 
 #[derive(Clone, Debug, SmartDefault)]

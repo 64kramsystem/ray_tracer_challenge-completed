@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
     math::{Matrix, Tuple},
-    Color, Material,
+    properties::{Color, Material},
 };
 
 pub struct World {

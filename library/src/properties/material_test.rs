@@ -2,8 +2,8 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Material" {
-        use crate::*;
         use crate::math::*;
+        use crate::properties::*;
         use crate::space::*;
 
         describe "Material" {
