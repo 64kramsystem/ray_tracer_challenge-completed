@@ -2,7 +2,8 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Ray" {
-        use crate::*;
+        use crate::math::*;
+        use crate::space::*;
 
         it "should compute a position at t" {
             let ray = Ray::new((2, 3, 4), (1, 0, 0));

@@ -1,6 +1,10 @@
 use std::sync::Mutex;
 
-use crate::{Color, Image, Matrix, Ray, Tuple, World};
+use crate::{
+    math::{Matrix, Tuple},
+    Color, Image
+};
+use super::{Ray, World};
 
 use rayon::prelude::*;
 

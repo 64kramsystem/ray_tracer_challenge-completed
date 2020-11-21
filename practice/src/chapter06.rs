@@ -1,7 +1,11 @@
 use std::io::{self, Write};
 use std::{f64::consts::PI, sync::Mutex};
 
-use library::{Axis, Color, Image, Matrix, PointLight, Ray, Sdl2Interface, Shape, Sphere, Tuple};
+use library::{
+    math::{Matrix, Tuple},
+    space::{PointLight, Ray, Shape, Sphere},
+    Axis, Color, Image, Sdl2Interface,
+};
 use rayon::prelude::*;
 
 pub fn practice() {

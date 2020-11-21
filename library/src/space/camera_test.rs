@@ -3,6 +3,8 @@ use demonstrate::demonstrate;
 demonstrate! {
     describe "Camera" {
         use crate::*;
+        use crate::math::*;
+        use crate::space::*;
         use std::f64::consts::PI;
 
         context "pixel size" {

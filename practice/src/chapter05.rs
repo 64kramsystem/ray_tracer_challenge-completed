@@ -1,6 +1,10 @@
 use std::f64::consts::PI;
 
-use library::{Axis, Color, Image, Matrix, Ray, Sdl2Interface, Sphere, Tuple};
+use library::{
+    math::{Matrix, Tuple},
+    space::{Ray, Sphere},
+    Axis, Color, Image, Sdl2Interface,
+};
 
 pub fn practice() {
     let display_size: u16 = 100;

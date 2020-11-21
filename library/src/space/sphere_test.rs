@@ -2,7 +2,8 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Sphere" {
-        use crate::*;
+        use crate::space::*;
+        use crate::math::*;
 
         it "should have an identity transformation of order 4 as default" {
             assert_eq!(Sphere::default().transformation, Matrix::identity(4));

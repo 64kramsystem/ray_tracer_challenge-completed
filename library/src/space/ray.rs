@@ -1,4 +1,9 @@
-use crate::{has_float64_value::HasFloat64Value, IntersectionState, Matrix, Shape, Tuple};
+use super::IntersectionState;
+use crate::{
+    has_float64_value::HasFloat64Value,
+    math::{Matrix, Tuple},
+    space::Shape,
+};
 
 #[derive(PartialEq, Debug)]
 pub struct Ray {

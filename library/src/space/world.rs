@@ -1,8 +1,9 @@
 use std::collections::BTreeSet;
 
+use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
-    intersection::Intersection, Color, IntersectionState, Material, Matrix, PointLight, Ray, Shape,
-    Sphere, Tuple,
+    math::{Matrix, Tuple},
+    Color, Material,
 };
 
 pub struct World {

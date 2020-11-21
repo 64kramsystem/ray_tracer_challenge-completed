@@ -1,8 +1,7 @@
 use std::ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub};
 
-use crate::{has_float64_value::HasFloat64Value, Axis, Matrix};
-
-use crate::EPSILON;
+use super::{Matrix, EPSILON};
+use crate::{has_float64_value::HasFloat64Value, Axis};
 
 pub const POINT_TYPE: f64 = 1.0;
 pub const VECTOR_TYPE: f64 = 0.0;

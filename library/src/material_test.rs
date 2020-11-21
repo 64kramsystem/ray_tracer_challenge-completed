@@ -3,6 +3,8 @@ use demonstrate::demonstrate;
 demonstrate! {
     describe "Material" {
         use crate::*;
+        use crate::math::*;
+        use crate::space::*;
 
         describe "Material" {
             context "lighting" {

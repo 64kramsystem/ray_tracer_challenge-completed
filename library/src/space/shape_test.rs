@@ -2,7 +2,8 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Shape" {
-        use crate::*;
+        use crate::space::*;
+        use crate::math::*;
 
         before {
             let test_shape = Sphere::default();

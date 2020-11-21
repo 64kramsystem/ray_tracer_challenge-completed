@@ -1,6 +1,10 @@
 use std::{fmt, sync::Mutex};
 
-use crate::{Material, Matrix, Ray, Tuple};
+use super::Ray;
+use crate::{
+    math::{Matrix, Tuple},
+    Material, 
+};
 
 lazy_static::lazy_static! {
   static ref NEXT_ID: Mutex<u32> = Mutex::new(1);
@@ -16,7 +20,8 @@ pub(crate) fn new_shape_id() -> u32 {
 }
 
 pub(crate) mod private {
-    use crate::{Ray, Tuple};
+    use super::Ray;
+    use crate::math::Tuple;
 
     pub trait ShapeLocal {
         fn local_normal(&self, world_point: &Tuple) -> Tuple;

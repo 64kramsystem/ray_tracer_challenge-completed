@@ -1,6 +1,6 @@
 use std::{cmp::Ordering, fmt::Debug};
 
-use crate::Shape;
+use crate::space::Shape;
 
 // Setting NaN values for t is invalid; it will cause undefined behavior when sorting, likely panic.
 //

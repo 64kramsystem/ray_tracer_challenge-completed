@@ -1,4 +1,7 @@
-use crate::{Shape, Tuple, EPSILON};
+use crate::{
+    math::{Tuple, EPSILON},
+    space::Shape,
+};
 
 #[derive(Debug, PartialEq)]
 pub struct IntersectionState<'a> {

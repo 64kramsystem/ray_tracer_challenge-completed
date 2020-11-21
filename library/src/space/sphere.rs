@@ -1,7 +1,8 @@
+use super::{shape, shape::private::ShapeLocal, Shape};
 use crate::{
     has_float64_value::HasFloat64Value,
-    shape::{self, private::ShapeLocal},
-    Axis, Material, Matrix, Shape, Tuple,
+    math::{Matrix, Tuple},
+    Axis, Material,
 };
 
 #[derive(Clone, Debug, SmartDefault)]
@@ -45,7 +46,7 @@ impl ShapeLocal for Sphere {
         object_point - &Tuple::point(0, 0, 0)
     }
 
-    fn local_intersections(&self, transformed_ray: &crate::Ray) -> Option<(f64, f64)> {
+    fn local_intersections(&self, transformed_ray: &super::Ray) -> Option<(f64, f64)> {
         let sphere_location = Tuple::point(0, 0, 0);
         let sphere_to_ray = transformed_ray.origin - &sphere_location;
 
