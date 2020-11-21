@@ -1,6 +1,6 @@
 mod color;
 mod material;
-pub use color::Color;
+pub use color::{Color, COLOR_BLACK, COLOR_WHITE};
 pub use material::Material;
 
 #[cfg(test)]
