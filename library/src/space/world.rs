@@ -18,6 +18,7 @@ impl World {
                 Box::new(Sphere {
                     material: Material {
                         color: Color::new(0.8, 1.0, 0.6),
+                        pattern: None,
                         ambient: 0.1,
                         diffuse: 0.7,
                         specular: 0.2,

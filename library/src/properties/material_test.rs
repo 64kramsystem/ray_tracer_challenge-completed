@@ -9,7 +9,9 @@ demonstrate! {
         describe "Material" {
             context "lighting" {
                 before {
-                    let material = Material::default();
+                    #[allow(unused_variables, unused_mut)]
+                    let mut material = Material::default();
+                    #[allow(unused_variables)]
                     let position = Tuple::point(0, 0, 0);
                 }
 
@@ -44,6 +46,33 @@ demonstrate! {
                     let expected_result = Color::new(0.1, 0.1, 0.1);
 
                     assert_eq!(actual_result, expected_result);
+                }
+
+                it "should be computed with a pattern" {
+                    let material = Material {
+                        color: Color {
+                            r: 1.0,
+                            g: 1.0,
+                            b: 1.0,
+                        },
+                        pattern: Some(Box::new(StripePattern::default())),
+                        ambient: 1.0,
+                        diffuse: 0.0,
+                        specular: 0.0,
+                        shininess: 200.0,
+                    };
+
+                    let eyev = Tuple::vector(0, 0, -1);
+                    let normalv = Tuple::vector(0, 0, -1);
+                    let light = PointLight::new((0, 0, -10), (1, 1, 1));
+
+                    let actual_result_c1 = material.lighting(&light, &Tuple::point(0.9, 0, 0), &eyev, &normalv, false);
+
+                    assert_eq!(actual_result_c1, COLOR_WHITE);
+
+                    let actual_result_c2 = material.lighting(&light, &Tuple::point(1.1, 0, 0), &eyev, &normalv, false);
+
+                    assert_eq!(actual_result_c2, COLOR_BLACK);
                 }
             }
         }

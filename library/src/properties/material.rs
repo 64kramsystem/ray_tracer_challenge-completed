@@ -1,8 +1,11 @@
 use crate::{math::Tuple, properties::Color, space::PointLight};
 
+use super::Pattern;
+
 #[derive(Debug)]
 pub struct Material {
     pub color: Color,
+    pub pattern: Option<Box<dyn Pattern>>,
     pub ambient: f64,
     pub diffuse: f64,
     pub specular: f64,
@@ -17,6 +20,7 @@ impl Default for Material {
                 g: 1.0,
                 b: 1.0,
             },
+            pattern: None,
             ambient: 0.1,
             diffuse: 0.9,
             specular: 0.9,
@@ -34,7 +38,15 @@ impl Material {
         normalv: &Tuple,
         in_shadow: bool,
     ) -> Color {
-        let effective_color = self.color * &light.intensity;
+        let patterned_color = if let Some(pattern) = &self.pattern {
+            pattern.color_at(&point)
+        } else {
+            self.color
+        };
+
+        // Watch out! Don't use the self.color here, but the patterned color instead.
+
+        let effective_color = patterned_color * &light.intensity;
 
         let lightv = (light.position - point).normalize();
 
