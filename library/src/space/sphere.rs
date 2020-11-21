@@ -6,7 +6,7 @@ use crate::{
     Axis,
 };
 
-#[derive(Clone, Debug, SmartDefault)]
+#[derive(Clone, Debug, ShapeAccessors, SmartDefault)]
 pub struct Sphere {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
@@ -67,27 +67,5 @@ impl ShapeLocal for Sphere {
 
             Some((t1, t2))
         }
-    }
-}
-
-impl Shape for Sphere {
-    fn id(&self) -> u32 {
-        self.id
-    }
-
-    fn transformation(&self) -> &Matrix {
-        &self.transformation
-    }
-
-    fn transformation_mut(&mut self) -> &mut Matrix {
-        &mut self.transformation
-    }
-
-    fn material(&self) -> &Material {
-        &self.material
-    }
-
-    fn material_mut(&mut self) -> &mut Material {
-        &mut self.material
     }
 }

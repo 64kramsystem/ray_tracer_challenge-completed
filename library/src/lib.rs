@@ -13,6 +13,9 @@ pub enum Axis {
 #[macro_use]
 extern crate smart_default;
 
+#[macro_use]
+extern crate macros;
+
 #[cfg(test)]
 #[macro_use]
 extern crate assert_float_eq;
