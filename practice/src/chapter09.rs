@@ -9,15 +9,19 @@ use library::{
     Axis,
 };
 
+fn prepare_material() -> Material {
+    Material {
+        color: Color::new(1, 0.9, 0.9),
+        specular: 0.0,
+        ..Material::default()
+    }
+}
+
 fn prepare_world() -> World {
     let light_source = PointLight::new((-10, 10, -10), (1, 1, 1));
 
     let floor = Plane {
-        material: Material {
-            color: Color::new(1, 0.9, 0.9),
-            specular: 0.0,
-            ..Material::default()
-        },
+        material: prepare_material(),
         ..Plane::default()
     };
 
@@ -25,7 +29,7 @@ fn prepare_world() -> World {
         transformation: Matrix::translation(0, 0, 5)
             * &Matrix::rotation(Axis::Y, -PI / 4.0)
             * &Matrix::rotation(Axis::X, -PI / 2.0),
-        material: floor.material.clone(),
+        material: prepare_material(),
         ..Plane::default()
     };
 
@@ -33,7 +37,7 @@ fn prepare_world() -> World {
         transformation: Matrix::translation(0, 0, 5)
             * &Matrix::rotation(Axis::Y, PI / 4.0)
             * &Matrix::rotation(Axis::X, -PI / 2.0),
-        material: floor.material.clone(),
+        material: prepare_material(),
         ..Plane::default()
     };
 

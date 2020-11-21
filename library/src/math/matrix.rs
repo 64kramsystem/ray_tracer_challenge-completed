@@ -3,7 +3,7 @@ use crate::{lang::HasFloat64Value, Axis};
 
 use std::ops::{Index, IndexMut, Mul};
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Matrix {
     pub values: Vec<Vec<f64>>,
 }

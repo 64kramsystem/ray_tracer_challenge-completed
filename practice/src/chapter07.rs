@@ -8,14 +8,18 @@ use library::{
     Axis,
 };
 
+fn prepare_material() -> Material {
+    Material {
+        color: Color::new(1, 0.9, 0.9),
+        specular: 0.0,
+        ..Material::default()
+    }
+}
+
 fn prepare_world() -> World {
     let floor = Sphere {
         transformation: Matrix::scaling(10.0, 0.01, 10.0),
-        material: Material {
-            color: Color::new(1, 0.9, 0.9),
-            specular: 0.0,
-            ..Material::default()
-        },
+        material: prepare_material(),
         ..Sphere::default()
     };
 
@@ -24,7 +28,7 @@ fn prepare_world() -> World {
             * &Matrix::rotation(Axis::Y, -PI / 4.0)
             * &Matrix::rotation(Axis::X, PI / 2.0)
             * &Matrix::scaling(10.0, 0.01, 10.0),
-        material: floor.material.clone(),
+        material: prepare_material(),
         ..Sphere::default()
     };
 
@@ -33,7 +37,7 @@ fn prepare_world() -> World {
             * &Matrix::rotation(Axis::Y, PI / 4.0)
             * &Matrix::rotation(Axis::X, PI / 2.0)
             * &Matrix::scaling(10.0, 0.01, 10.0),
-        material: floor.material.clone(),
+        material: prepare_material(),
         ..Sphere::default()
     };
 

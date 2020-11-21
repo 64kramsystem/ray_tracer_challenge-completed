@@ -6,7 +6,7 @@ use crate::{
     Axis,
 };
 
-#[derive(Clone, Debug, ShapeAccessors, SmartDefault)]
+#[derive(Debug, ShapeAccessors, SmartDefault)]
 pub struct Sphere {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,

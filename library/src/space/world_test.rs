@@ -37,12 +37,16 @@ demonstrate! {
 
             it "should be performed in the shadow" {
                 let sphere1 = Sphere::default();
-                let sphere2 = Sphere {
+                let sphere2a = Sphere {
+                    transformation: Matrix::translation(0, 0, 10),
+                    ..Sphere::default()
+                };
+                let sphere2b = Sphere {
                     transformation: Matrix::translation(0, 0, 10),
                     ..Sphere::default()
                 };
 
-                let objects: Vec<Box<dyn Shape>> = vec![Box::new(sphere1), Box::new(sphere2.clone())];
+                let objects: Vec<Box<dyn Shape>> = vec![Box::new(sphere1), Box::new(sphere2a)];
 
                 let light_source = PointLight::new(
                     (0, 0, -10),
@@ -56,7 +60,7 @@ demonstrate! {
                     (0, 0, 1),
                 );
 
-                let intersection_state = ray.intersection_state(4.0, &sphere2);
+                let intersection_state = ray.intersection_state(4.0, &sphere2b);
 
                 let expected_color = Color::new(0.1, 0.1, 0.1);
 
