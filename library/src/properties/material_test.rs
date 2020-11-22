@@ -13,6 +13,8 @@ demonstrate! {
                     let mut material = Material::default();
                     #[allow(unused_variables)]
                     let position = Tuple::point(0, 0, 0);
+                    #[allow(unused_variables)]
+                    let test_object = Sphere::default();
                 }
 
                 it "should be computed when the eye is between the light and the surface" {
@@ -20,7 +22,7 @@ demonstrate! {
                     let normalv = Tuple::vector(0, 0, -1);
                     let light = PointLight::new((0, 0, -10), (1, 1, 1));
 
-                    let actual_result  = material.lighting(&light, &position, &eyev, &normalv, false);
+                    let actual_result  = material.lighting(&light, &test_object, &position, &eyev, &normalv, false);
                     let expected_result = Color::new(1.9, 1.9, 1.9);
 
                     assert_eq!(actual_result, expected_result);
@@ -31,7 +33,7 @@ demonstrate! {
                     let normalv = Tuple::vector(0, 0, -1);
                     let light = PointLight::new((0, 10, -10), (1, 1, 1));
 
-                    let actual_result  = material.lighting(&light, &position, &eyev, &normalv, false);
+                    let actual_result  = material.lighting(&light, &test_object, &position, &eyev, &normalv, false);
                     let expected_result = Color::new(1.6364, 1.6364, 1.6364);
 
                     assert_eq!(actual_result, expected_result);
@@ -42,7 +44,7 @@ demonstrate! {
                     let normalv = Tuple::vector(0, 0, -1);
                     let light = PointLight::new((0, 10, -10), (1, 1, 1));
 
-                    let actual_result  = material.lighting(&light, &position, &eyev, &normalv, true);
+                    let actual_result  = material.lighting(&light, &test_object, &position, &eyev, &normalv, true);
                     let expected_result = Color::new(0.1, 0.1, 0.1);
 
                     assert_eq!(actual_result, expected_result);
@@ -57,15 +59,26 @@ demonstrate! {
                         shininess: 200.0,
                     };
 
+                    let test_object = Sphere {
+                        material: Material {
+                            pattern: Box::new(StripePattern::default()),
+                            ambient: 1.0,
+                            diffuse: 0.0,
+                            specular: 0.0,
+                            shininess: 200.0,
+                        },
+                        ..Sphere::default()
+                    };
+
                     let eyev = Tuple::vector(0, 0, -1);
                     let normalv = Tuple::vector(0, 0, -1);
                     let light = PointLight::new((0, 0, -10), (1, 1, 1));
 
-                    let actual_result_c1 = material.lighting(&light, &Tuple::point(0.9, 0, 0), &eyev, &normalv, false);
+                    let actual_result_c1 = material.lighting(&light, &test_object, &Tuple::point(0.9, 0, 0), &eyev, &normalv, false);
 
                     assert_eq!(actual_result_c1, COLOR_WHITE);
 
-                    let actual_result_c2 = material.lighting(&light, &Tuple::point(1.1, 0, 0), &eyev, &normalv, false);
+                    let actual_result_c2 = material.lighting(&light, &test_object, &Tuple::point(1.1, 0, 0), &eyev, &normalv, false);
 
                     assert_eq!(actual_result_c2, COLOR_BLACK);
                 }

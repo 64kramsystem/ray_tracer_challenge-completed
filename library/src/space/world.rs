@@ -88,6 +88,7 @@ impl World {
 
         intersection_state.object.material().lighting(
             &self.light_source,
+            intersection_state.object,
             &intersection_state.point,
             &intersection_state.eyev,
             &intersection_state.normalv,

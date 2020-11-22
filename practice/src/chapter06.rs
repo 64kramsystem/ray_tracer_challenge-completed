@@ -58,6 +58,7 @@ pub fn practice() {
 
                     let light_color = sphere.material.lighting(
                         &light,
+                        &sphere,
                         &hit_point,
                         &-eye_ray.direction,
                         &hit_normal,

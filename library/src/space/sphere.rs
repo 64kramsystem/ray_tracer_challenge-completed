@@ -2,7 +2,7 @@ use super::{shape, shape::private::ShapeLocal, Shape};
 use crate::{
     lang::HasFloat64Value,
     math::{Matrix, Tuple},
-    properties::Material,
+    properties::{FlatPattern, Material, Pattern},
     Axis,
 };
 
@@ -14,6 +14,8 @@ pub struct Sphere {
     pub transform: Matrix,
     #[default(Material::default())]
     pub material: Material,
+    #[default(Box::new(FlatPattern::default()))]
+    pub pattern: Box<dyn Pattern>,
 }
 
 impl Sphere {

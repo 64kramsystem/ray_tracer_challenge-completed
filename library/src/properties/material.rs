@@ -1,4 +1,8 @@
-use crate::{math::Tuple, properties::Color, space::PointLight};
+use crate::{
+    math::Tuple,
+    properties::Color,
+    space::{PointLight, Shape},
+};
 
 use super::{FlatPattern, Pattern, COLOR_BLACK};
 
@@ -27,12 +31,13 @@ impl Material {
     pub fn lighting(
         &self,
         light: &PointLight,
+        object: &dyn Shape,
         point: &Tuple,
         eyev: &Tuple,
         normalv: &Tuple,
         in_shadow: bool,
     ) -> Color {
-        let color = self.pattern.color_at(&point);
+        let color = object.color_at(&point);
 
         let effective_color = color * &light.intensity;
 
