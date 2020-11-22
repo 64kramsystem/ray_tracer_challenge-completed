@@ -32,9 +32,7 @@ pub(crate) mod private {
 pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
     fn id(&self) -> u32;
     fn transform(&self) -> &Matrix;
-    fn transform_mut(&mut self) -> &mut Matrix;
     fn material(&self) -> &Material;
-    fn material_mut(&mut self) -> &mut Material;
     fn pattern(&self) -> &dyn Pattern;
 
     fn normal(&self, world_point: &Tuple) -> Tuple {

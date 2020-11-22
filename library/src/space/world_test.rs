@@ -7,8 +7,8 @@ demonstrate! {
         use crate::space::*;
 
         before {
-            #[allow(unused_mut,unused_variables)]
-            let mut world = World::default();
+            #[allow(unused_variables)]
+            let world = World::default();
         }
 
         it "should intersect with a ray" {
@@ -86,8 +86,31 @@ demonstrate! {
             it "with the intersection behind the ray" {
                 let ray = Ray::new((0.0, 0.0, 0.75), (0, 0, -1));
 
-                (*world.objects[0].material_mut()).ambient = 1.0;
-                (*world.objects[1].material_mut()).ambient = 1.0;
+                // Differs in the material ambient value.
+                //
+                let world = World {
+                    objects: vec![
+                        Box::new(Sphere {
+                            material: Material {
+                                pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
+                                ambient: 1.0,
+                                diffuse: 0.7,
+                                specular: 0.2,
+                                shininess: 200.0,
+                            },
+                            ..Sphere::default()
+                        }),
+                        Box::new(Sphere {
+                            material: Material {
+                                ambient: 1.0,
+                                ..Material::default()
+                            },
+                            transform: Matrix::scaling(0.5, 0.5, 0.5),
+                            ..Sphere::default()
+                        }),
+                    ],
+                    ..World::default()
+                };
 
                 // With the flat pattern, the color is the same at any point.
                 //
