@@ -28,7 +28,7 @@ impl Material {
         &self,
         light: &PointLight,
         object_point: &Tuple,
-        point: &Tuple,
+        world_point: &Tuple,
         eyev: &Tuple,
         normalv: &Tuple,
         in_shadow: bool,
@@ -38,7 +38,7 @@ impl Material {
 
         let effective_color = color * &light.intensity;
 
-        let lightv = (light.position - point).normalize();
+        let lightv = (light.position - world_point).normalize();
 
         let ambient = effective_color * self.ambient;
 
