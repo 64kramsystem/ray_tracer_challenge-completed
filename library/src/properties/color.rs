@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, Div, Mul, Sub};
 
 use crate::math::EPSILON;
 
@@ -105,6 +105,18 @@ impl Mul<&Self> for Color {
             r: self.r * rhs.r,
             g: self.g * rhs.g,
             b: self.b * rhs.b,
+        }
+    }
+}
+
+impl Div<f64> for Color {
+    type Output = Self;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Self {
+            r: self.r / rhs,
+            g: self.g / rhs,
+            b: self.b / rhs,
         }
     }
 }
