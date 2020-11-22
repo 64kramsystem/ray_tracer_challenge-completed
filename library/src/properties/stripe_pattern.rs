@@ -1,6 +1,6 @@
 use super::{Color, Pattern, COLOR_BLACK, COLOR_WHITE};
 
-#[derive(Clone, Debug, SmartDefault)]
+#[derive(Debug, SmartDefault)]
 pub struct StripePattern {
     #[default(COLOR_WHITE)]
     pub color_a: Color,

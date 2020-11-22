@@ -1,7 +1,7 @@
 use super::{Color, Pattern, COLOR_WHITE};
 use crate::lang::HasFloat64Value;
 
-#[derive(Clone, Debug, SmartDefault)]
+#[derive(Debug, SmartDefault)]
 pub struct FlatPattern {
     #[default(COLOR_WHITE)]
     pub color: Color,
