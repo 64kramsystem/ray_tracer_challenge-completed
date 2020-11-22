@@ -60,7 +60,7 @@ impl Camera {
         let world_x = self.half_width - x_offset;
         let world_y = self.half_height - y_offset;
 
-        let camera_inverse_transform = self.transform.inverse().unwrap();
+        let camera_inverse_transform = self.transform.inverse();
 
         // The canvas's z is -1!!
         //

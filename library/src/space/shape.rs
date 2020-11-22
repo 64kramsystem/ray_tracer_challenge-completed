@@ -37,19 +37,11 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
     fn material_mut(&mut self) -> &mut Material;
 
     fn normal(&self, world_point: &Tuple) -> Tuple {
-        let object_point = if let Some(inverse) = self.transform().inverse() {
-            inverse * world_point
-        } else {
-            panic!()
-        };
+        let object_point = self.transform().inverse() * world_point;
 
         let object_normal = self.local_normal(&object_point);
 
-        let mut world_normal = if let Some(inverse) = self.transform().inverse() {
-            inverse.transpose() * &object_normal
-        } else {
-            panic!()
-        };
+        let mut world_normal = self.transform().inverse().transpose() * &object_normal;
 
         world_normal.w = 0.0;
 
