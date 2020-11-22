@@ -3,7 +3,7 @@ use sdl2::{
 };
 
 use super::image::Image;
-use crate::properties::Color;
+use crate::properties::{Color, COLOR_BLACK};
 
 // Interface for drawing to a canvas, and waiting a keypress, intentionally designed to be as simple
 // as  possible.
@@ -64,14 +64,7 @@ impl Sdl2Interface {
         //
         event_pump.pump_events();
 
-        let pixels_buffer = vec![
-            Color {
-                r: 0.0,
-                g: 0.0,
-                b: 0.0,
-            };
-            width as usize * height as usize
-        ];
+        let pixels_buffer = vec![COLOR_BLACK; width as usize * height as usize];
 
         Self {
             event_pump,

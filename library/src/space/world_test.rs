@@ -71,7 +71,7 @@ demonstrate! {
         context "color of a ray intersection" {
             it "when a ray misses" {
                 let ray =  Ray::new((0, 0, -5), (0, 1, 0));
-                let expected_color = Color::new(0, 0, 0);
+                let expected_color = COLOR_BLACK;
 
                 assert_eq!(world.color_at(&ray), expected_color);
             }

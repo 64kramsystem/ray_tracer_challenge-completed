@@ -1,5 +1,5 @@
 use super::Image;
-use crate::properties::Color;
+use crate::properties::{Color, COLOR_BLACK};
 
 // An image that has no phisical representation, usable for testing rendering.
 //
@@ -19,14 +19,7 @@ impl VirtualImage {
 
 impl Image for VirtualImage {
     fn new(width: u16, height: u16) -> Self {
-        let pixels_buffer = vec![
-            Color {
-                r: 0.0,
-                g: 0.0,
-                b: 0.0,
-            };
-            width as usize * height as usize
-        ];
+        let pixels_buffer = vec![COLOR_BLACK; width as usize * height as usize];
 
         Self {
             pixels_buffer,

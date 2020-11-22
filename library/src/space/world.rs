@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
     math::{Matrix, Tuple},
-    properties::{Color, Material},
+    properties::{Color, Material, COLOR_BLACK, COLOR_WHITE},
 };
 
 pub struct World {
@@ -33,7 +33,7 @@ impl World {
             ],
             light_source: PointLight {
                 position: Tuple::point(-10, 10, -10),
-                intensity: Color::new(1, 1, 1),
+                intensity: COLOR_WHITE,
             },
         }
     }
@@ -103,7 +103,7 @@ impl World {
             let intersection_state = ray.intersection_state(*t, *object);
             self.shade_hit(intersection_state)
         } else {
-            Color::new(0, 0, 0)
+            COLOR_BLACK
         }
     }
 

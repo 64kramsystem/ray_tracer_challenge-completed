@@ -4,7 +4,7 @@ use super::{Ray, World};
 use crate::{
     interface::Image,
     math::{Matrix, Tuple},
-    properties::Color,
+    properties::COLOR_BLACK,
 };
 
 use rayon::prelude::*;
@@ -73,8 +73,7 @@ impl Camera {
     }
 
     pub fn render<T: Image>(&self, world: &World) -> T {
-        let mut pixels_buffer =
-            vec![vec![Color::new(0, 0, 0); self.hsize as usize]; self.vsize as usize];
+        let mut pixels_buffer = vec![vec![COLOR_BLACK; self.hsize as usize]; self.vsize as usize];
         let pixels_buffer_mtx = Mutex::new(&mut pixels_buffer);
 
         (0..self.vsize).into_par_iter().for_each(|y| {

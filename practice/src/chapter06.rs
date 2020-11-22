@@ -4,7 +4,7 @@ use std::{f64::consts::PI, sync::Mutex};
 use library::{
     interface::{Image, Sdl2Interface},
     math::{Matrix, Tuple},
-    properties::Color,
+    properties::{Color, COLOR_BLACK},
     space::{PointLight, Ray, Shape, Sphere},
     Axis,
 };
@@ -30,7 +30,7 @@ pub fn practice() {
 
     let eye_position = Tuple::point(0, 0, eye_z);
 
-    let mut pixels_buffer = vec![vec![Color::new(0, 0, 0); WALL_SIZE as usize]; WALL_SIZE as usize];
+    let mut pixels_buffer = vec![vec![COLOR_BLACK; WALL_SIZE as usize]; WALL_SIZE as usize];
     let pixels_buffer_mtx = Mutex::new(&mut pixels_buffer);
 
     // buffer_y/x are just for convenience.
@@ -39,7 +39,7 @@ pub fn practice() {
         .into_par_iter()
         .enumerate()
         .for_each(|(buffer_y, interface_y)| {
-            let mut row_buffer = vec![Color::new(0, 0, 0); WALL_SIZE as usize];
+            let mut row_buffer = vec![COLOR_BLACK; WALL_SIZE as usize];
 
             for (buffer_x, interface_x) in (-origin_x..origin_x).enumerate() {
                 let eye_ray_direction =
