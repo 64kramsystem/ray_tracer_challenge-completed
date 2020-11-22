@@ -7,10 +7,12 @@ demonstrate! {
 
         it "should interpolate linearly between colors" {
             let pattern = GradientPattern::default();
-              assert_eq!(pattern.color_at(&Tuple::point(0, 0, 0)), COLOR_WHITE);
-              assert_eq!(pattern.color_at(&Tuple::point(0.25, 0, 0)), Color::new(0.75, 0.75, 0.75));
+              assert_eq!(pattern.color_at(&Tuple::point(-0.25, 0, 0)), COLOR_BLACK);
+              assert_eq!(pattern.color_at(&Tuple::point(0, 0, 0)), Color::new(0.5, 0.5, 0.5));
+              assert_eq!(pattern.color_at(&Tuple::point(0.25, 0, 0)), COLOR_WHITE);
               assert_eq!(pattern.color_at(&Tuple::point(0.5, 0, 0)), Color::new(0.5, 0.5, 0.5));
-              assert_eq!(pattern.color_at(&Tuple::point(0.75, 0, 0)), Color::new(0.25, 0.25, 0.25));
+              assert_eq!(pattern.color_at(&Tuple::point(0.75, 0, 0)), COLOR_BLACK);
+              assert_eq!(pattern.color_at(&Tuple::point(1.0, 0, 0)), Color::new(0.5, 0.5, 0.5));
         }
     }
 }
