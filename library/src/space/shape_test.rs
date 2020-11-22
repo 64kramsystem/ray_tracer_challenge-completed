@@ -3,7 +3,6 @@ use demonstrate::demonstrate;
 demonstrate! {
     describe "Shape" {
         use crate::math::*;
-        use crate::properties::*;
         use crate::space::*;
 
         before {
@@ -46,41 +45,5 @@ demonstrate! {
                 }
             } // context "with a transformed shape"
         }
-
-        context "pattern transformations" {
-            it "Stripes with an object transformation" {
-                let test_shape = Sphere {
-                    transform: Matrix::scaling(2, 2, 2),
-                    ..Sphere::default()
-                };
-
-                assert_eq!(test_shape.color_at(&Tuple::point(1.5, 0, 0)), COLOR_WHITE);
-            }
-
-            it "Stripes with a pattern transformation" {
-                let test_shape = Sphere {
-                    pattern: Box::new(StripePattern {
-                        transform: Matrix::scaling(0.5, 0.0, 0.0),
-                        ..StripePattern::default()
-                    }),
-                    ..Sphere::default()
-                };
-
-                assert_eq!(test_shape.color_at(&Tuple::point(1.5, 0, 0)), COLOR_WHITE);
-            }
-
-            it "Stripes with both an object and a pattern transformation" {
-                let test_shape = Sphere {
-                    transform: Matrix::scaling(2, 2, 2),
-                    pattern: Box::new(StripePattern {
-                        transform: Matrix::scaling(0.5, 0.5, 0.5),
-                        ..StripePattern::default()
-                    }),
-                    ..Sphere::default()
-                };
-
-                assert_eq!(test_shape.color_at(&Tuple::point(1.5, 0, 0)), COLOR_WHITE);
-            }
-        } // context "pattern transformations"
     }
 }

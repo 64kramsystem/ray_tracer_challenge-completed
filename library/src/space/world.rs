@@ -86,9 +86,8 @@ impl World {
     pub fn shade_hit(&self, intersection_state: IntersectionState) -> Color {
         let is_shadowed = self.is_shadowed(&intersection_state.over_point);
 
-        intersection_state.object.material().lighting(
+        intersection_state.object.lighting(
             &self.light_source,
-            intersection_state.object,
             &intersection_state.point,
             &intersection_state.eyev,
             &intersection_state.normalv,

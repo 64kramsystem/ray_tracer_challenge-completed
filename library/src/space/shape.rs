@@ -1,6 +1,6 @@
 use std::{fmt, sync::Mutex};
 
-use super::Ray;
+use super::{PointLight, Ray};
 use crate::{
     math::{Matrix, Tuple},
     properties::{Color, Material, Pattern},
@@ -54,11 +54,21 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
         self.local_intersections(&transformed_ray)
     }
 
-    fn color_at(&self, world_point: &Tuple) -> Color {
+    // Divergence from the book design. Having the lighting method herea voids going back and forth
+    // between Shape and Material, and makes World#shade_hit cleaner.
+    //
+    fn lighting(
+        &self,
+        light: &PointLight,
+        world_point: &Tuple,
+        eyev: &Tuple,
+        normalv: &Tuple,
+        in_shadow: bool,
+    ) -> Color {
         let object_point = self.transform().inverse() * world_point;
-        let pattern_point = self.material().pattern.transform().inverse() * &object_point;
 
-        self.material().pattern.color_at(&pattern_point)
+        self.material()
+            .lighting(light, &object_point, world_point, eyev, normalv, in_shadow)
     }
 }
 

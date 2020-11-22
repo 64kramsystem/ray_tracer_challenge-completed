@@ -56,9 +56,8 @@ pub fn practice() {
                     let hit_point = eye_ray.position(hit);
                     let hit_normal = sphere.normal(&hit_point);
 
-                    let light_color = sphere.material.lighting(
+                    let light_color = sphere.lighting(
                         &light,
-                        &sphere,
                         &hit_point,
                         &-eye_ray.direction,
                         &hit_normal,
