@@ -19,13 +19,13 @@ fn prepare_material() -> Material {
 
 fn prepare_world() -> World {
     let floor = Sphere {
-        transformation: Matrix::scaling(10.0, 0.01, 10.0),
+        transform: Matrix::scaling(10.0, 0.01, 10.0),
         material: prepare_material(),
         ..Sphere::default()
     };
 
     let left_wall = Sphere {
-        transformation: Matrix::translation(0, 0, 5)
+        transform: Matrix::translation(0, 0, 5)
             * &Matrix::rotation(Axis::Y, -PI / 4.0)
             * &Matrix::rotation(Axis::X, PI / 2.0)
             * &Matrix::scaling(10.0, 0.01, 10.0),
@@ -34,7 +34,7 @@ fn prepare_world() -> World {
     };
 
     let right_wall = Sphere {
-        transformation: Matrix::translation(0, 0, 5)
+        transform: Matrix::translation(0, 0, 5)
             * &Matrix::rotation(Axis::Y, PI / 4.0)
             * &Matrix::rotation(Axis::X, PI / 2.0)
             * &Matrix::scaling(10.0, 0.01, 10.0),
@@ -43,7 +43,7 @@ fn prepare_world() -> World {
     };
 
     let middle = Sphere {
-        transformation: Matrix::translation(-0.5, 1.0, 0.5),
+        transform: Matrix::translation(-0.5, 1.0, 0.5),
         material: Material {
             pattern: Box::new(FlatPattern::new(0.1, 1, 0.5)),
             diffuse: 0.7,
@@ -54,7 +54,7 @@ fn prepare_world() -> World {
     };
 
     let right = Sphere {
-        transformation: Matrix::translation(1.5, 0.5, -0.5) * &Matrix::scaling(0.5, 0.5, 0.5),
+        transform: Matrix::translation(1.5, 0.5, -0.5) * &Matrix::scaling(0.5, 0.5, 0.5),
         material: Material {
             pattern: Box::new(FlatPattern::new(0.5, 1, 0.1)),
             diffuse: 0.7,
@@ -65,7 +65,7 @@ fn prepare_world() -> World {
     };
 
     let left = Sphere {
-        transformation: Matrix::translation(-1.5, 0.33, -0.75) * &Matrix::scaling(0.33, 0.33, 0.33),
+        transform: Matrix::translation(-1.5, 0.33, -0.75) * &Matrix::scaling(0.33, 0.33, 0.33),
         material: Material {
             pattern: Box::new(FlatPattern::new(1, 0.8, 0.1)),
             diffuse: 0.7,

@@ -32,7 +32,7 @@ pub fn practice() {
     let transformation = Matrix::translation(10, 0, 0)
         * &Matrix::rotation(Axis::Z, -PI / 4.0)
         * &Matrix::scaling(6.25, 12.5, 12.5);
-    sphere.transformation = transformation;
+    sphere.transform = transformation;
 
     let ray_origin = Tuple::point(0, 0, eye_z);
 

@@ -13,7 +13,7 @@ pub struct Plane {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
     #[default(Matrix::identity(4))]
-    pub transformation: Matrix,
+    pub transform: Matrix,
     #[default(Material::default())]
     pub material: Material,
 }

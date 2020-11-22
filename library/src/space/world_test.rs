@@ -38,11 +38,11 @@ demonstrate! {
             it "should be performed in the shadow" {
                 let sphere1 = Sphere::default();
                 let sphere2a = Sphere {
-                    transformation: Matrix::translation(0, 0, 10),
+                    transform: Matrix::translation(0, 0, 10),
                     ..Sphere::default()
                 };
                 let sphere2b = Sphere {
-                    transformation: Matrix::translation(0, 0, 10),
+                    transform: Matrix::translation(0, 0, 10),
                     ..Sphere::default()
                 };
 

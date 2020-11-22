@@ -23,7 +23,7 @@ pub fn practice() {
 
     let mut sphere = Sphere::default();
     sphere.material.pattern = Box::new(FlatPattern::new(1, 0.2, 1));
-    sphere.transformation = Matrix::translation(10, 0, 0)
+    sphere.transform = Matrix::translation(10, 0, 0)
         * &Matrix::rotation(Axis::Z, -PI / 4.0)
         * &Matrix::scaling(6.25, 12.5, 12.5);
 

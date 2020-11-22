@@ -31,13 +31,13 @@ pub(crate) mod private {
 
 pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
     fn id(&self) -> u32;
-    fn transformation(&self) -> &Matrix;
-    fn transformation_mut(&mut self) -> &mut Matrix;
+    fn transform(&self) -> &Matrix;
+    fn transform_mut(&mut self) -> &mut Matrix;
     fn material(&self) -> &Material;
     fn material_mut(&mut self) -> &mut Material;
 
     fn normal(&self, world_point: &Tuple) -> Tuple {
-        let object_point = if let Some(inverse) = self.transformation().inverse() {
+        let object_point = if let Some(inverse) = self.transform().inverse() {
             inverse * world_point
         } else {
             panic!()
@@ -45,7 +45,7 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
 
         let object_normal = self.local_normal(&object_point);
 
-        let mut world_normal = if let Some(inverse) = self.transformation().inverse() {
+        let mut world_normal = if let Some(inverse) = self.transform().inverse() {
             inverse.transpose() * &object_normal
         } else {
             panic!()
@@ -59,7 +59,7 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
     // Intersections are returned in order.
     //
     fn intersections(&self, ray: &Ray) -> Option<(f64, f64)> {
-        let transformed_ray = ray.inverse_transform(self.transformation());
+        let transformed_ray = ray.inverse_transform(self.transform());
         self.local_intersections(&transformed_ray)
     }
 }

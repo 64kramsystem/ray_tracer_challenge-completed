@@ -26,7 +26,7 @@ impl World {
                     ..Sphere::default()
                 }),
                 Box::new(Sphere {
-                    transformation: Matrix::scaling(0.5, 0.5, 0.5),
+                    transform: Matrix::scaling(0.5, 0.5, 0.5),
                     ..Sphere::default()
                 }),
             ],
