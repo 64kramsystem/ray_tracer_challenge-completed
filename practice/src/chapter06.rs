@@ -4,7 +4,8 @@ use std::{f64::consts::PI, sync::Mutex};
 use library::{
     interface::{Image, Sdl2Interface},
     math::{Matrix, Tuple},
-    properties::{Color, COLOR_BLACK},
+    properties::FlatPattern,
+    properties::COLOR_BLACK,
     space::{PointLight, Ray, Shape, Sphere},
     Axis,
 };
@@ -21,7 +22,7 @@ pub fn practice() {
     let (origin_x, origin_y) = ((WALL_SIZE / 2) as i16, (WALL_SIZE / 2) as i16);
 
     let mut sphere = Sphere::default();
-    sphere.material.color = Color::new(1, 0.2, 1);
+    sphere.material.pattern = Box::new(FlatPattern::new(1, 0.2, 1));
     sphere.transformation = Matrix::translation(10, 0, 0)
         * &Matrix::rotation(Axis::Z, -PI / 4.0)
         * &Matrix::scaling(6.25, 12.5, 12.5);

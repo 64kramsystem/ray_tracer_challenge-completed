@@ -89,7 +89,9 @@ demonstrate! {
                 (*world.objects[0].material_mut()).ambient = 1.0;
                 (*world.objects[1].material_mut()).ambient = 1.0;
 
-                let expected_color = world.objects[1].material().color;
+                // With the flat pattern, the color is the same at any point.
+                //
+                let expected_color = world.objects[1].material().pattern.color_at(&Tuple::point(0, 0, 0));
 
                 assert_eq!(world.color_at(&ray), expected_color);
             }

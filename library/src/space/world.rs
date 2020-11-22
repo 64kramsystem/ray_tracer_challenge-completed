@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
     math::{Matrix, Tuple},
-    properties::{Color, Material, COLOR_BLACK, COLOR_WHITE},
+    properties::{Color, FlatPattern, Material, COLOR_BLACK, COLOR_WHITE},
 };
 
 pub struct World {
@@ -17,8 +17,7 @@ impl World {
             objects: vec![
                 Box::new(Sphere {
                     material: Material {
-                        color: Color::new(0.8, 1.0, 0.6),
-                        pattern: None,
+                        pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
                         ambient: 0.1,
                         diffuse: 0.7,
                         specular: 0.2,

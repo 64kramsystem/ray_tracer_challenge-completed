@@ -50,8 +50,7 @@ demonstrate! {
 
                 it "should be computed with a pattern" {
                     let material = Material {
-                        color: COLOR_WHITE,
-                        pattern: Some(Box::new(StripePattern::default())),
+                        pattern: Box::new(StripePattern::default()),
                         ambient: 1.0,
                         diffuse: 0.0,
                         specular: 0.0,
