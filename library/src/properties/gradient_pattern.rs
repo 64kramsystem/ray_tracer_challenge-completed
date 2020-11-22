@@ -17,6 +17,8 @@ impl Pattern for GradientPattern {
     }
 
     fn color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
+        // This shouldn't need float denoise, as it doesn't rely on exact transformations/operations.
+        //
         let distance = self.color_b - &self.color_a;
         let fraction = pattern_point.x - pattern_point.x.floor();
         self.color_a + &(distance * fraction)

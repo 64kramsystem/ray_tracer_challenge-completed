@@ -1,5 +1,5 @@
 use super::{Color, Pattern, COLOR_BLACK, COLOR_WHITE};
-use crate::math::Matrix;
+use crate::{lang::NoisyFloat64, math::Matrix};
 
 #[derive(Debug, SmartDefault)]
 pub struct RingPattern {
@@ -17,9 +17,12 @@ impl Pattern for RingPattern {
     }
 
     fn color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
-        let sum_powers = pattern_point.x.powi(2) + pattern_point.z.powi(2);
+        let denoised_root_floor = (pattern_point.x.powi(2) + pattern_point.z.powi(2))
+            .sqrt()
+            .denoise()
+            .floor();
 
-        if sum_powers.sqrt().floor() as u32 % 2 == 0 {
+        if denoised_root_floor as u32 % 2 == 0 {
             self.color_a
         } else {
             self.color_b
