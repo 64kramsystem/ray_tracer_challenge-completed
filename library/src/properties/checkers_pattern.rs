@@ -9,6 +9,8 @@ pub struct CheckersPattern {
     pub color_b: Color,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
+    #[default(None)]
+    pub previous_pattern: Option<Box<dyn Pattern>>,
 }
 
 impl Pattern for CheckersPattern {
@@ -16,7 +18,11 @@ impl Pattern for CheckersPattern {
         &self.transform
     }
 
-    fn color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
+    fn previous_pattern(&self) -> &Option<Box<dyn Pattern>> {
+        &self.previous_pattern
+    }
+
+    fn current_color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
         let denoised_floors_sum = pattern_point.x.denoise().floor()
             + pattern_point.y.denoise().floor()
             + pattern_point.z.denoise().floor();

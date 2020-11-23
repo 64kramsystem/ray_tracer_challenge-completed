@@ -7,6 +7,8 @@ pub struct FlatPattern {
     pub color: Color,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
+    #[default(None)]
+    pub previous_pattern: Option<Box<dyn Pattern>>,
 }
 
 impl FlatPattern {
@@ -31,7 +33,11 @@ impl Pattern for FlatPattern {
         &self.transform
     }
 
-    fn color_at(&self, _pattern_point: &crate::math::Tuple) -> Color {
+    fn previous_pattern(&self) -> &Option<Box<dyn Pattern>> {
+        &self.previous_pattern
+    }
+
+    fn current_color_at(&self, _pattern_point: &crate::math::Tuple) -> Color {
         self.color
     }
 }

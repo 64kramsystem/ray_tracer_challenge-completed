@@ -12,7 +12,7 @@ use rand::Rng;
 
 const SCREEN_WIDTH: u16 = 300; // height is half
 
-const PATTERN_INDEX: Option<u32> = None; // Some(n: ring, checker, gradient, stripe), or None for random
+const PATTERN_INDEX: Option<u32> = None; // Some(n: ring, checkers+stripe, gradient, stripe), or None for random
 const PATTERN_SCALE: f64 = 0.33;
 const ROTATE_SPHERES: bool = true;
 
@@ -46,6 +46,12 @@ fn random_pattern() -> Box<dyn Pattern> {
             transform: Matrix::scaling(PATTERN_SCALE, PATTERN_SCALE, PATTERN_SCALE),
             color_a: random_color(),
             color_b: random_color(),
+            previous_pattern: Some(Box::new(StripePattern {
+                transform: Matrix::scaling(PATTERN_SCALE, PATTERN_SCALE, PATTERN_SCALE),
+                color_a: random_color(),
+                color_b: random_color(),
+                ..StripePattern::default()
+            })),
             ..CheckersPattern::default()
         }),
         2 => Box::new(GradientPattern {

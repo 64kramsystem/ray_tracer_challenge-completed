@@ -11,6 +11,8 @@ pub struct GradientPattern {
     pub color_b: Color,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
+    #[default(None)]
+    pub previous_pattern: Option<Box<dyn Pattern>>,
 }
 
 impl Pattern for GradientPattern {
@@ -18,7 +20,11 @@ impl Pattern for GradientPattern {
         &self.transform
     }
 
-    fn color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
+    fn previous_pattern(&self) -> &Option<Box<dyn Pattern>> {
+        &self.previous_pattern
+    }
+
+    fn current_color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
         // This shouldn't need float denoise, as it doesn't rely on exact transformations/operations.
         //
         // Original formula:
