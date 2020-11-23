@@ -3,44 +3,49 @@ use std::f64::consts::PI;
 use library::{
     interface::Sdl2Interface,
     math::{Matrix, Tuple},
-    properties::{Color, Material},
+    properties::FlatPattern,
+    properties::Material,
     space::{Camera, PointLight, Shape, Sphere, World},
     Axis,
 };
 
+fn prepare_material() -> Material {
+    Material {
+        pattern: Box::new(FlatPattern::new(1, 0.9, 0.9)),
+        specular: 0.0,
+        ..Material::default()
+    }
+}
+
 fn prepare_world() -> World {
     let floor = Sphere {
-        transformation: Matrix::scaling(10.0, 0.01, 10.0),
-        material: Material {
-            color: Color::new(1, 0.9, 0.9),
-            specular: 0.0,
-            ..Material::default()
-        },
+        transform: Matrix::scaling(10.0, 0.01, 10.0),
+        material: prepare_material(),
         ..Sphere::default()
     };
 
     let left_wall = Sphere {
-        transformation: Matrix::translation(0, 0, 5)
+        transform: Matrix::translation(0, 0, 5)
             * &Matrix::rotation(Axis::Y, -PI / 4.0)
             * &Matrix::rotation(Axis::X, PI / 2.0)
             * &Matrix::scaling(10.0, 0.01, 10.0),
-        material: floor.material.clone(),
+        material: prepare_material(),
         ..Sphere::default()
     };
 
     let right_wall = Sphere {
-        transformation: Matrix::translation(0, 0, 5)
+        transform: Matrix::translation(0, 0, 5)
             * &Matrix::rotation(Axis::Y, PI / 4.0)
             * &Matrix::rotation(Axis::X, PI / 2.0)
             * &Matrix::scaling(10.0, 0.01, 10.0),
-        material: floor.material.clone(),
+        material: prepare_material(),
         ..Sphere::default()
     };
 
     let middle = Sphere {
-        transformation: Matrix::translation(-0.5, 1.0, 0.5),
+        transform: Matrix::translation(-0.5, 1.0, 0.5),
         material: Material {
-            color: Color::new(0.1, 1, 0.5),
+            pattern: Box::new(FlatPattern::new(0.1, 1, 0.5)),
             diffuse: 0.7,
             specular: 0.3,
             ..Material::default()
@@ -49,9 +54,9 @@ fn prepare_world() -> World {
     };
 
     let right = Sphere {
-        transformation: Matrix::translation(1.5, 0.5, -0.5) * &Matrix::scaling(0.5, 0.5, 0.5),
+        transform: Matrix::translation(1.5, 0.5, -0.5) * &Matrix::scaling(0.5, 0.5, 0.5),
         material: Material {
-            color: Color::new(0.5, 1, 0.1),
+            pattern: Box::new(FlatPattern::new(0.5, 1, 0.1)),
             diffuse: 0.7,
             specular: 0.3,
             ..Material::default()
@@ -60,9 +65,9 @@ fn prepare_world() -> World {
     };
 
     let left = Sphere {
-        transformation: Matrix::translation(-1.5, 0.33, -0.75) * &Matrix::scaling(0.33, 0.33, 0.33),
+        transform: Matrix::translation(-1.5, 0.33, -0.75) * &Matrix::scaling(0.33, 0.33, 0.33),
         material: Material {
-            color: Color::new(1, 0.8, 0.1),
+            pattern: Box::new(FlatPattern::new(1, 0.8, 0.1)),
             diffuse: 0.7,
             specular: 0.3,
             ..Material::default()

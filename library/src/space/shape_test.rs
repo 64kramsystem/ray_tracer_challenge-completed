@@ -2,10 +2,11 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Shape" {
-        use crate::space::*;
         use crate::math::*;
+        use crate::space::*;
 
         before {
+            #[allow(unused_variables)]
             let test_shape = Sphere::default();
         }
 

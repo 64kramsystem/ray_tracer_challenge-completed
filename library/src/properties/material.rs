@@ -1,8 +1,10 @@
 use crate::{math::Tuple, properties::Color, space::PointLight};
 
-#[derive(Clone, Debug, PartialEq)]
+use super::{FlatPattern, Pattern, COLOR_BLACK};
+
+#[derive(Debug)]
 pub struct Material {
-    pub color: Color,
+    pub pattern: Box<dyn Pattern>,
     pub ambient: f64,
     pub diffuse: f64,
     pub specular: f64,
@@ -12,11 +14,7 @@ pub struct Material {
 impl Default for Material {
     fn default() -> Self {
         Self {
-            color: Color {
-                r: 1.0,
-                g: 1.0,
-                b: 1.0,
-            },
+            pattern: Box::new(FlatPattern::default()),
             ambient: 0.1,
             diffuse: 0.9,
             specular: 0.9,
@@ -29,22 +27,26 @@ impl Material {
     pub fn lighting(
         &self,
         light: &PointLight,
-        point: &Tuple,
+        object_point: &Tuple,
+        world_point: &Tuple,
         eyev: &Tuple,
         normalv: &Tuple,
         in_shadow: bool,
     ) -> Color {
-        let effective_color = self.color * &light.intensity;
+        let pattern_point = self.pattern.transform().inverse() * object_point;
+        let color = self.pattern.color_at(&pattern_point);
 
-        let lightv = (light.position - point).normalize();
+        let effective_color = color * &light.intensity;
+
+        let lightv = (light.position - world_point).normalize();
 
         let ambient = effective_color * self.ambient;
 
         let light_dot_normal = lightv.dot_product(&normalv);
 
         let (diffuse, specular) = if in_shadow || light_dot_normal < 0.0 {
-            let diffuse = Color::new(0, 0, 0);
-            let specular = Color::new(0, 0, 0);
+            let diffuse = COLOR_BLACK;
+            let specular = COLOR_BLACK;
 
             (diffuse, specular)
         } else {
@@ -54,7 +56,7 @@ impl Material {
             let reflect_dot_eye = reflectv.dot_product(&eyev);
 
             let specular = if reflect_dot_eye <= 0.0 {
-                Color::new(0, 0, 0)
+                COLOR_BLACK
             } else {
                 let factor = reflect_dot_eye.powf(self.shininess);
 

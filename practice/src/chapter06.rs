@@ -4,7 +4,8 @@ use std::{f64::consts::PI, sync::Mutex};
 use library::{
     interface::{Image, Sdl2Interface},
     math::{Matrix, Tuple},
-    properties::Color,
+    properties::FlatPattern,
+    properties::COLOR_BLACK,
     space::{PointLight, Ray, Shape, Sphere},
     Axis,
 };
@@ -21,8 +22,8 @@ pub fn practice() {
     let (origin_x, origin_y) = ((WALL_SIZE / 2) as i16, (WALL_SIZE / 2) as i16);
 
     let mut sphere = Sphere::default();
-    sphere.material.color = Color::new(1, 0.2, 1);
-    sphere.transformation = Matrix::translation(10, 0, 0)
+    sphere.material.pattern = Box::new(FlatPattern::new(1, 0.2, 1));
+    sphere.transform = Matrix::translation(10, 0, 0)
         * &Matrix::rotation(Axis::Z, -PI / 4.0)
         * &Matrix::scaling(6.25, 12.5, 12.5);
 
@@ -30,7 +31,7 @@ pub fn practice() {
 
     let eye_position = Tuple::point(0, 0, eye_z);
 
-    let mut pixels_buffer = vec![vec![Color::new(0, 0, 0); WALL_SIZE as usize]; WALL_SIZE as usize];
+    let mut pixels_buffer = vec![vec![COLOR_BLACK; WALL_SIZE as usize]; WALL_SIZE as usize];
     let pixels_buffer_mtx = Mutex::new(&mut pixels_buffer);
 
     // buffer_y/x are just for convenience.
@@ -39,7 +40,7 @@ pub fn practice() {
         .into_par_iter()
         .enumerate()
         .for_each(|(buffer_y, interface_y)| {
-            let mut row_buffer = vec![Color::new(0, 0, 0); WALL_SIZE as usize];
+            let mut row_buffer = vec![COLOR_BLACK; WALL_SIZE as usize];
 
             for (buffer_x, interface_x) in (-origin_x..origin_x).enumerate() {
                 let eye_ray_direction =
@@ -55,7 +56,7 @@ pub fn practice() {
                     let hit_point = eye_ray.position(hit);
                     let hit_normal = sphere.normal(&hit_point);
 
-                    let light_color = sphere.material.lighting(
+                    let light_color = sphere.lighting(
                         &light,
                         &hit_point,
                         &-eye_ray.direction,

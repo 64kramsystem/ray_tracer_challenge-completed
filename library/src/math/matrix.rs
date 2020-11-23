@@ -3,7 +3,7 @@ use crate::{lang::HasFloat64Value, Axis};
 
 use std::ops::{Index, IndexMut, Mul};
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Matrix {
     pub values: Vec<Vec<f64>>,
 }
@@ -223,11 +223,11 @@ impl Matrix {
         f64::from_bits(minor_bits ^ sign_bits)
     }
 
-    pub fn inverse(&self) -> Option<Self> {
+    pub fn inverse(&self) -> Self {
         let determinant = self.determinant();
 
         if determinant == 0.0 {
-            None
+            panic!("The matrix has zero determinant!")
         } else {
             let order = self.values.len();
 
@@ -241,7 +241,7 @@ impl Matrix {
                 })
                 .collect::<Vec<_>>();
 
-            Some(Self { values: result })
+            Self { values: result }
         }
     }
 }

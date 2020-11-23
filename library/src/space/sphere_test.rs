@@ -6,16 +6,16 @@ demonstrate! {
         use crate::math::*;
 
         it "should have an identity transformation of order 4 as default" {
-            assert_eq!(Sphere::default().transformation, Matrix::identity(4));
+            assert_eq!(Sphere::default().transform, Matrix::identity(4));
         }
 
         it "should allow a transformation to be set" {
             let mut sphere = Sphere::default();
-            sphere.transformation = Matrix::scaling(1, 2, 3);
+            sphere.transform = Matrix::scaling(1, 2, 3);
 
-            let expected_transformation = Matrix::scaling(1, 2, 3);
+            let expected_transform = Matrix::scaling(1, 2, 3);
 
-            assert_eq!(sphere.transformation, expected_transformation);
+            assert_eq!(sphere.transform, expected_transform);
         }
 
         // The property of increasing each id by one can't be tested without modifying the Sphere code.

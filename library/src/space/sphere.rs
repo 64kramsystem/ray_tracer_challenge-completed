@@ -2,18 +2,20 @@ use super::{shape, shape::private::ShapeLocal, Shape};
 use crate::{
     lang::HasFloat64Value,
     math::{Matrix, Tuple},
-    properties::Material,
+    properties::{FlatPattern, Material, Pattern},
     Axis,
 };
 
-#[derive(Clone, Debug, ShapeAccessors, SmartDefault)]
+#[derive(Debug, ShapeAccessors, SmartDefault)]
 pub struct Sphere {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
     #[default(Matrix::identity(4))]
-    pub transformation: Matrix,
+    pub transform: Matrix,
     #[default(Material::default())]
     pub material: Material,
+    #[default(Box::new(FlatPattern::default()))]
+    pub pattern: Box<dyn Pattern>,
 }
 
 impl Sphere {
@@ -36,8 +38,8 @@ impl Sphere {
     // Returns a new Sphere with same id, with new transformation = (transformation * self.transformation).
     //
     pub fn transform(mut self, transformation: &Matrix) -> Self {
-        let new_transformation = transformation * &self.transformation;
-        self.transformation = new_transformation;
+        let new_transformation = transformation * &self.transform;
+        self.transform = new_transformation;
         self
     }
 }

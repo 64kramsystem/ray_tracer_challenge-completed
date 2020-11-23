@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
     math::{Matrix, Tuple},
-    properties::{Color, Material},
+    properties::{Color, FlatPattern, Material, COLOR_BLACK, COLOR_WHITE},
 };
 
 pub struct World {
@@ -17,7 +17,7 @@ impl World {
             objects: vec![
                 Box::new(Sphere {
                     material: Material {
-                        color: Color::new(0.8, 1.0, 0.6),
+                        pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
                         ambient: 0.1,
                         diffuse: 0.7,
                         specular: 0.2,
@@ -26,13 +26,13 @@ impl World {
                     ..Sphere::default()
                 }),
                 Box::new(Sphere {
-                    transformation: Matrix::scaling(0.5, 0.5, 0.5),
+                    transform: Matrix::scaling(0.5, 0.5, 0.5),
                     ..Sphere::default()
                 }),
             ],
             light_source: PointLight {
                 position: Tuple::point(-10, 10, -10),
-                intensity: Color::new(1, 1, 1),
+                intensity: COLOR_WHITE,
             },
         }
     }
@@ -86,7 +86,7 @@ impl World {
     pub fn shade_hit(&self, intersection_state: IntersectionState) -> Color {
         let is_shadowed = self.is_shadowed(&intersection_state.over_point);
 
-        intersection_state.object.material().lighting(
+        intersection_state.object.lighting(
             &self.light_source,
             &intersection_state.point,
             &intersection_state.eyev,
@@ -102,7 +102,7 @@ impl World {
             let intersection_state = ray.intersection_state(*t, *object);
             self.shade_hit(intersection_state)
         } else {
-            Color::new(0, 0, 0)
+            COLOR_BLACK
         }
     }
 

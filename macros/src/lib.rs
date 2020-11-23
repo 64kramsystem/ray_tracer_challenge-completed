@@ -17,20 +17,16 @@ pub fn shape_accessors_derive(input: TokenStream) -> TokenStream {
                 self.id
             }
 
-            fn transformation(&self) -> &Matrix {
-                &self.transformation
-            }
-
-            fn transformation_mut(&mut self) -> &mut Matrix {
-                &mut self.transformation
+            fn transform(&self) -> &Matrix {
+                &self.transform
             }
 
             fn material(&self) -> &Material {
                 &self.material
             }
 
-            fn material_mut(&mut self) -> &mut Material {
-                &mut self.material
+            fn pattern(&self) -> &dyn Pattern {
+                &*self.pattern
             }
         }
     };

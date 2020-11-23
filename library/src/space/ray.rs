@@ -43,13 +43,9 @@ impl Ray {
     pub fn inverse_transform(&self, transform: &Matrix) -> Self {
         let inverse_transform = transform.inverse();
 
-        if let Some(inverse_transform) = inverse_transform {
-            Self {
-                origin: &inverse_transform * &self.origin,
-                direction: &inverse_transform * &self.direction,
-            }
-        } else {
-            panic!("Non-invertible transform matrix!")
+        Self {
+            origin: &inverse_transform * &self.origin,
+            direction: &inverse_transform * &self.direction,
         }
     }
 

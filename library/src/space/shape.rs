@@ -1,9 +1,9 @@
 use std::{fmt, sync::Mutex};
 
-use super::Ray;
+use super::{PointLight, Ray};
 use crate::{
     math::{Matrix, Tuple},
-    properties::Material,
+    properties::{Color, Material, Pattern},
 };
 
 lazy_static::lazy_static! {
@@ -31,25 +31,16 @@ pub(crate) mod private {
 
 pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
     fn id(&self) -> u32;
-    fn transformation(&self) -> &Matrix;
-    fn transformation_mut(&mut self) -> &mut Matrix;
+    fn transform(&self) -> &Matrix;
     fn material(&self) -> &Material;
-    fn material_mut(&mut self) -> &mut Material;
+    fn pattern(&self) -> &dyn Pattern;
 
     fn normal(&self, world_point: &Tuple) -> Tuple {
-        let object_point = if let Some(inverse) = self.transformation().inverse() {
-            inverse * world_point
-        } else {
-            panic!()
-        };
+        let object_point = self.transform().inverse() * world_point;
 
         let object_normal = self.local_normal(&object_point);
 
-        let mut world_normal = if let Some(inverse) = self.transformation().inverse() {
-            inverse.transpose() * &object_normal
-        } else {
-            panic!()
-        };
+        let mut world_normal = self.transform().inverse().transpose() * &object_normal;
 
         world_normal.w = 0.0;
 
@@ -59,8 +50,25 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
     // Intersections are returned in order.
     //
     fn intersections(&self, ray: &Ray) -> Option<(f64, f64)> {
-        let transformed_ray = ray.inverse_transform(self.transformation());
+        let transformed_ray = ray.inverse_transform(self.transform());
         self.local_intersections(&transformed_ray)
+    }
+
+    // Divergence from the book design. Having the lighting method herea voids going back and forth
+    // between Shape and Material, and makes World#shade_hit cleaner.
+    //
+    fn lighting(
+        &self,
+        light: &PointLight,
+        world_point: &Tuple,
+        eyev: &Tuple,
+        normalv: &Tuple,
+        in_shadow: bool,
+    ) -> Color {
+        let object_point = self.transform().inverse() * world_point;
+
+        self.material()
+            .lighting(light, &object_point, world_point, eyev, normalv, in_shadow)
     }
 }
 

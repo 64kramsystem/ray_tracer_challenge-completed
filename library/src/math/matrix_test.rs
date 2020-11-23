@@ -170,7 +170,8 @@ demonstrate! {
             }
 
             context "inversion" {
-                it "should return none if the matrix is not invertible" {
+                #[should_panic]
+                it "should panic if the matrix is not invertible" {
                     let matrix = Matrix::new(&[
                         -4,  2, -2, -3,
                          9,  6,  2,  6,
@@ -178,7 +179,7 @@ demonstrate! {
                          0,  0,  0,  0,
                     ]);
 
-                    assert_eq!(matrix.inverse(), None);
+                    matrix.inverse();
                 }
 
                 it "should return the (wrapped) inverted matrix if he matrix is invertible" {
@@ -189,12 +190,12 @@ demonstrate! {
                          1, -3,  7,  4,
                     ]);
 
-                    let expected_result = Some(Matrix::new(&[
+                    let expected_result = Matrix::new(&[
                          0.21805,  0.45113,  0.24060, -0.04511,
                         -0.80827, -1.45677, -0.44361,  0.52068,
                         -0.07895, -0.22368, -0.05263,  0.19737,
                         -0.52256, -0.81391, -0.30075,  0.30639,
-                    ]));
+                    ]);
 
                     assert_eq!(matrix.inverse(), expected_result);
                 }
