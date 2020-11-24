@@ -2,6 +2,7 @@ use std::collections::BTreeSet;
 
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
+    lang::NoisyFloat64,
     math::{Matrix, Tuple},
     properties::{Color, FlatPattern, Material, COLOR_BLACK, COLOR_WHITE},
 };
@@ -107,7 +108,18 @@ impl World {
     }
 
     pub fn reflected_color(&self, intersection_state: IntersectionState) -> Color {
-        COLOR_BLACK
+        if intersection_state.object.material().reflective.denoise() == 0.0 {
+            return COLOR_BLACK;
+        }
+
+        let reflect_ray = Ray {
+            origin: intersection_state.over_point,
+            direction: intersection_state.reflectv,
+        };
+
+        let color = self.color_at(&reflect_ray);
+
+        return color * intersection_state.object.material().reflective;
     }
 
     pub fn is_shadowed(&self, point: &Tuple) -> bool {

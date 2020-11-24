@@ -7,8 +7,8 @@ demonstrate! {
         use crate::space::*;
 
         before {
-            #[allow(unused_variables)]
-            let world = World::default();
+            #[allow(unused_variables,unused_mut)]
+            let mut world = World::default();
         }
 
         it "should intersect with a ray" {
@@ -138,6 +138,31 @@ demonstrate! {
 
                 assert_eq!(actual_color, COLOR_BLACK);
 
+            }
+
+            it "should be computed for a reflective material" {
+                #[allow(non_snake_case)]
+                let SQRT_TWO = 2.0_f64.sqrt();
+
+                let plane = Plane {
+                    material: Material {
+                        reflective: 0.5,
+                        ..Material::default()
+                    },
+                    transform: Matrix::translation(0, -1, 0),
+                    ..Plane::default()
+                };
+
+                world.objects.push(Box::new(plane));
+
+                let ray = Ray::new((0, 0, -3), (0.0, -SQRT_TWO / 2.0, SQRT_TWO / 2.0));
+
+                let plane_ref = world.objects.last().unwrap().as_ref();
+                let intersection_state = ray.intersection_state(SQRT_TWO, plane_ref);
+
+                let actual_color = world.reflected_color(intersection_state);
+
+                assert_eq!(actual_color, Color::new(0.19032, 0.2379, 0.14274));
             }
         } // context "reflected color"
 
