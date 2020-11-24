@@ -17,13 +17,13 @@ pub struct IntersectionState<'a> {
 impl<'a> IntersectionState<'a> {
     pub fn new(t: f64, object: &'a dyn Shape, point: Tuple, eyev: Tuple) -> Self {
         let mut normalv = object.normal(&point);
-        let over_point = point + &(normalv * EPSILON);
         let inside = if normalv.dot_product(&eyev) >= 0.0 {
             false
         } else {
             normalv = -normalv;
             true
         };
+        let over_point = point + &(normalv * EPSILON);
 
         Self {
             t,
