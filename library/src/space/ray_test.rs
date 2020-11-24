@@ -28,6 +28,7 @@ demonstrate! {
                         over_point: Tuple::point(0, 0, -1),
                         eyev: Tuple::vector(0, 0, -1),
                         normalv: Tuple::vector(0, 0, -1),
+                        reflectv: Tuple::vector(0, 0, -1),
                         inside: false,
                     };
 
@@ -48,12 +49,27 @@ demonstrate! {
                         over_point: Tuple::point(0, 0, 0.9999),
                         eyev: Tuple::vector(0, 0, -1),
                         normalv: Tuple::vector(0, 0, -1),
+                        reflectv: Tuple::vector(0, 0, -1),
                         inside: true,
                     };
 
                     let actual_intersection_state = ray.intersection_state(t, object);
 
                     assert_eq!(actual_intersection_state, expected_intersection_state);
+                }
+
+                it "with reflection" {
+                    #[allow(non_snake_case)]
+                    let SQRT_TWO: f64 = 2.0_f64.sqrt();
+
+                    let object = Plane::default();
+                    let ray = Ray::new((0, 1, -1), (0.0, -SQRT_TWO / 2.0, SQRT_TWO / 2.0));
+                    let intersection = Intersection { t: SQRT_TWO, object: &object };
+
+                    let actual_intersection_state = ray.intersection_state(intersection.t, intersection.object);
+                    let expected_reflectv = Tuple::vector(0.0, SQRT_TWO / 2.0, SQRT_TWO / 2.0);
+
+                    assert_eq!(actual_intersection_state.reflectv, expected_reflectv);
                 }
             } // context "should be computed from an intersection and an object"
         } // context "intersection state"

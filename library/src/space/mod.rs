@@ -9,6 +9,7 @@ mod sphere;
 mod world;
 
 pub use camera::Camera;
+pub use intersection::Intersection;
 pub use intersection_state::IntersectionState;
 pub use plane::Plane;
 pub use point_light::PointLight;

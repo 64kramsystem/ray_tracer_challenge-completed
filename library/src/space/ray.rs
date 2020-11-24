@@ -62,6 +62,7 @@ impl Ray {
             true
         };
         let over_point = point + &(normalv * EPSILON);
+        let reflectv = self.direction.reflect(&normalv);
 
         IntersectionState {
             t,
@@ -70,6 +71,7 @@ impl Ray {
             over_point,
             eyev,
             normalv,
+            reflectv,
             inside,
         }
     }

@@ -8,5 +8,6 @@ pub struct IntersectionState<'a> {
     pub over_point: Tuple,
     pub eyev: Tuple,
     pub normalv: Tuple,
+    pub reflectv: Tuple,
     pub inside: bool,
 }
