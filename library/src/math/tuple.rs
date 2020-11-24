@@ -105,6 +105,8 @@ impl Tuple {
         Matrix::shearing(x_py, x_pz, y_px, y_pz, z_px, z_py) * &self
     }
 
+    // In the book, this is `reflect(in, normal)`
+    //
     pub fn reflect(&self, normal: &Tuple) -> Self {
         *self - &(*normal * 2.0 * self.dot_product(normal))
     }

@@ -49,6 +49,8 @@ impl Ray {
         }
     }
 
+    // In the book, this is split between `intersection(t, s)` and `prepare_computations(i, r)`.
+    //
     pub fn intersection_state<'a>(&self, t: f64, object: &'a dyn Shape) -> IntersectionState<'a> {
         let point = self.position(t);
         let eyev = -self.direction;
