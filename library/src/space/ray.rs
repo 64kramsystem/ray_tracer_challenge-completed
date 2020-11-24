@@ -1,7 +1,7 @@
 use super::IntersectionState;
 use crate::{
     lang::HasFloat64Value,
-    math::{Matrix, Tuple},
+    math::{Matrix, Tuple, EPSILON},
     space::Shape,
 };
 
@@ -52,8 +52,24 @@ impl Ray {
     pub fn intersection_state<'a>(&self, t: f64, object: &'a dyn Shape) -> IntersectionState<'a> {
         let point = self.position(t);
         let eyev = -self.direction;
+        let mut normalv = object.normal(&point);
+        let inside = if normalv.dot_product(&eyev) >= 0.0 {
+            false
+        } else {
+            normalv = -normalv;
+            true
+        };
+        let over_point = point + &(normalv * EPSILON);
 
-        IntersectionState::new(t, object, point, eyev)
+        IntersectionState {
+            t,
+            object,
+            point,
+            over_point,
+            eyev,
+            normalv,
+            inside,
+        }
     }
 
     pub fn hit(&self, sphere: &dyn Shape) -> Option<f64> {
