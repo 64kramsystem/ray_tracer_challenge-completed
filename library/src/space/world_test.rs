@@ -96,7 +96,7 @@ demonstrate! {
                                 ambient: 1.0,
                                 diffuse: 0.7,
                                 specular: 0.2,
-                                shininess: 200.0,
+                                ..Material::default()
                             },
                             ..Sphere::default()
                         }),
