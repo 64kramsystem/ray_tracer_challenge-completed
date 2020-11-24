@@ -106,6 +106,10 @@ impl World {
         }
     }
 
+    pub fn reflected_color(&self, intersection_state: IntersectionState) -> Color {
+        COLOR_BLACK
+    }
+
     pub fn is_shadowed(&self, point: &Tuple) -> bool {
         let lightv = self.light_source.position - point;
         let distance = lightv.magnitude();

@@ -120,6 +120,27 @@ demonstrate! {
             }
         } // context "color of a ray intersection"
 
+        context "reflected color" {
+            it "should be computed for a nonreflective material" {
+                let ray = Ray::new((0, 0, 0), (0, 0, 1));
+                let shape = Sphere {
+                    transform: Matrix::scaling(0.5, 0.5, 0.5),
+                    material: Material {
+                        ambient: 1.0,
+                        ..Material::default()
+                    },
+                    ..Sphere::default()
+                };
+
+                let intersection_state = ray.intersection_state(1.0, &shape);
+
+                let actual_color = world.reflected_color(intersection_state);
+
+                assert_eq!(actual_color, COLOR_BLACK);
+
+            }
+        } // context "reflected color"
+
         context "shadowing" {
             it "should find when a point is not in the shadow" {
                 let point = Tuple::point(10, -10, 10);
