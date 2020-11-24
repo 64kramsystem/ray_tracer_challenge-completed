@@ -9,6 +9,9 @@ demonstrate! {
         before {
             #[allow(unused_variables,unused_mut)]
             let mut world = World::default();
+
+            #[allow(non_snake_case,unused_variables)]
+            let SQRT_TWO = 2.0_f64.sqrt();
         }
 
         it "should intersect with a ray" {
@@ -66,7 +69,30 @@ demonstrate! {
 
                 assert_eq!(world.shade_hit(intersection_state), expected_color);
             }
-        } // context "intersection shading"
+
+            it "should be performed with a reflective material" {
+                let plane = Plane {
+                    material: Material {
+                        reflective: 0.5,
+                        ..Material::default()
+                    },
+                    transform: Matrix::translation(0, -1, 0),
+                    ..Plane::default()
+                };
+
+                world.objects.push(Box::new(plane));
+
+                let ray = Ray::new((0, 0, -3), (0.0, -SQRT_TWO / 2.0, SQRT_TWO / 2.0));
+
+                let plane_ref = world.objects.last().unwrap().as_ref();
+                let intersection_state = ray.intersection_state(SQRT_TWO, plane_ref);
+
+                let actual_color = world.shade_hit(intersection_state);
+
+                assert_eq!(actual_color, Color::new(0.87677, 0.92436, 0.82918));
+            }
+
+          } // context "intersection shading"
 
         context "color of a ray intersection" {
             it "when a ray misses" {
@@ -141,9 +167,6 @@ demonstrate! {
             }
 
             it "should be computed for a reflective material" {
-                #[allow(non_snake_case)]
-                let SQRT_TWO = 2.0_f64.sqrt();
-
                 let plane = Plane {
                     material: Material {
                         reflective: 0.5,
