@@ -9,6 +9,8 @@ use crate::{
 
 use rayon::prelude::*;
 
+const MAX_REFLECTIONS: u8 = 5;
+
 pub struct Camera {
     pub hsize: u16,
     pub vsize: u16,
@@ -79,7 +81,7 @@ impl Camera {
         (0..self.vsize).into_par_iter().for_each(|y| {
             for x in 0..self.hsize {
                 let ray = self.ray_for_pixel(x, y);
-                let color = world.color_at(&ray);
+                let color = world.color_at(&ray, MAX_REFLECTIONS);
 
                 let mut pixels_buffer = pixels_buffer_mtx.lock().unwrap();
                 pixels_buffer[y as usize][x as usize] = color;

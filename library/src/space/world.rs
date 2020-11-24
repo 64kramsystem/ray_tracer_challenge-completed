@@ -84,7 +84,7 @@ impl World {
         false
     }
 
-    pub fn shade_hit(&self, intersection_state: IntersectionState) -> Color {
+    pub fn shade_hit(&self, intersection_state: IntersectionState, max_reflections: u8) -> Color {
         let is_shadowed = self.is_shadowed(&intersection_state.over_point);
 
         let surface_color = intersection_state.object.lighting(
@@ -95,24 +95,29 @@ impl World {
             is_shadowed,
         );
 
-        let reflected_color = self.reflected_color(intersection_state);
+        let reflected_color = self.reflected_color(intersection_state, max_reflections);
 
         surface_color + &reflected_color
     }
 
-    pub fn color_at(&self, ray: &Ray) -> Color {
+    pub fn color_at(&self, ray: &Ray, max_reflections: u8) -> Color {
         let intersections = self.intersections(ray);
 
         if let Some(Intersection { t, object }) = intersections.first() {
             let intersection_state = ray.intersection_state(*t, *object);
-            self.shade_hit(intersection_state)
+            self.shade_hit(intersection_state, max_reflections)
         } else {
             COLOR_BLACK
         }
     }
 
-    pub fn reflected_color(&self, intersection_state: IntersectionState) -> Color {
-        if intersection_state.object.material().reflective.denoise() == 0.0 {
+    pub fn reflected_color(
+        &self,
+        intersection_state: IntersectionState,
+        max_reflections: u8,
+    ) -> Color {
+        if max_reflections == 0 || intersection_state.object.material().reflective.denoise() == 0.0
+        {
             return COLOR_BLACK;
         }
 
@@ -121,7 +126,7 @@ impl World {
             direction: intersection_state.reflectv,
         };
 
-        let color = self.color_at(&reflect_ray);
+        let color = self.color_at(&reflect_ray, max_reflections - 1);
 
         return color * intersection_state.object.material().reflective;
     }

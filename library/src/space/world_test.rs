@@ -35,7 +35,7 @@ demonstrate! {
 
                 let expected_shade = Color::new(0.38066, 0.47583, 0.2855);
 
-                assert_eq!(world.shade_hit(intersection_state), expected_shade);
+                assert_eq!(world.shade_hit(intersection_state, 0), expected_shade);
             }
 
             it "should be performed in the shadow" {
@@ -67,7 +67,7 @@ demonstrate! {
 
                 let expected_color = Color::new(0.1, 0.1, 0.1);
 
-                assert_eq!(world.shade_hit(intersection_state), expected_color);
+                assert_eq!(world.shade_hit(intersection_state, 0), expected_color);
             }
 
             it "should be performed with a reflective material" {
@@ -87,26 +87,55 @@ demonstrate! {
                 let plane_ref = world.objects.last().unwrap().as_ref();
                 let intersection_state = ray.intersection_state(SQRT_TWO, plane_ref);
 
-                let actual_color = world.shade_hit(intersection_state);
+                let actual_color = world.shade_hit(intersection_state, 1);
 
                 assert_eq!(actual_color, Color::new(0.87677, 0.92436, 0.82918));
             }
 
-          } // context "intersection shading"
+            it "should be performed with mutually reflective surfaces" {
+                world.light_source = PointLight::new((0, 0, 0), (1, 1, 1));
+
+                let lower_plane = Plane {
+                    material: Material {
+                        reflective: 1.0,
+                        ..Material::default()
+                    },
+                    transform: Matrix::translation(0, -1, 0),
+                    ..Plane::default()
+                };
+
+                world.objects.push(Box::new(lower_plane));
+
+                let upper_plane = Plane {
+                    material: Material {
+                        reflective: 1.0,
+                        ..Material::default()
+                    },
+                    transform: Matrix::translation(0, 1, 0),
+                    ..Plane::default()
+                };
+
+                world.objects.push(Box::new(upper_plane));
+
+                let ray = Ray::new((0, 0, 0), (0, 1, 0));
+
+                world.color_at(&ray, 5);
+            }
+        } // context "intersection shading"
 
         context "color of a ray intersection" {
             it "when a ray misses" {
                 let ray =  Ray::new((0, 0, -5), (0, 1, 0));
                 let expected_color = COLOR_BLACK;
 
-                assert_eq!(world.color_at(&ray), expected_color);
+                assert_eq!(world.color_at(&ray, 0), expected_color);
             }
 
             it "when a ray hits" {
                 let ray = Ray::new((0, 0, -5), (0, 0, 1));
                 let expected_color = Color::new(0.38066, 0.47583, 0.2855);
 
-                assert_eq!(world.color_at(&ray), expected_color);
+                assert_eq!(world.color_at(&ray, 0), expected_color);
             }
 
             it "with the intersection behind the ray" {
@@ -142,7 +171,7 @@ demonstrate! {
                 //
                 let expected_color = world.objects[1].material().pattern.color_at(&Tuple::point(0, 0, 0));
 
-                assert_eq!(world.color_at(&ray), expected_color);
+                assert_eq!(world.color_at(&ray, 0), expected_color);
             }
         } // context "color of a ray intersection"
 
@@ -160,7 +189,7 @@ demonstrate! {
 
                 let intersection_state = ray.intersection_state(1.0, &shape);
 
-                let actual_color = world.reflected_color(intersection_state);
+                let actual_color = world.reflected_color(intersection_state, 0);
 
                 assert_eq!(actual_color, COLOR_BLACK);
 
@@ -183,7 +212,7 @@ demonstrate! {
                 let plane_ref = world.objects.last().unwrap().as_ref();
                 let intersection_state = ray.intersection_state(SQRT_TWO, plane_ref);
 
-                let actual_color = world.reflected_color(intersection_state);
+                let actual_color = world.reflected_color(intersection_state, 1);
 
                 assert_eq!(actual_color, Color::new(0.19032, 0.2379, 0.14274));
             }
