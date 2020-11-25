@@ -282,7 +282,31 @@ demonstrate! {
                 let intersection_state = ray.intersection_state(4.0, world.objects[0].as_ref(), &world);
                 let expected_color = COLOR_BLACK;
 
-                assert_eq!(world.refracted_color(intersection_state), expected_color);
+                assert_eq!(world.refracted_color(intersection_state, 5), expected_color);
+            }
+
+            it "should be computed for a refractive material, at the maximum recursion depth" {
+                let ray = Ray::new((0, 0, -5), (0, 0, 1));
+
+                let new_shape = Sphere {
+                    material: Material {
+                        pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
+                        ambient: 0.1,
+                        diffuse: 0.7,
+                        specular: 0.2,
+                        transparency: 1.0,
+                        refractive_index: 1.5,
+                        ..Material::default()
+                    },
+                    ..Sphere::default()
+                };
+
+                world.objects[0] = Box::new(new_shape);
+
+                let intersection_state = ray.intersection_state(4.0, world.objects[0].as_ref(), &world);
+                let expected_color = COLOR_BLACK;
+
+                assert_eq!(world.refracted_color(intersection_state, 0), expected_color);
             }
         } // context "refracted color"
 

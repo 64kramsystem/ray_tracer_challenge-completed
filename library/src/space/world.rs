@@ -166,8 +166,12 @@ impl World {
         return color * intersection_state.object.material().reflective;
     }
 
-    pub fn refracted_color(&self, intersection_state: IntersectionState) -> Color {
-        if intersection_state.object.material().transparency == 0.0 {
+    pub fn refracted_color(
+        &self,
+        intersection_state: IntersectionState,
+        max_refractions: u8,
+    ) -> Color {
+        if max_refractions == 0 || intersection_state.object.material().transparency == 0.0 {
             return COLOR_BLACK;
         }
 
