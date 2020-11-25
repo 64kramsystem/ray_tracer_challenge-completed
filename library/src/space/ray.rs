@@ -1,4 +1,4 @@
-use super::IntersectionState;
+use super::{IntersectionState, World};
 use crate::{
     lang::HasFloat64Value,
     math::{Matrix, Tuple, EPSILON},
@@ -51,7 +51,12 @@ impl Ray {
 
     // In the book, this is split between `intersection(t, s)` and `prepare_computations(i, r)`.
     //
-    pub fn intersection_state<'a>(&self, t: f64, object: &'a dyn Shape) -> IntersectionState<'a> {
+    pub fn intersection_state<'a>(
+        &self,
+        t: f64,
+        object: &'a dyn Shape,
+        world: &World,
+    ) -> IntersectionState<'a> {
         let point = self.position(t);
         let eyev = -self.direction;
         let mut normalv = object.normal(&point);
@@ -64,6 +69,7 @@ impl Ray {
         let over_point = point + &(normalv * EPSILON);
         let under_point = point - &(normalv * EPSILON);
         let reflectv = self.direction.reflect(&normalv);
+        let (n1, n2) = world.refraction_indexes(t, &self);
 
         IntersectionState {
             t,
@@ -74,6 +80,8 @@ impl Ray {
             eyev,
             normalv,
             reflectv,
+            n1,
+            n2,
             inside,
         }
     }

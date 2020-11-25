@@ -4,6 +4,7 @@ demonstrate! {
     describe "Ray" {
         use crate::math::*;
         use crate::space::*;
+        use crate::properties::*;
 
         it "should compute a position at t" {
             let ray = Ray::new((2, 3, 4), (1, 0, 0));
@@ -15,6 +16,10 @@ demonstrate! {
         }
 
         context "intersection state" {
+            before {
+                let world = World::default();
+            }
+
             context "should be computed from an intersection and an object" {
                 it "with the ray outside the object" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
@@ -30,10 +35,12 @@ demonstrate! {
                         eyev: Tuple::vector(0, 0, -1),
                         normalv: Tuple::vector(0, 0, -1),
                         reflectv: Tuple::vector(0, 0, -1),
+                        n1: REFRACTIVE_INDEX_VACUUM,
+                        n2: REFRACTIVE_INDEX_VACUUM,
                         inside: false,
                     };
 
-                    let actual_intersection_state = ray.intersection_state(t, object);
+                    let actual_intersection_state = ray.intersection_state(t, object, &world);
 
                     assert_eq!(actual_intersection_state, expected_intersection_state);
                 }
@@ -52,10 +59,12 @@ demonstrate! {
                         eyev: Tuple::vector(0, 0, -1),
                         normalv: Tuple::vector(0, 0, -1),
                         reflectv: Tuple::vector(0, 0, -1),
+                        n1: REFRACTIVE_INDEX_VACUUM,
+                        n2: REFRACTIVE_INDEX_VACUUM,
                         inside: true,
                     };
 
-                    let actual_intersection_state = ray.intersection_state(t, object);
+                    let actual_intersection_state = ray.intersection_state(t, object, &world);
 
                     assert_eq!(actual_intersection_state, expected_intersection_state);
                 }
@@ -68,7 +77,7 @@ demonstrate! {
                     let ray = Ray::new((0, 1, -1), (0.0, -SQRT_TWO / 2.0, SQRT_TWO / 2.0));
                     let intersection = Intersection { t: SQRT_TWO, object: &object };
 
-                    let actual_intersection_state = ray.intersection_state(intersection.t, intersection.object);
+                    let actual_intersection_state = ray.intersection_state(intersection.t, intersection.object, &world);
                     let expected_reflectv = Tuple::vector(0.0, SQRT_TWO / 2.0, SQRT_TWO / 2.0);
 
                     assert_eq!(actual_intersection_state.reflectv, expected_reflectv);

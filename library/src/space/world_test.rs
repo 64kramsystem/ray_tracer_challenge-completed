@@ -89,7 +89,7 @@ demonstrate! {
             it "should be performed in direct light" {
                 let ray = Ray::new((0, 0, -5), (0, 0, 1));
                 let sphere = &world.objects[0];
-                let intersection_state = ray.intersection_state(4.0, &**sphere);
+                let intersection_state = ray.intersection_state(4.0, sphere.as_ref(), &world);
 
                 let expected_shade = Color::new(0.38066, 0.47583, 0.2855);
 
@@ -121,7 +121,7 @@ demonstrate! {
                     (0, 0, 1),
                 );
 
-                let intersection_state = ray.intersection_state(4.0, &sphere2b);
+                let intersection_state = ray.intersection_state(4.0, &sphere2b, &world);
 
                 let expected_color = Color::new(0.1, 0.1, 0.1);
 
@@ -143,7 +143,7 @@ demonstrate! {
                 let ray = Ray::new((0, 0, -3), (0.0, -SQRT_TWO / 2.0, SQRT_TWO / 2.0));
 
                 let plane_ref = world.objects.last().unwrap().as_ref();
-                let intersection_state = ray.intersection_state(SQRT_TWO, plane_ref);
+                let intersection_state = ray.intersection_state(SQRT_TWO, plane_ref, &world);
 
                 let actual_color = world.shade_hit(intersection_state, 1);
 
@@ -245,7 +245,7 @@ demonstrate! {
                     ..Sphere::default()
                 };
 
-                let intersection_state = ray.intersection_state(1.0, &shape);
+                let intersection_state = ray.intersection_state(1.0, &shape, &world);
 
                 let actual_color = world.reflected_color(intersection_state, 0);
 
@@ -268,13 +268,23 @@ demonstrate! {
                 let ray = Ray::new((0, 0, -3), (0.0, -SQRT_TWO / 2.0, SQRT_TWO / 2.0));
 
                 let plane_ref = world.objects.last().unwrap().as_ref();
-                let intersection_state = ray.intersection_state(SQRT_TWO, plane_ref);
+                let intersection_state = ray.intersection_state(SQRT_TWO, plane_ref, &world);
 
                 let actual_color = world.reflected_color(intersection_state, 1);
 
                 assert_eq!(actual_color, Color::new(0.19032, 0.2379, 0.14274));
             }
         } // context "reflected color"
+
+        context "refracted color" {
+            it "should be computed for an opaque material" {
+                let ray = Ray::new((0, 0, -5), (0, 0, 1));
+                let intersection_state = ray.intersection_state(4.0, world.objects[0].as_ref(), &world);
+                let expected_color = COLOR_BLACK;
+
+                assert_eq!(world.refracted_color(intersection_state), expected_color);
+            }
+        } // context "refracted color"
 
         context "shadowing" {
             it "should find when a point is not in the shadow" {

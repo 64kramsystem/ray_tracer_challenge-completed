@@ -139,7 +139,7 @@ impl World {
         let intersections = self.intersections(ray);
 
         if let Some(Intersection { t, object }) = intersections.first() {
-            let intersection_state = ray.intersection_state(*t, *object);
+            let intersection_state = ray.intersection_state(*t, *object, &self);
             self.shade_hit(intersection_state, max_reflections)
         } else {
             COLOR_BLACK
@@ -164,6 +164,14 @@ impl World {
         let color = self.color_at(&reflect_ray, max_reflections - 1);
 
         return color * intersection_state.object.material().reflective;
+    }
+
+    pub fn refracted_color(&self, intersection_state: IntersectionState) -> Color {
+        if intersection_state.object.material().transparency == 0.0 {
+            return COLOR_BLACK;
+        }
+
+        COLOR_WHITE
     }
 
     pub fn is_shadowed(&self, point: &Tuple) -> bool {
