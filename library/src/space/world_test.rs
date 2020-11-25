@@ -319,7 +319,7 @@ demonstrate! {
 
                 let intersection_state = ray.intersection_state(1.0, &shape, &world);
 
-                let actual_color = world.reflected_color(intersection_state, 0);
+                let actual_color = world.reflected_color(&intersection_state, 0);
 
                 assert_eq!(actual_color, COLOR_BLACK);
 
@@ -342,7 +342,7 @@ demonstrate! {
                 let plane_ref = world.objects.last().unwrap().as_ref();
                 let intersection_state = ray.intersection_state(2.0_f64.sqrt(), plane_ref, &world);
 
-                let actual_color = world.reflected_color(intersection_state, 1);
+                let actual_color = world.reflected_color(&intersection_state, 1);
 
                 assert_eq!(actual_color, Color::new(0.19032, 0.2379, 0.14274));
             }
@@ -354,7 +354,7 @@ demonstrate! {
                 let intersection_state = ray.intersection_state(4.0, world.objects[0].as_ref(), &world);
                 let expected_color = COLOR_BLACK;
 
-                assert_eq!(world.refracted_color(intersection_state, 5), expected_color);
+                assert_eq!(world.refracted_color(&intersection_state, 5), expected_color);
             }
 
             it "should be computed for a refractive material, at the maximum recursion depth" {
@@ -378,7 +378,7 @@ demonstrate! {
                 let intersection_state = ray.intersection_state(4.0, world.objects[0].as_ref(), &world);
                 let expected_color = COLOR_BLACK;
 
-                assert_eq!(world.refracted_color(intersection_state, 0), expected_color);
+                assert_eq!(world.refracted_color(&intersection_state, 0), expected_color);
             }
 
             it "should return black in case of total internal refraction" {
@@ -403,7 +403,7 @@ demonstrate! {
                 let intersection_state = ray.intersection_state(5.0, world.objects[0].as_ref(), &world);
                 let expected_color = COLOR_BLACK;
 
-                assert_eq!(world.refracted_color(intersection_state, 0), expected_color);
+                assert_eq!(world.refracted_color(&intersection_state, 0), expected_color);
             }
 
             // This fails, and it's not clear why, in particular, because live rendering does exhibit
@@ -447,7 +447,7 @@ demonstrate! {
                 let intersections = world.intersections(&ray);
                 let intersection_state = ray.intersection_state(intersections[0].t, intersections[0].object, &world);
 
-                assert_eq!(world.refracted_color(intersection_state, 5), expected_color);
+                assert_eq!(world.refracted_color(&intersection_state, 5), expected_color);
             }
         } // context "refracted color"
 

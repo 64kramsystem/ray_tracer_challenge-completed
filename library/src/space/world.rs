@@ -130,7 +130,7 @@ impl World {
             is_shadowed,
         );
 
-        let reflected_color = self.reflected_color(intersection_state, max_reflections);
+        let reflected_color = self.reflected_color(&intersection_state, max_reflections);
 
         surface_color + &reflected_color
     }
@@ -148,7 +148,7 @@ impl World {
 
     pub fn reflected_color(
         &self,
-        intersection_state: IntersectionState,
+        intersection_state: &IntersectionState,
         max_reflections: u8,
     ) -> Color {
         if max_reflections == 0 || intersection_state.object.material().reflective.denoise() == 0.0
@@ -168,7 +168,7 @@ impl World {
 
     pub fn refracted_color(
         &self,
-        intersection_state: IntersectionState,
+        intersection_state: &IntersectionState,
         max_refractions: u8,
     ) -> Color {
         if max_refractions == 0 || intersection_state.object.material().transparency == 0.0 {
