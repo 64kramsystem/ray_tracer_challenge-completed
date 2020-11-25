@@ -187,7 +187,16 @@ impl World {
             return COLOR_BLACK;
         }
 
-        COLOR_WHITE
+        let cos_t = (1.0 - sin2_t).sqrt();
+        let direction = intersection_state.normalv * (n_ratio * cos_i - cos_t)
+            - &(intersection_state.eyev * n_ratio);
+        let refracted_ray = Ray {
+            origin: intersection_state.under_point,
+            direction,
+        };
+
+        self.color_at(&refracted_ray, max_refractions - 1)
+            * intersection_state.object.material().transparency
     }
 
     pub fn is_shadowed(&self, point: &Tuple) -> bool {
