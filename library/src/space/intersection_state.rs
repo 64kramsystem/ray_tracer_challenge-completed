@@ -6,6 +6,7 @@ pub struct IntersectionState<'a> {
     pub object: &'a dyn Shape,
     pub point: Tuple,
     pub over_point: Tuple,
+    pub under_point: Tuple,
     pub eyev: Tuple,
     pub normalv: Tuple,
     pub reflectv: Tuple,
