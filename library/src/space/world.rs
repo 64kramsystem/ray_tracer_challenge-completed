@@ -1,9 +1,10 @@
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, f64::NEG_INFINITY};
 
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
     lang::NoisyFloat64,
     math::{Matrix, Tuple},
+    properties::REFRACTIVE_INDEX_VACUUM,
     properties::{Color, FlatPattern, Material, COLOR_BLACK, COLOR_WHITE},
 };
 
@@ -64,6 +65,40 @@ impl World {
         }
 
         all_intersections.into_iter().collect::<Vec<_>>()
+    }
+
+    // In the book, this is part of `prepare_computations(i, r)`. This version is simpler and more intuitive.
+    //
+    // We select the object intersecting the ray, and divide them in two categories:
+    //
+    // - those "before", with i1 < t;
+    // - those "after", with i2 > t.
+    //
+    // Then we choose, for each category, the object with the greatest i1. Done!
+    //
+    // Note that an object can be in both categories at the same time, when i1 < t < i2.
+    //
+    pub fn refraction_indexes(&self, t: f64, ray: &Ray) -> (f64, f64) {
+        let (mut max_i1_before, mut max_i1_after) = (NEG_INFINITY, NEG_INFINITY);
+        let (mut n_before, mut n_after) = (REFRACTIVE_INDEX_VACUUM, REFRACTIVE_INDEX_VACUUM);
+
+        for object in self.objects.iter() {
+            let object_intersections = object.intersections(ray);
+
+            if let Some((i1, i2)) = object_intersections {
+                if (i1 < t && t <= i2) && (i1 > max_i1_before) {
+                    max_i1_before = i1;
+                    n_before = object.material().refractive_index;
+                }
+
+                if (i1 <= t && t < i2) && (i1 > max_i1_after) {
+                    max_i1_after = i1;
+                    n_after = object.material().refractive_index;
+                }
+            }
+        }
+
+        (n_before, n_after)
     }
 
     // Optimized version of intersections(), which stops at the first obstructing intersection.

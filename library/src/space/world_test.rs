@@ -27,6 +27,64 @@ demonstrate! {
             assert_eq!(intersections, expected_intersections);
         }
 
+        it "should find the refractive indexes at various scenarios" {
+            let examples = [
+                // [t, n1, n2]
+                //
+                [2.0,  1.0, 1.5],
+                [2.75, 1.5, 2.0],
+                [3.25, 2.0, 2.5],
+                [4.75, 2.5, 2.5],
+                [5.25, 2.5, 1.5],
+                [6.00, 1.5, 1.0],
+            ];
+
+            let sphere1 = Sphere {
+                transform: Matrix::scaling(2, 2, 2),
+                material: Material {
+                    refractive_index: 1.5,
+                    ..Material::default()
+                },
+                ..Sphere::default()
+            };
+            let sphere2 = Sphere {
+                transform: Matrix::translation(0.0, 0.0, -0.25),
+                material: Material {
+                    refractive_index: 2.0,
+                    ..Material::default()
+                },
+                ..Sphere::default()
+            };
+            let sphere3 = Sphere {
+                transform: Matrix::translation(0.0, 0.0, 0.25),
+                material: Material {
+                    refractive_index: 2.5,
+                    ..Material::default()
+                },
+                ..Sphere::default()
+            };
+
+            let objects: Vec<Box<dyn Shape>> = vec![
+                Box::new(sphere1),
+                Box::new(sphere2),
+                Box::new(sphere3),
+            ];
+
+            let world = World {
+                objects,
+                ..World::default()
+            };
+
+            let ray = Ray::new((0, 0, -4), (0, 0, 1));
+
+            for (i, [t, expected_n1, expected_n2]) in examples.iter().enumerate() {
+                let (actual_n1, actual_n2) = world.refraction_indexes(*t, &ray);
+
+                assert_eq!(actual_n1, *expected_n1, "Example {}: E:{}/{} A:{}/{}", i, expected_n1, expected_n2, actual_n1, actual_n2);
+                assert_eq!(actual_n2, *expected_n2, "Example {}: E:{}/{} A:{}/{}", i, expected_n1, expected_n2, actual_n1, actual_n2);
+            }
+        }
+
         context "intersection shading" {
             it "should be performed in direct light" {
                 let ray = Ray::new((0, 0, -5), (0, 0, 1));
