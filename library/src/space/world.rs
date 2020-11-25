@@ -131,8 +131,9 @@ impl World {
         );
 
         let reflected_color = self.reflected_color(&intersection_state, max_reflections);
+        let refracted_color = self.refracted_color(&intersection_state, max_reflections);
 
-        surface_color + &reflected_color
+        surface_color + &reflected_color + &refracted_color
     }
 
     pub fn color_at(&self, ray: &Ray, max_reflections: u8) -> Color {
