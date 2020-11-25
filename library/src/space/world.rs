@@ -175,6 +175,18 @@ impl World {
             return COLOR_BLACK;
         }
 
+        // Identify the case of total internal refraction, using Snell's law. See book p.157.
+        //
+        let n_ratio = intersection_state.n1 / intersection_state.n2;
+        let cos_i = intersection_state
+            .eyev
+            .dot_product(&intersection_state.normalv);
+        let sin2_t = n_ratio.powi(2) * (1.0 - cos_i.powi(2));
+
+        if sin2_t > 1.0 {
+            return COLOR_BLACK;
+        }
+
         COLOR_WHITE
     }
 
