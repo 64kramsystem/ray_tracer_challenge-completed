@@ -22,6 +22,9 @@ pub use world::World;
 mod camera_test;
 
 #[cfg(test)]
+mod intersection_state_test;
+
+#[cfg(test)]
 mod plane_test;
 
 #[cfg(test)]

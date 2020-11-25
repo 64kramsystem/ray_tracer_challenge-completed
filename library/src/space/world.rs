@@ -86,12 +86,12 @@ impl World {
             let object_intersections = object.intersections(ray);
 
             if let Some((i1, i2)) = object_intersections {
-                if (i1 < t && t <= i2) && (i1 > max_i1_before) {
+                if (i1 < t && t.denoised_less_or_equal(i2)) && (i1 > max_i1_before) {
                     max_i1_before = i1;
                     n_before = object.material().refractive_index;
                 }
 
-                if (i1 <= t && t < i2) && (i1 > max_i1_after) {
+                if (i1.denoised_less_or_equal(t) && t < i2) && (i1 > max_i1_after) {
                     max_i1_after = i1;
                     n_after = object.material().refractive_index;
                 }
@@ -133,7 +133,17 @@ impl World {
         let reflected_color = self.reflected_color(&intersection_state, max_reflections);
         let refracted_color = self.refracted_color(&intersection_state, max_reflections);
 
-        surface_color + &reflected_color + &refracted_color
+        let material = intersection_state.object.material();
+
+        if material.reflective > 0.0 && material.transparency > 0.0 {
+            let reflectance = intersection_state.schlick();
+
+            return surface_color
+                + &(reflected_color * reflectance)
+                + &(refracted_color * (1.0 - reflectance));
+        } else {
+            return surface_color + &reflected_color + &refracted_color;
+        }
     }
 
     pub fn color_at(&self, ray: &Ray, max_reflections: u8) -> Color {
