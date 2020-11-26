@@ -2,6 +2,7 @@ use std::{collections::BTreeSet, f64::NEG_INFINITY};
 
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
+    lang::math::sqrt,
     lang::NoisyFloat64,
     math::{Matrix, Tuple},
     properties::REFRACTIVE_INDEX_VACUUM,
@@ -187,7 +188,7 @@ impl World {
             return COLOR_BLACK;
         }
 
-        let cos_t = (1.0 - sin2_t).sqrt();
+        let cos_t = sqrt(1.0 - sin2_t);
         let direction = intersection_state.normalv * (n_ratio * cos_i - cos_t)
             - &(intersection_state.eyev * n_ratio);
         let refracted_ray = Ray {

@@ -3,6 +3,7 @@ use demonstrate::demonstrate;
 demonstrate! {
     describe "World" {
         use crate::math::*;
+        use crate::lang::math::sqrt;
         use crate::properties::*;
         use crate::space::*;
 
@@ -137,10 +138,10 @@ demonstrate! {
 
                 world.objects.push(Box::new(plane));
 
-                let ray = Ray::new((0, 0, -3), (0.0, -2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0));
+                let ray = Ray::new((0, 0, -3), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
 
                 let plane_ref = world.objects.last().unwrap().as_ref();
-                let intersection_state = ray.intersection_state(2.0_f64.sqrt(), plane_ref, &world);
+                let intersection_state = ray.intersection_state(sqrt(2), plane_ref, &world);
 
                 let actual_color = world.shade_hit(intersection_state, 1);
 
@@ -205,9 +206,9 @@ demonstrate! {
 
                 world.objects.push(Box::new(ball));
 
-                let ray = Ray::new((0, 0, -3), (0.0, 2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0));
+                let ray = Ray::new((0, 0, -3), (0.0, sqrt(2) / 2.0, sqrt(2) / 2.0));
 
-                let intersection_state = ray.intersection_state(2.0_f64.sqrt(), world.objects[2].as_ref(), &world);
+                let intersection_state = ray.intersection_state(sqrt(2), world.objects[2].as_ref(), &world);
 
                 let actual_color = world.shade_hit(intersection_state, 5);
 
@@ -215,7 +216,7 @@ demonstrate! {
             }
 
             it "should be performed on a reflective, transparent material" {
-                let ray = Ray::new((0, 0, -3), (0.0, 2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0));
+                let ray = Ray::new((0, 0, -3), (0.0, sqrt(2) / 2.0, sqrt(2) / 2.0));
 
                 let floor = Plane {
                     transform: Matrix::translation(0, -1, 0),
@@ -242,7 +243,7 @@ demonstrate! {
 
                 world.objects.push(Box::new(ball));
 
-                let intersection_state = ray.intersection_state(2.0_f64.sqrt(), world.objects[2].as_ref(), &world);
+                let intersection_state = ray.intersection_state(sqrt(2), world.objects[2].as_ref(), &world);
 
                 // Original expectation in the book.
                 // let expected_color = Color::new(0.93391, 0.69643, 0.69243);
@@ -337,10 +338,10 @@ demonstrate! {
 
                 world.objects.push(Box::new(plane));
 
-                let ray = Ray::new((0, 0, -3), (0.0, -2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0));
+                let ray = Ray::new((0, 0, -3), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
 
                 let plane_ref = world.objects.last().unwrap().as_ref();
-                let intersection_state = ray.intersection_state(2.0_f64.sqrt(), plane_ref, &world);
+                let intersection_state = ray.intersection_state(sqrt(2), plane_ref, &world);
 
                 let actual_color = world.reflected_color(&intersection_state, 1);
 
@@ -395,7 +396,7 @@ demonstrate! {
                     ..Sphere::default()
                 };
 
-                let ray = Ray::new((0.0, 0.0, 2.0_f64.sqrt() / 2.0), (0, 1, 1));
+                let ray = Ray::new((0.0, 0.0, sqrt(2) / 2.0), (0, 1, 1));
                 world.objects[0] = Box::new(new_shape);
 
                 // We're taking the intersection from inside the sphere.

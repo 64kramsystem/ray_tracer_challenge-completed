@@ -3,6 +3,7 @@ use demonstrate::demonstrate;
 demonstrate! {
     describe "Ray" {
         use crate::math::*;
+        use crate::lang::math::sqrt;
         use crate::space::*;
         use crate::properties::*;
 
@@ -70,15 +71,12 @@ demonstrate! {
                 }
 
                 it "with reflection" {
-                    #[allow(non_snake_case)]
-                    let SQRT_TWO: f64 = 2.0_f64.sqrt();
-
                     let object = Plane::default();
-                    let ray = Ray::new((0, 1, -1), (0.0, -SQRT_TWO / 2.0, SQRT_TWO / 2.0));
-                    let intersection = Intersection { t: SQRT_TWO, object: &object };
+                    let ray = Ray::new((0, 1, -1), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
+                    let intersection = Intersection { t: sqrt(2), object: &object };
 
                     let actual_intersection_state = ray.intersection_state(intersection.t, intersection.object, &world);
-                    let expected_reflectv = Tuple::vector(0.0, SQRT_TWO / 2.0, SQRT_TWO / 2.0);
+                    let expected_reflectv = Tuple::vector(0.0, sqrt(2) / 2.0, sqrt(2) / 2.0);
 
                     assert_eq!(actual_intersection_state.reflectv, expected_reflectv);
                 }
