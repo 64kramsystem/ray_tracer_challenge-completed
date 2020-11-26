@@ -1,7 +1,10 @@
 use std::ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub};
 
 use super::{Matrix, EPSILON};
-use crate::{lang::HasFloat64Value, Axis};
+use crate::{
+    lang::{math::sqrt, HasFloat64Value},
+    Axis,
+};
 
 pub const POINT_TYPE: f64 = 1.0;
 pub const VECTOR_TYPE: f64 = 0.0;
@@ -60,7 +63,7 @@ impl Tuple {
     }
 
     pub fn magnitude(&self) -> f64 {
-        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2) + self.w.powi(2)).sqrt()
+        sqrt(self.x.powi(2) + self.y.powi(2) + self.z.powi(2) + self.w.powi(2))
     }
 
     pub fn normalize(&self) -> Self {
@@ -105,6 +108,8 @@ impl Tuple {
         Matrix::shearing(x_py, x_pz, y_px, y_pz, z_px, z_py) * &self
     }
 
+    // In the book, this is `reflect(in, normal)`
+    //
     pub fn reflect(&self, normal: &Tuple) -> Self {
         *self - &(*normal * 2.0 * self.dot_product(normal))
     }

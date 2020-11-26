@@ -5,16 +5,18 @@ mod flat_pattern;
 mod gradient_pattern;
 mod material;
 mod pattern;
+mod refractive_indexes;
 mod ring_pattern;
 mod stripe_pattern;
 
 pub use checkers_pattern::CheckersPattern;
 pub use color::Color;
-pub use colors::{COLOR_BLACK, COLOR_BLUE, COLOR_GREEN, COLOR_RED, COLOR_WHITE};
+pub use colors::*;
 pub use flat_pattern::FlatPattern;
 pub use gradient_pattern::GradientPattern;
 pub use material::Material;
 pub use pattern::Pattern;
+pub use refractive_indexes::*;
 pub use ring_pattern::RingPattern;
 pub use stripe_pattern::StripePattern;
 

@@ -1,5 +1,6 @@
 use super::{shape, shape::private::ShapeLocal, Shape};
 use crate::{
+    lang::math::sqrt,
     lang::HasFloat64Value,
     math::{Matrix, Tuple},
     properties::{FlatPattern, Material, Pattern},
@@ -64,8 +65,8 @@ impl ShapeLocal for Sphere {
         if discriminant < 0.0 {
             None
         } else {
-            let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
-            let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
+            let t1 = (-b - sqrt(discriminant)) / (2.0 * a);
+            let t2 = (-b + sqrt(discriminant)) / (2.0 * a);
 
             Some((t1, t2))
         }

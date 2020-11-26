@@ -3,7 +3,9 @@ use demonstrate::demonstrate;
 demonstrate! {
     describe "Ray" {
         use crate::math::*;
+        use crate::lang::math::sqrt;
         use crate::space::*;
+        use crate::properties::*;
 
         it "should compute a position at t" {
             let ray = Ray::new((2, 3, 4), (1, 0, 0));
@@ -21,14 +23,23 @@ demonstrate! {
                     let object = &Sphere::default();
                     let t = 4.0;
 
-                    let expected_intersection_state = IntersectionState::new(
+                    let expected_intersection_state = IntersectionState {
                         t,
                         object,
-                        Tuple::point(0, 0, -1),
-                        Tuple::vector(0, 0, -1)
-                    );
+                        point: Tuple::point(0, 0, -1),
+                        over_point: Tuple::point(0, 0, -1),
+                        under_point: Tuple::point(0, 0, -0.9999),
+                        eyev: Tuple::vector(0, 0, -1),
+                        normalv: Tuple::vector(0, 0, -1),
+                        reflectv: Tuple::vector(0, 0, -1),
+                        n1: REFRACTIVE_INDEX_VACUUM,
+                        n2: REFRACTIVE_INDEX_VACUUM,
+                        inside: false,
+                    };
 
-                    assert_eq!(ray.intersection_state(t, object), expected_intersection_state);
+                    let actual_intersection_state = ray.intersection_state(t, object, &[]);
+
+                    assert_eq!(actual_intersection_state, expected_intersection_state);
                 }
 
                 it "with the ray inside the object" {
@@ -36,14 +47,34 @@ demonstrate! {
                     let object = &Sphere::default();
                     let t = 1.0;
 
-                    let expected_intersection_state = IntersectionState::new(
+                    let expected_intersection_state = IntersectionState {
                         t,
                         object,
-                        Tuple::point(0, 0, 1),
-                        Tuple::vector(0, 0, -1)
-                    );
+                        point: Tuple::point(0, 0, 1),
+                        over_point: Tuple::point(0, 0, 0.9999),
+                        under_point: Tuple::point(0, 0, 1),
+                        eyev: Tuple::vector(0, 0, -1),
+                        normalv: Tuple::vector(0, 0, -1),
+                        reflectv: Tuple::vector(0, 0, -1),
+                        n1: REFRACTIVE_INDEX_VACUUM,
+                        n2: REFRACTIVE_INDEX_VACUUM,
+                        inside: true,
+                    };
 
-                    assert_eq!(ray.intersection_state(t, object), expected_intersection_state);
+                    let actual_intersection_state = ray.intersection_state(t, object, &[]);
+
+                    assert_eq!(actual_intersection_state, expected_intersection_state);
+                }
+
+                it "with reflection" {
+                    let object = Plane::default();
+                    let ray = Ray::new((0, 1, -1), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
+                    let intersection = Intersection { t: sqrt(2), object: &object };
+
+                    let actual_intersection_state = ray.intersection_state(intersection.t, intersection.object, &[]);
+                    let expected_reflectv = Tuple::vector(0.0, sqrt(2) / 2.0, sqrt(2) / 2.0);
+
+                    assert_eq!(actual_intersection_state.reflectv, expected_reflectv);
                 }
             } // context "should be computed from an intersection and an object"
         } // context "intersection state"

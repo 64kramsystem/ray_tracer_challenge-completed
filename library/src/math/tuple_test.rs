@@ -4,6 +4,7 @@ demonstrate! {
     describe "Tuple" {
         use crate::*;
         use crate::math::{*, tuple::{POINT_TYPE, VECTOR_TYPE}};
+        use crate::lang::math::sqrt;
         use std::f64::consts::PI;
 
         context "with w=1_0" {
@@ -105,7 +106,7 @@ demonstrate! {
             it "can be normalized" {
                 let vector = Tuple::vector(1.0, 2.0, 3.0);
 
-                let expected_vector = Tuple::vector(1.0 / 14_f64.sqrt(), 2.0 / 14_f64.sqrt(), 3.0 / 14_f64.sqrt());
+                let expected_vector = Tuple::vector(1.0 / sqrt(14), 2.0 / sqrt(14), 3.0 / sqrt(14));
 
                 assert_eq!(vector.normalize(), expected_vector);
             }
@@ -159,7 +160,7 @@ demonstrate! {
             it "as vector (-1, -2, -3)" {
                 let vector = Tuple::vector(-1.0, -2.0, -3.0);
 
-                let expected_magnitude = 14.0_f64.sqrt();
+                let expected_magnitude = sqrt(14);
 
                 assert!(vector.magnitude() - expected_magnitude < EPSILON);
             }
@@ -192,12 +193,10 @@ demonstrate! {
             }
 
             context "rotation" {
-                before { let sqrt_2 = 2.0_f64.sqrt(); }
-
                 it "should by performed by Pi/4 around the x axis" {
                     let tuple = Tuple::point(0, 1, 0);
 
-                    let expected_result = Tuple::point(0, sqrt_2 / 2.0, sqrt_2 / 2.0);
+                    let expected_result = Tuple::point(0, sqrt(2) / 2.0, sqrt(2) / 2.0);
 
                     assert_eq!(tuple.rotate(Axis::X, PI / 4.0), expected_result);
                 }
@@ -205,7 +204,7 @@ demonstrate! {
                 it "should by performed by Pi/4 around the y axis" {
                     let tuple = Tuple::point(0, 0, 1);
 
-                    let expected_result = Tuple::point(sqrt_2 / 2.0, 0, sqrt_2 / 2.0);
+                    let expected_result = Tuple::point(sqrt(2) / 2.0, 0, sqrt(2) / 2.0);
 
                     assert_eq!(tuple.rotate(Axis::Y, PI / 4.0), expected_result);
                 }
@@ -213,7 +212,7 @@ demonstrate! {
                 it "should by performed by Pi/4 around the z axis" {
                     let tuple = Tuple::point(0, 1, 0);
 
-                    let expected_result = Tuple::point(-sqrt_2 / 2.0, sqrt_2 / 2.0, 0);
+                    let expected_result = Tuple::point(-sqrt(2) / 2.0, sqrt(2) / 2.0, 0);
 
                     assert_eq!(tuple.rotate(Axis::Z, PI / 4.0), expected_result);
                 }

@@ -5,6 +5,7 @@ demonstrate! {
         use crate::*;
         use crate::interface::*;
         use crate::math::*;
+        use crate::lang::math::sqrt;
         use crate::properties::*;
         use crate::space::*;
         use std::f64::consts::PI;
@@ -56,10 +57,8 @@ demonstrate! {
 
                 let ray = camera.ray_for_pixel(100, 50);
 
-                let sqrt_2 = 2.0_f64.sqrt();
-
                 assert_eq!(ray.origin, Tuple::point(0, 2, -5));
-                assert_eq!(ray.direction, Tuple::vector(sqrt_2 / 2.0, 0, -sqrt_2 / 2.0));
+                assert_eq!(ray.direction, Tuple::vector(sqrt(2) / 2.0, 0, -sqrt(2) / 2.0));
             }
         } // context "constructs a ray"
 

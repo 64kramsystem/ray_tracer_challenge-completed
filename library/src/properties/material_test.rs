@@ -3,6 +3,7 @@ use demonstrate::demonstrate;
 demonstrate! {
     describe "Material" {
         use crate::math::*;
+        use crate::lang::math::sqrt;
         use crate::properties::*;
         use crate::space::*;
 
@@ -30,7 +31,7 @@ demonstrate! {
                 }
 
                 it "should be computed when the eye is in the path of the reflection vector" {
-                    let eyev = Tuple::vector(0, -2.0_f64.sqrt() / 2.0, -2.0_f64.sqrt() / 2.0);
+                    let eyev = Tuple::vector(0, -sqrt(2.0) / 2.0, -sqrt(2.0) / 2.0);
                     let normalv = Tuple::vector(0, 0, -1);
                     let light = PointLight::new((0, 10, -10), (1, 1, 1));
 
@@ -57,7 +58,7 @@ demonstrate! {
                         ambient: 1.0,
                         diffuse: 0.0,
                         specular: 0.0,
-                        shininess: 200.0,
+                        ..Material::default()
                     };
 
                     let eyev = Tuple::vector(0, 0, -1);
