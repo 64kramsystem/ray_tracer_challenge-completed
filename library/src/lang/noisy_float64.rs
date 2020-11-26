@@ -6,6 +6,7 @@ use crate::math::EPSILON;
 //
 pub trait NoisyFloat64 {
     fn denoise(self) -> f64;
+    fn denoised_less_or_equal(self, rhs: f64) -> bool;
 }
 
 impl NoisyFloat64 for f64 {
@@ -15,5 +16,9 @@ impl NoisyFloat64 for f64 {
         } else {
             self
         }
+    }
+
+    fn denoised_less_or_equal(self, rhs: f64) -> bool {
+        self <= rhs + EPSILON
     }
 }
