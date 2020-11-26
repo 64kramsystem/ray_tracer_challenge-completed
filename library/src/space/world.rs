@@ -1,11 +1,10 @@
-use std::{collections::BTreeSet, f64::NEG_INFINITY};
+use std::collections::BTreeSet;
 
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
     lang::math::sqrt,
     lang::NoisyFloat64,
     math::{Matrix, Tuple},
-    properties::REFRACTIVE_INDEX_VACUUM,
     properties::{Color, FlatPattern, Material, COLOR_BLACK, COLOR_WHITE},
 };
 
@@ -39,10 +38,13 @@ impl World {
         }
     }
 
-    // Return the positive intersections, sorted.
+    // Returns the hit, and all the (sorted) intersections.
     //
-    pub fn intersections(&self, ray: &Ray) -> Vec<Intersection> {
+    // Minor optimization could be applied, but they're possibly not meaningful.
+    //
+    pub fn intersections(&self, ray: &Ray) -> (Option<Intersection>, Vec<Intersection>) {
         let mut all_intersections = BTreeSet::new();
+        let mut hit: Option<Intersection> = None;
 
         for object in self.objects.iter() {
             let object_intersections = object.intersections(ray);
@@ -53,6 +55,15 @@ impl World {
                         t: intersection_1,
                         object: object.as_ref(),
                     });
+
+                    // The if let version is theoretically cleaner, but in practice, it's uglier.
+                    //
+                    if hit.is_none() || intersection_1 < hit.as_ref().unwrap().t {
+                        hit = Some(Intersection {
+                            t: intersection_1,
+                            object: object.as_ref(),
+                        });
+                    }
                 }
 
                 if intersection_2 >= 0.0 {
@@ -60,45 +71,20 @@ impl World {
                         t: intersection_2,
                         object: object.as_ref(),
                     });
+
+                    if hit.is_none() || intersection_2 < hit.as_ref().unwrap().t {
+                        hit = Some(Intersection {
+                            t: intersection_2,
+                            object: object.as_ref(),
+                        });
+                    }
                 }
             }
         }
 
-        all_intersections.into_iter().collect::<Vec<_>>()
-    }
+        let all_intersections = all_intersections.into_iter().collect::<Vec<_>>();
 
-    // In the book, this is part of `prepare_computations(i, r)`. This version is simpler and more intuitive.
-    //
-    // We select the object intersecting the ray, and divide them in two categories:
-    //
-    // - those "before", with i1 < t;
-    // - those "after", with i2 > t.
-    //
-    // Then we choose, for each category, the object with the greatest i1. Done!
-    //
-    // Note that an object can be in both categories at the same time, when i1 < t < i2.
-    //
-    pub fn refraction_indexes(&self, t: f64, ray: &Ray) -> (f64, f64) {
-        let (mut max_i1_before, mut max_i1_after) = (NEG_INFINITY, NEG_INFINITY);
-        let (mut n_before, mut n_after) = (REFRACTIVE_INDEX_VACUUM, REFRACTIVE_INDEX_VACUUM);
-
-        for object in self.objects.iter() {
-            let object_intersections = object.intersections(ray);
-
-            if let Some((i1, i2)) = object_intersections {
-                if (i1 < t && t.denoised_less_or_equal(i2)) && (i1 > max_i1_before) {
-                    max_i1_before = i1;
-                    n_before = object.material().refractive_index;
-                }
-
-                if (i1.denoised_less_or_equal(t) && t < i2) && (i1 > max_i1_after) {
-                    max_i1_after = i1;
-                    n_after = object.material().refractive_index;
-                }
-            }
-        }
-
-        (n_before, n_after)
+        (hit, all_intersections)
     }
 
     // Optimized version of intersections(), which stops at the first obstructing intersection.
@@ -147,10 +133,10 @@ impl World {
     }
 
     pub fn color_at(&self, ray: &Ray, max_reflections: u8) -> Color {
-        let intersections = self.intersections(ray);
+        let (hit, intersections) = self.intersections(ray);
 
-        if let Some(Intersection { t, object }) = intersections.first() {
-            let intersection_state = ray.intersection_state(*t, *object, &self);
+        if let Some(Intersection { t, object }) = hit {
+            let intersection_state = ray.intersection_state(t, object, &intersections);
             self.shade_hit(intersection_state, max_reflections)
         } else {
             COLOR_BLACK

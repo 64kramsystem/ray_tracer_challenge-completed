@@ -17,10 +17,6 @@ demonstrate! {
         }
 
         context "intersection state" {
-            before {
-                let world = World::default();
-            }
-
             context "should be computed from an intersection and an object" {
                 it "with the ray outside the object" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
@@ -41,7 +37,7 @@ demonstrate! {
                         inside: false,
                     };
 
-                    let actual_intersection_state = ray.intersection_state(t, object, &world);
+                    let actual_intersection_state = ray.intersection_state(t, object, &[]);
 
                     assert_eq!(actual_intersection_state, expected_intersection_state);
                 }
@@ -65,7 +61,7 @@ demonstrate! {
                         inside: true,
                     };
 
-                    let actual_intersection_state = ray.intersection_state(t, object, &world);
+                    let actual_intersection_state = ray.intersection_state(t, object, &[]);
 
                     assert_eq!(actual_intersection_state, expected_intersection_state);
                 }
@@ -75,7 +71,7 @@ demonstrate! {
                     let ray = Ray::new((0, 1, -1), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
                     let intersection = Intersection { t: sqrt(2), object: &object };
 
-                    let actual_intersection_state = ray.intersection_state(intersection.t, intersection.object, &world);
+                    let actual_intersection_state = ray.intersection_state(intersection.t, intersection.object, &[]);
                     let expected_reflectv = Tuple::vector(0.0, sqrt(2) / 2.0, sqrt(2) / 2.0);
 
                     assert_eq!(actual_intersection_state.reflectv, expected_reflectv);
