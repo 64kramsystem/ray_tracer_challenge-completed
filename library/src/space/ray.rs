@@ -54,13 +54,12 @@ impl Ray {
     //
     pub fn intersection_state<'a>(
         &self,
-        t: f64,
-        object: &'a dyn Shape,
+        intersection: &'a Intersection,
         intersections: &[Intersection],
     ) -> IntersectionState<'a> {
-        let point = self.position(t);
+        let point = self.position(intersection.t);
         let eyev = -self.direction;
-        let mut normalv = object.normal(&point);
+        let mut normalv = intersection.object.normal(&point);
         let inside = if normalv.dot_product(&eyev) >= 0.0 {
             false
         } else {
@@ -70,11 +69,11 @@ impl Ray {
         let over_point = point + &(normalv * EPSILON);
         let under_point = point - &(normalv * EPSILON);
         let reflectv = self.direction.reflect(&normalv);
-        let (n1, n2) = Ray::refraction_indexes(&Intersection { t, object }, intersections);
+        let (n1, n2) = Ray::refraction_indexes(intersection, intersections);
 
         IntersectionState {
-            t,
-            object,
+            t: intersection.t,
+            object: intersection.object,
             point,
             over_point,
             under_point,

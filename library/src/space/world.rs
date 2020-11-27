@@ -135,8 +135,8 @@ impl World {
     pub fn color_at(&self, ray: &Ray, max_recursions: u8) -> Color {
         let (hit, intersections) = self.intersections(ray);
 
-        if let Some(Intersection { t, object }) = hit {
-            let intersection_state = ray.intersection_state(t, object, &intersections);
+        if let Some(hit) = hit {
+            let intersection_state = ray.intersection_state(&hit, &intersections);
             self.shade_hit(intersection_state, max_recursions)
         } else {
             COLOR_BLACK
@@ -148,8 +148,7 @@ impl World {
         intersection_state: &IntersectionState,
         max_recursions: u8,
     ) -> Color {
-        if max_recursions == 0 || intersection_state.object.material().reflective.denoise() == 0.0
-        {
+        if max_recursions == 0 || intersection_state.object.material().reflective.denoise() == 0.0 {
             return COLOR_BLACK;
         }
 

@@ -28,7 +28,7 @@ demonstrate! {
                     Intersection { t: -sqrt(2) / 2.0, object: world.objects[0].as_ref() },
                     Intersection { t: sqrt(2) / 2.0, object: world.objects[0].as_ref() },
                 ];
-                let intersection_state = ray.intersection_state(intersections[1].t, intersections[1].object, &intersections);
+                let intersection_state = ray.intersection_state(&intersections[1], &intersections);
 
                 let expected_reflectance = 1.0;
 
@@ -41,7 +41,7 @@ demonstrate! {
                     Intersection { t: -1.0, object: world.objects[0].as_ref() },
                     Intersection { t: 1.0, object: world.objects[0].as_ref() },
                 ];
-                let intersection_state = ray.intersection_state(intersections[1].t, intersections[1].object, &intersections);
+                let intersection_state = ray.intersection_state(&intersections[1], &intersections);
 
                 let expected_reflectance = 0.04;
 
@@ -53,7 +53,7 @@ demonstrate! {
                 let intersections = [
                     Intersection { t: 1.8589, object: world.objects[0].as_ref() },
                 ];
-                let intersection_state = ray.intersection_state(intersections[0].t, intersections[0].object, &intersections);
+                let intersection_state = ray.intersection_state(&intersections[0], &intersections);
 
                 let expected_reflectance = 0.48873;
 
