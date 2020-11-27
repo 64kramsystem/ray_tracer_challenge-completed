@@ -4,7 +4,7 @@ demonstrate! {
     describe "Tuple" {
         use crate::*;
         use crate::math::{*, tuple::{POINT_TYPE, VECTOR_TYPE}};
-        use crate::lang::math::sqrt;
+        use crate::lang::{math::sqrt, ApproximateFloat64Ops};
         use std::f64::consts::PI;
 
         context "with w=1_0" {
@@ -162,7 +162,7 @@ demonstrate! {
 
                 let expected_magnitude = sqrt(14);
 
-                assert!(vector.magnitude() - expected_magnitude < EPSILON);
+                assert!(vector.magnitude().approximate_equals(expected_magnitude));
             }
         } // context "should have a magnitude"
 

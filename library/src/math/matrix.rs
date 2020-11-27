@@ -1,5 +1,8 @@
-use super::{Tuple, EPSILON};
-use crate::{lang::HasFloat64Value, Axis};
+use super::Tuple;
+use crate::{
+    lang::{ApproximateFloat64Ops, HasFloat64Value},
+    Axis,
+};
 
 use std::ops::{Index, IndexMut, Mul};
 
@@ -270,7 +273,7 @@ impl PartialEq for Matrix {
             .all(|(row, rhs_row)| {
                 row.iter()
                     .zip(rhs_row.iter())
-                    .all(|(value, rhs_value)| (value - rhs_value).abs() < EPSILON)
+                    .all(|(value, rhs_value)| value.approximate_equals(*rhs_value))
             })
     }
 }

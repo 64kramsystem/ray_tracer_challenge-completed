@@ -5,6 +5,8 @@ use crate::math::EPSILON;
 //
 pub trait ApproximateFloat64Ops {
     fn approximate(self) -> f64;
+    fn approximate_equals(self, rhs: f64) -> bool;
+    fn within_epsilon(self) -> bool;
 }
 
 // Returns 0 if the absolute value is smaller than EPSILON, and the value otherwise.
@@ -17,5 +19,13 @@ impl ApproximateFloat64Ops for f64 {
         } else {
             self
         }
+    }
+
+    fn approximate_equals(self, rhs: f64) -> bool {
+        (self - rhs).abs() < EPSILON
+    }
+
+    fn within_epsilon(self) -> bool {
+        self.abs() < EPSILON
     }
 }

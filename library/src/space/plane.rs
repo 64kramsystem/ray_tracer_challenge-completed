@@ -2,11 +2,7 @@ use super::{
     shape::{self, private::ShapeLocal},
     Shape,
 };
-use crate::{
-    math::Matrix,
-    math::{Tuple, EPSILON},
-    properties::Material,
-};
+use crate::{lang::ApproximateFloat64Ops, math::Matrix, math::Tuple, properties::Material};
 
 #[derive(Debug, ShapeAccessors, SmartDefault)]
 pub struct Plane {
@@ -24,7 +20,7 @@ impl ShapeLocal for Plane {
     }
 
     fn local_intersections(&self, transformed_ray: &super::Ray) -> Option<(f64, f64)> {
-        if transformed_ray.direction.y.abs() < EPSILON {
+        if transformed_ray.direction.y.within_epsilon() {
             None
         } else {
             let t = -transformed_ray.origin.y / transformed_ray.direction.y;

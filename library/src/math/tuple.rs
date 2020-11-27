@@ -1,8 +1,8 @@
 use std::ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub};
 
-use super::{Matrix, EPSILON};
+use super::Matrix;
 use crate::{
-    lang::{math::sqrt, HasFloat64Value},
+    lang::{math::sqrt, ApproximateFloat64Ops, HasFloat64Value},
     Axis,
 };
 
@@ -144,13 +144,13 @@ impl IndexMut<usize> for Tuple {
 }
 
 impl PartialEq for Tuple {
-    // Values are considered as equals if within EPSILON.
+    // Values are considered as equal if within ε.
     //
     fn eq(&self, rhs: &Self) -> bool {
-        ((self.x - rhs.x).abs() < EPSILON)
-            && ((self.y - rhs.y).abs() < EPSILON)
-            && ((self.z - rhs.z).abs() < EPSILON)
-            && ((self.w - rhs.w).abs() < EPSILON)
+        self.x.approximate_equals(rhs.x)
+            && self.y.approximate_equals(rhs.y)
+            && self.z.approximate_equals(rhs.z)
+            && self.w.approximate_equals(rhs.w)
     }
 }
 
