@@ -54,13 +54,12 @@ impl Ray {
     //
     pub fn intersection_state<'a>(
         &self,
-        t: f64,
-        object: &'a dyn Shape,
+        intersection: &'a Intersection,
         intersections: &[Intersection],
     ) -> IntersectionState<'a> {
-        let point = self.position(t);
+        let point = self.position(intersection.t);
         let eyev = -self.direction;
-        let mut normalv = object.normal(&point);
+        let mut normalv = intersection.object.normal(&point);
         let inside = if normalv.dot_product(&eyev) >= 0.0 {
             false
         } else {
@@ -70,11 +69,11 @@ impl Ray {
         let over_point = point + &(normalv * EPSILON);
         let under_point = point - &(normalv * EPSILON);
         let reflectv = self.direction.reflect(&normalv);
-        let (n1, n2) = Ray::refraction_indexes(&Intersection { t, object }, intersections);
+        let (n1, n2) = Ray::refraction_indexes(intersection, intersections);
 
         IntersectionState {
-            t,
-            object,
+            t: intersection.t,
+            object: intersection.object,
             point,
             over_point,
             under_point,
@@ -94,9 +93,7 @@ impl Ray {
         let mut comps = (None, None);
 
         for intersection in intersections.iter() {
-            let is_hit = intersection.object.id() == hit.object.id() && intersection.t == hit.t;
-
-            if is_hit {
+            if intersection == hit {
                 let container_last = containers.last();
 
                 if let Some(object) = container_last {
@@ -115,7 +112,7 @@ impl Ray {
                 containers.push(intersection.object);
             }
 
-            if is_hit {
+            if intersection == hit {
                 let container_last = containers.last();
 
                 if let Some(object) = container_last {
@@ -135,20 +132,6 @@ impl Ray {
             (REFRACTIVE_INDEX_VACUUM, REFRACTIVE_INDEX_VACUUM)
         } else {
             (comps.0.unwrap(), comps.1.unwrap())
-        }
-    }
-
-    pub fn hit(&self, sphere: &dyn Shape) -> Option<f64> {
-        if let Some((t1, t2)) = sphere.intersections(self) {
-            if t1 >= 0.0 {
-                Some(t1)
-            } else if t2 >= 0.0 {
-                Some(t2)
-            } else {
-                None
-            }
-        } else {
-            None
         }
     }
 }

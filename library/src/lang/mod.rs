@@ -1,6 +1,6 @@
+mod approximate_float64_ops;
 mod has_float64_value;
 pub mod math;
-mod noisy_float64;
 
+pub use approximate_float64_ops::ApproximateFloat64Ops;
 pub use has_float64_value::HasFloat64Value;
-pub use noisy_float64::NoisyFloat64;

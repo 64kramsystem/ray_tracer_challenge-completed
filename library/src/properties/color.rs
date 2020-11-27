@@ -1,8 +1,6 @@
 use std::ops::{Add, Div, Mul, Sub};
 
-use crate::math::EPSILON;
-
-use crate::lang::HasFloat64Value;
+use crate::lang::{ApproximateFloat64Ops, HasFloat64Value};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Color {
@@ -26,11 +24,8 @@ impl Color {
 
     pub fn u8_components(&self) -> (u8, u8, u8) {
         fn to_u8(value: f64) -> u8 {
-            if (value - 1.0).abs() < EPSILON {
-                255
-            } else {
-                (256.0 * value) as u8
-            }
+            let unbounded_result = 256.0 * value;
+            unbounded_result.min(255.0) as u8
         }
 
         (to_u8(self.r), to_u8(self.g), to_u8(self.b))
@@ -38,10 +33,12 @@ impl Color {
 }
 
 impl PartialEq for Color {
+    // Values are considered as equal if within ε.
+    //
     fn eq(&self, rhs: &Self) -> bool {
-        ((self.r - rhs.r).abs() < EPSILON)
-            && ((self.g - rhs.g).abs() < EPSILON)
-            && ((self.b - rhs.b).abs() < EPSILON)
+        self.r.approximate_equals(rhs.r)
+            && self.g.approximate_equals(rhs.g)
+            && self.b.approximate_equals(rhs.b)
     }
 }
 

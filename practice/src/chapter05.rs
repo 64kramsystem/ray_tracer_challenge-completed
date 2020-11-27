@@ -4,9 +4,24 @@ use library::{
     interface::{Image, Sdl2Interface},
     math::{Matrix, Tuple},
     properties::Color,
+    space::Shape,
     space::{Ray, Sphere},
     Axis,
 };
+
+fn hit(ray: &Ray, sphere: &Sphere) -> Option<f64> {
+    if let Some((t1, t2)) = sphere.intersections(ray) {
+        if t1 >= 0.0 {
+            Some(t1)
+        } else if t2 >= 0.0 {
+            Some(t2)
+        } else {
+            None
+        }
+    } else {
+        None
+    }
+}
 
 pub fn practice() {
     let display_size: u16 = 100;
@@ -47,7 +62,7 @@ pub fn practice() {
                 direction: ray_direction,
             };
 
-            if ray.hit(&sphere).is_some() {
+            if let Some(_) = hit(&ray, &sphere) {
                 interface.write_pixel(x, y, hit_color);
             };
         }

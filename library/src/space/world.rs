@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
     lang::math::sqrt,
-    lang::NoisyFloat64,
+    lang::ApproximateFloat64Ops,
     math::{Matrix, Tuple},
     properties::{Color, FlatPattern, Material, COLOR_BLACK, COLOR_WHITE},
 };
@@ -105,7 +105,7 @@ impl World {
         false
     }
 
-    pub fn shade_hit(&self, intersection_state: IntersectionState, max_reflections: u8) -> Color {
+    pub fn shade_hit(&self, intersection_state: IntersectionState, max_recursions: u8) -> Color {
         let is_shadowed = self.is_shadowed(&intersection_state.over_point);
 
         let surface_color = intersection_state.object.lighting(
@@ -116,8 +116,8 @@ impl World {
             is_shadowed,
         );
 
-        let reflected_color = self.reflected_color(&intersection_state, max_reflections);
-        let refracted_color = self.refracted_color(&intersection_state, max_reflections);
+        let reflected_color = self.reflected_color(&intersection_state, max_recursions);
+        let refracted_color = self.refracted_color(&intersection_state, max_recursions);
 
         let material = intersection_state.object.material();
 
@@ -132,12 +132,12 @@ impl World {
         }
     }
 
-    pub fn color_at(&self, ray: &Ray, max_reflections: u8) -> Color {
+    pub fn color_at(&self, ray: &Ray, max_recursions: u8) -> Color {
         let (hit, intersections) = self.intersections(ray);
 
-        if let Some(Intersection { t, object }) = hit {
-            let intersection_state = ray.intersection_state(t, object, &intersections);
-            self.shade_hit(intersection_state, max_reflections)
+        if let Some(hit) = hit {
+            let intersection_state = ray.intersection_state(&hit, &intersections);
+            self.shade_hit(intersection_state, max_recursions)
         } else {
             COLOR_BLACK
         }
@@ -146,10 +146,9 @@ impl World {
     pub fn reflected_color(
         &self,
         intersection_state: &IntersectionState,
-        max_reflections: u8,
+        max_recursions: u8,
     ) -> Color {
-        if max_reflections == 0 || intersection_state.object.material().reflective.denoise() == 0.0
-        {
+        if max_recursions == 0 || intersection_state.object.material().reflective.approximate() == 0.0 {
             return COLOR_BLACK;
         }
 
@@ -158,7 +157,7 @@ impl World {
             direction: intersection_state.reflectv,
         };
 
-        let color = self.color_at(&reflect_ray, max_reflections - 1);
+        let color = self.color_at(&reflect_ray, max_recursions - 1);
 
         return color * intersection_state.object.material().reflective;
     }
@@ -166,9 +165,9 @@ impl World {
     pub fn refracted_color(
         &self,
         intersection_state: &IntersectionState,
-        max_refractions: u8,
+        max_recursions: u8,
     ) -> Color {
-        if max_refractions == 0 || intersection_state.object.material().transparency == 0.0 {
+        if max_recursions == 0 || intersection_state.object.material().transparency == 0.0 {
             return COLOR_BLACK;
         }
 
@@ -192,7 +191,7 @@ impl World {
             direction,
         };
 
-        self.color_at(&refracted_ray, max_refractions - 1)
+        self.color_at(&refracted_ray, max_recursions - 1)
             * intersection_state.object.material().transparency
     }
 

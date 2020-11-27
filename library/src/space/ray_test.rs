@@ -20,12 +20,11 @@ demonstrate! {
             context "should be computed from an intersection and an object" {
                 it "with the ray outside the object" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
-                    let object = &Sphere::default();
-                    let t = 4.0;
+                    let intersection = Intersection { t: 4.0, object: &Sphere::default() };
 
                     let expected_intersection_state = IntersectionState {
-                        t,
-                        object,
+                        t: intersection.t,
+                        object: intersection.object,
                         point: Tuple::point(0, 0, -1),
                         over_point: Tuple::point(0, 0, -1),
                         under_point: Tuple::point(0, 0, -0.9999),
@@ -37,19 +36,18 @@ demonstrate! {
                         inside: false,
                     };
 
-                    let actual_intersection_state = ray.intersection_state(t, object, &[]);
+                    let actual_intersection_state = ray.intersection_state(&intersection, &[]);
 
                     assert_eq!(actual_intersection_state, expected_intersection_state);
                 }
 
                 it "with the ray inside the object" {
                     let ray = Ray::new((0, 0, 0), (0, 0, 1));
-                    let object = &Sphere::default();
-                    let t = 1.0;
+                    let intersection = Intersection { t: 1.0, object: &Sphere::default() };
 
                     let expected_intersection_state = IntersectionState {
-                        t,
-                        object,
+                        t: intersection.t,
+                        object: intersection.object,
                         point: Tuple::point(0, 0, 1),
                         over_point: Tuple::point(0, 0, 0.9999),
                         under_point: Tuple::point(0, 0, 1),
@@ -61,7 +59,7 @@ demonstrate! {
                         inside: true,
                     };
 
-                    let actual_intersection_state = ray.intersection_state(t, object, &[]);
+                    let actual_intersection_state = ray.intersection_state(&intersection, &[]);
 
                     assert_eq!(actual_intersection_state, expected_intersection_state);
                 }
@@ -71,7 +69,7 @@ demonstrate! {
                     let ray = Ray::new((0, 1, -1), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
                     let intersection = Intersection { t: sqrt(2), object: &object };
 
-                    let actual_intersection_state = ray.intersection_state(intersection.t, intersection.object, &[]);
+                    let actual_intersection_state = ray.intersection_state(&intersection, &[]);
                     let expected_reflectv = Tuple::vector(0.0, sqrt(2) / 2.0, sqrt(2) / 2.0);
 
                     assert_eq!(actual_intersection_state.reflectv, expected_reflectv);

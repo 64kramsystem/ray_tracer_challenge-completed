@@ -74,7 +74,7 @@ demonstrate! {
             ];
 
             for (i, [expected_n1, expected_n2]) in examples.iter().enumerate() {
-                let intersection_state = ray.intersection_state(intersections[i].t, intersections[i].object, &intersections);
+                let intersection_state = ray.intersection_state(&intersections[i], &intersections);
 
                 assert_eq!(intersection_state.n1, *expected_n1, "Example {}: E:{}/{} A:{}/{}", i, expected_n1, expected_n2, intersection_state.n1, intersection_state.n2);
                 assert_eq!(intersection_state.n2, *expected_n2, "Example {}: E:{}/{} A:{}/{}", i, expected_n1, expected_n2, intersection_state.n1, intersection_state.n2);
@@ -85,7 +85,8 @@ demonstrate! {
             it "should be performed in direct light" {
                 let ray = Ray::new((0, 0, -5), (0, 0, 1));
                 let sphere = &world.objects[0];
-                let intersection_state = ray.intersection_state(4.0, sphere.as_ref(), &[]);
+                let intersection = Intersection {t: 4.0, object: sphere.as_ref()};
+                let intersection_state = ray.intersection_state(&intersection, &[]);
 
                 let expected_shade = Color::new(0.38066, 0.47583, 0.2855);
 
@@ -117,7 +118,8 @@ demonstrate! {
                     (0, 0, 1),
                 );
 
-                let intersection_state = ray.intersection_state(4.0, &sphere2b, &[]);
+                let intersection = Intersection {t: 4.0, object: &sphere2b};
+                let intersection_state = ray.intersection_state(&intersection, &[]);
 
                 let expected_color = Color::new(0.1, 0.1, 0.1);
 
@@ -141,7 +143,7 @@ demonstrate! {
                 let intersections = [
                     Intersection { t: sqrt(2), object: world.objects[2].as_ref() },
                 ];
-                let intersection_state = ray.intersection_state(intersections[0].t, intersections[0].object, &intersections);
+                let intersection_state = ray.intersection_state(&intersections[0], &intersections);
 
                 let actual_color = world.shade_hit(intersection_state, 1);
 
@@ -211,7 +213,7 @@ demonstrate! {
                 let intersections = [
                     Intersection { t: sqrt(2), object: world.objects[2].as_ref() },
                 ];
-                let intersection_state = ray.intersection_state(intersections[0].t, intersections[0].object, &intersections);
+                let intersection_state = ray.intersection_state(&intersections[0], &intersections);
 
                 let actual_color = world.shade_hit(intersection_state, 5);
 
@@ -249,7 +251,7 @@ demonstrate! {
                 let intersections = [
                     Intersection { t: sqrt(2), object: world.objects[2].as_ref() },
                 ];
-                let intersection_state = ray.intersection_state(intersections[0].t, intersections[0].object, &intersections);
+                let intersection_state = ray.intersection_state(&intersections[0], &intersections);
 
                 let expected_color = Color::new(0.93391, 0.69643, 0.69243);
 
@@ -275,31 +277,8 @@ demonstrate! {
             it "with the intersection behind the ray" {
                 let ray = Ray::new((0.0, 0.0, 0.75), (0, 0, -1));
 
-                // Differs in the material ambient value.
-                //
-                let world = World {
-                    objects: vec![
-                        Box::new(Sphere {
-                            material: Material {
-                                pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
-                                ambient: 1.0,
-                                diffuse: 0.7,
-                                specular: 0.2,
-                                ..Material::default()
-                            },
-                            ..Sphere::default()
-                        }),
-                        Box::new(Sphere {
-                            material: Material {
-                                ambient: 1.0,
-                                ..Material::default()
-                            },
-                            transform: Matrix::scaling(0.5, 0.5, 0.5),
-                            ..Sphere::default()
-                        }),
-                    ],
-                    ..World::default()
-                };
+                world.objects[0].material_mut().ambient = 1.0;
+                world.objects[1].material_mut().ambient = 1.0;
 
                 // With the flat pattern, the color is the same at any point.
                 //
@@ -312,16 +291,11 @@ demonstrate! {
         context "reflected color" {
             it "should be computed for a nonreflective material" {
                 let ray = Ray::new((0, 0, 0), (0, 0, 1));
-                let shape = Sphere {
-                    transform: Matrix::scaling(0.5, 0.5, 0.5),
-                    material: Material {
-                        ambient: 1.0,
-                        ..Material::default()
-                    },
-                    ..Sphere::default()
-                };
 
-                let intersection_state = ray.intersection_state(1.0, &shape, &[]);
+                world.objects[1].material_mut().ambient = 1.0;
+
+                let intersection = Intersection {t: 1.0, object: world.objects[1].as_ref()};
+                let intersection_state = ray.intersection_state(&intersection, &[]);
 
                 let actual_color = world.reflected_color(&intersection_state, 0);
 
@@ -343,8 +317,8 @@ demonstrate! {
 
                 let ray = Ray::new((0, 0, -3), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
 
-                let plane_ref = world.objects.last().unwrap().as_ref();
-                let intersection_state = ray.intersection_state(sqrt(2), plane_ref, &[]);
+                let intersection = Intersection {t: sqrt(2), object: world.objects.last().unwrap().as_ref()};
+                let intersection_state = ray.intersection_state(&intersection, &[]);
 
                 let actual_color = world.reflected_color(&intersection_state, 1);
 
@@ -355,7 +329,8 @@ demonstrate! {
         context "refracted color" {
             it "should be computed for an opaque material" {
                 let ray = Ray::new((0, 0, -5), (0, 0, 1));
-                let intersection_state = ray.intersection_state(4.0, world.objects[0].as_ref(), &[]);
+                let intersection = Intersection {t: 4.0, object: world.objects[0].as_ref()};
+                let intersection_state = ray.intersection_state(&intersection, &[]);
                 let expected_color = COLOR_BLACK;
 
                 assert_eq!(world.refracted_color(&intersection_state, 5), expected_color);
@@ -364,47 +339,26 @@ demonstrate! {
             it "should be computed for a refractive material, at the maximum recursion depth" {
                 let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
-                let new_shape = Sphere {
-                    material: Material {
-                        pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
-                        ambient: 0.1,
-                        diffuse: 0.7,
-                        specular: 0.2,
-                        transparency: 1.0,
-                        refractive_index: 1.5,
-                        ..Material::default()
-                    },
-                    ..Sphere::default()
-                };
+                world.objects[0].material_mut().transparency = 1.0;
+                world.objects[0].material_mut().refractive_index = 1.5;
 
-                world.objects[0] = Box::new(new_shape);
-
-                let intersection_state = ray.intersection_state(4.0, world.objects[0].as_ref(), &[]);
+                let intersection = Intersection {t: 4.0, object: world.objects[0].as_ref()};
+                let intersection_state = ray.intersection_state(&intersection, &[]);
                 let expected_color = COLOR_BLACK;
 
                 assert_eq!(world.refracted_color(&intersection_state, 0), expected_color);
             }
 
             it "should return black in case of total internal refraction" {
-                let new_shape = Sphere {
-                    material: Material {
-                        pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
-                        ambient: 0.1,
-                        diffuse: 0.7,
-                        specular: 0.2,
-                        transparency: 1.0,
-                        refractive_index: 1.5,
-                        ..Material::default()
-                    },
-                    ..Sphere::default()
-                };
-
                 let ray = Ray::new((0.0, 0.0, sqrt(2) / 2.0), (0, 1, 1));
-                world.objects[0] = Box::new(new_shape);
+
+                world.objects[0].material_mut().transparency = 1.0;
+                world.objects[0].material_mut().refractive_index = 1.5;
 
                 // We're taking the intersection from inside the sphere.
                 //
-                let intersection_state = ray.intersection_state(5.0, world.objects[0].as_ref(), &[]);
+                let intersection = Intersection {t: 5.0, object: world.objects[0].as_ref()};
+                let intersection_state = ray.intersection_state(&intersection, &[]);
                 let expected_color = COLOR_BLACK;
 
                 assert_eq!(world.refracted_color(&intersection_state, 0), expected_color);
@@ -419,30 +373,11 @@ demonstrate! {
             // from the color of the shape 2 pattern.
             //
             // it "return the color of a refracted ray" {
-            //     let new_shape_1 = Sphere {
-            //         material: Material {
-            //             pattern: Box::new(FlatPattern::default()),
-            //             ambient: 1.0, // changed
-            //             diffuse: 0.7,
-            //             specular: 0.2,
-            //             ..Material::default()
-            //         },
-            //         ..Sphere::default()
-            //     };
+            //     world.objects[0].material_mut().ambient = 1.0;
 
-            //     world.objects[0] = Box::new(new_shape_1);
-
-            //     let new_shape_2 = Sphere {
-            //         material: Material {
-            //             transparency: 1.0, // added
-            //             refractive_index: 1.5, // added
-            //             ..Material::default()
-            //         },
-            //         transform: Matrix::scaling(0.5, 0.5, 0.5),
-            //         ..Sphere::default()
-            //     };
-
-            //     world.objects[1] = Box::new(new_shape_2);
+            //     world.objects[1].material_mut().transparency = 1.0;
+            //     world.objects[1].material_mut().refractive_index = 1.5;
+            //     *world.objects[1].transform_mut() = Matrix::scaling(0.5, 0.5, 0.5);
 
             //     let ray = Ray::new((0.0, 0.0, 0.1), (0, 1, 0));
 
@@ -454,7 +389,7 @@ demonstrate! {
             //         Intersection { t: 0.4899, object: world.objects[1].as_ref() },
             //         Intersection { t: 0.9899, object: world.objects[0].as_ref() },
             //     ];
-            //     let intersection_state = ray.intersection_state(intersections[2].t, intersections[2].object, &intersections);
+            //     let intersection_state = ray.intersection_state(&intersections[2], &intersections);
 
             //     assert_eq!(world.refracted_color(&intersection_state, 5), expected_color);
             // }
