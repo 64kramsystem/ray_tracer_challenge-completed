@@ -24,11 +24,8 @@ impl Color {
 
     pub fn u8_components(&self) -> (u8, u8, u8) {
         fn to_u8(value: f64) -> u8 {
-            if (value - 1.0).within_epsilon() {
-                255
-            } else {
-                (256.0 * value) as u8
-            }
+            let unbounded_result = 256.0 * value;
+            unbounded_result.min(255.0) as u8
         }
 
         (to_u8(self.r), to_u8(self.g), to_u8(self.b))
