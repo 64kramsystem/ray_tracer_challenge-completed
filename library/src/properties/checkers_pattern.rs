@@ -1,5 +1,5 @@
 use super::{Color, Pattern, COLOR_BLACK, COLOR_WHITE};
-use crate::{lang::NoisyFloat64, math::Matrix};
+use crate::{lang::ApproximateFloat64Ops, math::Matrix};
 
 #[derive(Debug, SmartDefault)]
 pub struct CheckersPattern {
@@ -23,11 +23,11 @@ impl Pattern for CheckersPattern {
     }
 
     fn current_color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
-        let denoised_floors_sum = pattern_point.x.denoise().floor()
-            + pattern_point.y.denoise().floor()
-            + pattern_point.z.denoise().floor();
+        let approximated_floors_sum = pattern_point.x.approximate().floor()
+            + pattern_point.y.approximate().floor()
+            + pattern_point.z.approximate().floor();
 
-        if denoised_floors_sum as i32 % 2 == 0 {
+        if approximated_floors_sum as i32 % 2 == 0 {
             self.color_a
         } else {
             self.color_b

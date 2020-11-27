@@ -25,7 +25,7 @@ impl Pattern for GradientPattern {
     }
 
     fn current_color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
-        // This shouldn't need float denoise, as it doesn't rely on exact transformations/operations.
+        // This shouldn't need float approximate, as it doesn't rely on exact transformations/operations.
         //
         // Original formula:
         //

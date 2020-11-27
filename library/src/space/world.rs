@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
     lang::math::sqrt,
-    lang::NoisyFloat64,
+    lang::ApproximateFloat64Ops,
     math::{Matrix, Tuple},
     properties::{Color, FlatPattern, Material, COLOR_BLACK, COLOR_WHITE},
 };
@@ -148,7 +148,7 @@ impl World {
         intersection_state: &IntersectionState,
         max_recursions: u8,
     ) -> Color {
-        if max_recursions == 0 || intersection_state.object.material().reflective.denoise() == 0.0 {
+        if max_recursions == 0 || intersection_state.object.material().reflective.approximate() == 0.0 {
             return COLOR_BLACK;
         }
 

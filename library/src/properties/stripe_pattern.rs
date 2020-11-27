@@ -1,5 +1,5 @@
 use super::{Color, Pattern, COLOR_BLACK, COLOR_WHITE};
-use crate::{lang::NoisyFloat64, math::Matrix};
+use crate::{lang::ApproximateFloat64Ops, math::Matrix};
 
 #[derive(Debug, SmartDefault)]
 pub struct StripePattern {
@@ -23,9 +23,9 @@ impl Pattern for StripePattern {
     }
 
     fn current_color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
-        let denoised_floor = pattern_point.x.denoise().floor();
+        let approximated_floor = pattern_point.x.approximate().floor();
 
-        if denoised_floor as i32 % 2 == 0 {
+        if approximated_floor as i32 % 2 == 0 {
             self.color_a
         } else {
             self.color_b
