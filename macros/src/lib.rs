@@ -24,10 +24,6 @@ pub fn shape_accessors_derive(input: TokenStream) -> TokenStream {
             fn material(&self) -> &Material {
                 &self.material
             }
-
-            fn pattern(&self) -> &dyn Pattern {
-                &*self.pattern
-            }
         }
     };
 

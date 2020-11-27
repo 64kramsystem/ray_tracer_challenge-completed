@@ -3,7 +3,7 @@ use crate::{
     lang::math::sqrt,
     lang::HasFloat64Value,
     math::{Matrix, Tuple},
-    properties::{FlatPattern, Material, Pattern},
+    properties::Material,
     Axis,
 };
 
@@ -15,8 +15,6 @@ pub struct Sphere {
     pub transform: Matrix,
     #[default(Material::default())]
     pub material: Material,
-    #[default(Box::new(FlatPattern::default()))]
-    pub pattern: Box<dyn Pattern>,
 }
 
 impl Sphere {

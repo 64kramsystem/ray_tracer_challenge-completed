@@ -5,7 +5,7 @@ use super::{
 use crate::{
     math::Matrix,
     math::{Tuple, EPSILON},
-    properties::{FlatPattern, Material, Pattern},
+    properties::Material,
 };
 
 #[derive(Debug, ShapeAccessors, SmartDefault)]
@@ -16,8 +16,6 @@ pub struct Plane {
     pub transform: Matrix,
     #[default(Material::default())]
     pub material: Material,
-    #[default(Box::new(FlatPattern::default()))]
-    pub pattern: Box<dyn Pattern>,
 }
 
 impl ShapeLocal for Plane {

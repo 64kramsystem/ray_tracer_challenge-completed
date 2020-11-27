@@ -3,7 +3,7 @@ use std::{fmt, sync::Mutex};
 use super::{PointLight, Ray};
 use crate::{
     math::{Matrix, Tuple},
-    properties::{Color, Material, Pattern},
+    properties::{Color, Material},
 };
 
 lazy_static::lazy_static! {
@@ -33,7 +33,6 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
     fn id(&self) -> u32;
     fn transform(&self) -> &Matrix;
     fn material(&self) -> &Material;
-    fn pattern(&self) -> &dyn Pattern;
 
     fn normal(&self, world_point: &Tuple) -> Tuple {
         let object_point = self.transform().inverse() * world_point;
