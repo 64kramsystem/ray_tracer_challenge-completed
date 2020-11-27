@@ -11,6 +11,20 @@ use library::{
 };
 use rayon::prelude::*;
 
+fn hit(ray: &Ray, sphere: &Sphere) -> Option<f64> {
+    if let Some((t1, t2)) = sphere.intersections(ray) {
+        if t1 >= 0.0 {
+            Some(t1)
+        } else if t2 >= 0.0 {
+            Some(t2)
+        } else {
+            None
+        }
+    } else {
+        None
+    }
+}
+
 pub fn practice() {
     // The wall matches the display; for simplicity, the "wall" concept represents both.
     //
@@ -52,7 +66,7 @@ pub fn practice() {
                     direction: eye_ray_direction,
                 };
 
-                if let Some(hit) = eye_ray.hit(&sphere) {
+                if let Some(hit) = hit(&eye_ray, &sphere) {
                     let hit_point = eye_ray.position(hit);
                     let hit_normal = sphere.normal(&hit_point);
 

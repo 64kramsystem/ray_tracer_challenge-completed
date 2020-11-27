@@ -137,18 +137,4 @@ impl Ray {
             (comps.0.unwrap(), comps.1.unwrap())
         }
     }
-
-    pub fn hit(&self, sphere: &dyn Shape) -> Option<f64> {
-        if let Some((t1, t2)) = sphere.intersections(self) {
-            if t1 >= 0.0 {
-                Some(t1)
-            } else if t2 >= 0.0 {
-                Some(t2)
-            } else {
-                None
-            }
-        } else {
-            None
-        }
-    }
 }
