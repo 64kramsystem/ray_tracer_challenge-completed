@@ -94,9 +94,7 @@ impl Ray {
         let mut comps = (None, None);
 
         for intersection in intersections.iter() {
-            let is_hit = intersection.object.id() == hit.object.id() && intersection.t == hit.t;
-
-            if is_hit {
+            if intersection == hit {
                 let container_last = containers.last();
 
                 if let Some(object) = container_last {
@@ -115,7 +113,7 @@ impl Ray {
                 containers.push(intersection.object);
             }
 
-            if is_hit {
+            if intersection == hit {
                 let container_last = containers.last();
 
                 if let Some(object) = container_last {
