@@ -10,52 +10,65 @@ use library::{
 };
 use rand::Rng;
 
+enum MaterialQuality {
+    Reflective,
+    Refractive,
+}
+
 const SCREEN_WIDTH: u16 = 400; // height is half
 
-const LIGHT_POSITION: (i32, i32, i32) = (-10, 10, -10);
-const PATTERN_INDEX: Option<u32> = None; // Some(n: ring, checkers+stripe, gradient, stripe, flat), or None for random
+const LIGHT_POSITION: (i32, i32, i32) = (-8, 10, -10);
+const PATTERN: Option<u32> = None; // Some(n: ring, checkers+stripe, gradient, stripe, flat), or None for random
 const PATTERN_SCALE: f64 = 0.33;
+const REFRACTIVE_INDEX: f64 = 1.07;
 const ROTATE_SPHERES: bool = true;
 
 #[rustfmt::skip]
 fn add_objects(objects: &mut Vec<Box<dyn Shape>>) {
     let left_sphere = Sphere {
         transform: Matrix::translation(-1.5, 0.33, -0.75) * &Matrix::scaling(0.33, 0.33, 0.33) * &random_rotation(),
-        material: random_material(false),
+        material: random_material(None),
         ..Sphere::default()
     };
 
     let middle_sphere = Sphere {
         transform: Matrix::translation(-0.5, 1.0, 0.5) * &random_rotation(),
-        material: random_material(true),
+        material: random_material(Some(MaterialQuality::Refractive)),
+        ..Sphere::default()
+    };
+
+    let back_sphere = Sphere {
+        transform: Matrix::translation(0.0, 0.20, 3.0) * &Matrix::scaling(0.20, 0.20, 0.20) * &random_rotation(),
+        material: random_material(None),
         ..Sphere::default()
     };
 
     let right_sphere = Sphere {
         transform: Matrix::translation(1.5, 0.5, -0.5) * &Matrix::scaling(0.5, 0.5, 0.5) * &random_rotation(),
-        material: random_material(false),
+        material: random_material(None),
         ..Sphere::default()
     };
 
     let left_wall = Plane {
         transform: Matrix::translation(0, 0, 5) * &Matrix::rotation(Axis::Y, -PI / 4.0) * &Matrix::rotation(Axis::X, -PI / 2.0),
-        material: random_material(false),
+        material: random_material(None),
         ..Plane::default()
     };
 
     let floor = Plane {
-        material: random_material(false),
+        material: random_material(None),
         ..Plane::default()
     };
 
     let right_wall = Plane {
         transform: Matrix::translation(0, 0, 5) * &Matrix::rotation(Axis::Y, PI / 4.0) * &Matrix::rotation(Axis::X, -PI / 2.0),
-        material: random_material(false),
+        material: random_material(Some(MaterialQuality::Reflective)),
         ..Plane::default()
     };
 
     objects.push(Box::new(left_sphere));
     objects.push(Box::new(middle_sphere));
+    objects.push(Box::new(back_sphere));
     objects.push(Box::new(right_sphere));
 
     objects.push(Box::new(left_wall));
@@ -76,7 +89,7 @@ fn random_color() -> Color {
 }
 
 fn random_pattern() -> Box<dyn Pattern> {
-    let pattern_index = if let Some(pattern_index) = PATTERN_INDEX {
+    let pattern_index = if let Some(pattern_index) = PATTERN {
         pattern_index
     } else {
         rand::thread_rng().gen_range(0, 5)
@@ -131,8 +144,8 @@ fn random_rotation() -> Matrix {
     }
 }
 
-fn random_material(reflective: bool) -> Material {
-    let pattern = if reflective {
+fn random_material(fancy_material: Option<MaterialQuality>) -> Material {
+    let pattern = if let Some(_) = fancy_material {
         Box::new(FlatPattern {
             color: random_color(),
             ..FlatPattern::default()
@@ -141,13 +154,21 @@ fn random_material(reflective: bool) -> Material {
         random_pattern()
     };
 
+    let (reflective, transparency, refractive_index) = match fancy_material {
+        Some(MaterialQuality::Reflective) => (1.0, 0.0, 0.0),
+        Some(MaterialQuality::Refractive) => (0.0, 1.0, REFRACTIVE_INDEX),
+        None => (0.0, 0.0, 0.0),
+    };
+
     let reflective = reflective as u32 as f64;
 
     Material {
         pattern: pattern,
         diffuse: 0.7,
         specular: 0.3, // walls originally had 0.0
-        reflective: reflective,
+        reflective,
+        transparency,
+        refractive_index,
         ..Material::default()
     }
 }
