@@ -1,6 +1,6 @@
 use super::{
     shape::{self, private::ShapeLocal},
-    Shape,
+    Ray, Shape,
 };
 use crate::{lang::ApproximateFloat64Ops, math::Matrix, math::Tuple, properties::Material};
 
@@ -19,7 +19,7 @@ impl ShapeLocal for Plane {
         Tuple::vector(0, 1, 0)
     }
 
-    fn local_intersections(&self, transformed_ray: &super::Ray) -> Option<(f64, f64)> {
+    fn local_intersections(&self, transformed_ray: &Ray) -> Option<(f64, f64)> {
         if transformed_ray.direction.y.within_epsilon() {
             None
         } else {
