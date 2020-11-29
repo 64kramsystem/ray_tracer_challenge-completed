@@ -15,8 +15,37 @@ pub struct Cube {
 }
 
 impl ShapeLocal for Cube {
-    fn local_normal(&self, _object_point: &Tuple) -> Tuple {
-        todo!()
+    fn local_normal(&self, object_point: &Tuple) -> Tuple {
+        let x_abs = object_point.x.abs();
+        let y_abs = object_point.y.abs();
+        let z_abs = object_point.z.abs();
+
+        // Algorithm with less comparisons. An extreme version, possibly without any measurable improvement,
+        // is to duplicate the second if/else inside the branches of the first.
+
+        let (max_dimension_abs, current_normal) = if x_abs > y_abs {
+            (x_abs, (object_point.x, 0.0, 0.0))
+        } else {
+            (y_abs, (0.0, object_point.y, 0.0))
+        };
+
+        return if max_dimension_abs > z_abs {
+            Tuple::vector(current_normal.0, current_normal.1, current_normal.2)
+        } else {
+            Tuple::vector(0.0, 0.0, object_point.z)
+        };
+
+        // Original algorithm
+        //
+        // let max_dimension_abs = x_abs.max(y_abs).max(z_abs);
+
+        // return if max_dimension_abs == x_abs {
+        //     Tuple::vector(object_point.x, 0.0, 0.0)
+        // } else if max_dimension_abs == y_abs {
+        //     Tuple::vector(0.0, object_point.y, 0.0)
+        // } else {
+        //     Tuple::vector(0.0, 0.0, object_point.z)
+        // };
     }
 
     fn local_intersections(&self, transformed_ray: &Ray) -> Option<(f64, f64)> {
