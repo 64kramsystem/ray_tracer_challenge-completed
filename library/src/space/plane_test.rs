@@ -1,7 +1,7 @@
 use demonstrate::demonstrate;
 
 demonstrate! {
-    describe "Ray" {
+    describe "Plane" {
         use crate::math::*;
         use crate::space::{*, shape::private::ShapeLocal};
 
