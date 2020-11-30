@@ -16,8 +16,8 @@ pub struct Cylinder {
 }
 
 impl ShapeLocal for Cylinder {
-    fn local_normal(&self, _object_point: &Tuple) -> Tuple {
-        todo!()
+    fn local_normal(&self, object_point: &Tuple) -> Tuple {
+        Tuple::vector(object_point.x, 0, object_point.z)
     }
 
     fn local_intersections(&self, transformed_ray: &super::Ray) -> Option<(f64, f64)> {

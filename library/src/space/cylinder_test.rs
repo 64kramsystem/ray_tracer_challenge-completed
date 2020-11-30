@@ -46,5 +46,22 @@ demonstrate! {
                 assert!(actual_t2.approximate_equals(*t2));
             }
         }
+
+        it "Normal vector on a cylinder" {
+            let examples = [
+                // point       normal
+                (( 1,  0,  0), ( 1, 0,  0)),
+                (( 0,  5, -1), ( 0, 0, -1)),
+                (( 0, -2,  1), ( 0, 0,  1)),
+                ((-1,  1,  0), (-1, 0,  0)),
+            ];
+
+            for ((px, py, pz), (nx, ny, nz)) in examples.iter() {
+                let point = Tuple::point(*px, *py, *pz);
+                let expected_normal = Tuple::vector(*nx, *ny, *nz);
+
+                assert_eq!(cylinder.local_normal(&point), expected_normal);
+            }
+        }
     }
 }
