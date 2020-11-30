@@ -145,5 +145,28 @@ demonstrate! {
                 };
             }
         }
+
+        it "The normal vector on a cylinder\'s end caps" {
+            cylinder.minimum = 1.0;
+            cylinder.maximum = 2.0;
+            cylinder.closed = true;
+
+            let examples = [
+                // point        normal
+                ((0.0, 1, 0.0), (0, -1, 0)),
+                ((0.5, 1, 0.0), (0, -1, 0)),
+                ((0.0, 1, 0.5), (0, -1, 0)),
+                ((0.0, 2, 0.0), (0, 1, 0)),
+                ((0.5, 2, 0.0), (0, 1, 0)),
+                ((0.0, 2, 0.5), (0, 1, 0)),
+            ];
+
+            for ((px, py, pz), (nx, ny, nz)) in examples.iter() {
+                let point = Tuple::point(*px, *py, *pz);
+                let expected_normal = Tuple::vector(*nx, *ny, *nz);
+
+                assert_eq!(cylinder.local_normal(&point), expected_normal);
+            }
+        }
     }
 }

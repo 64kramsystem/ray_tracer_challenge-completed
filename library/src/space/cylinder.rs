@@ -67,7 +67,17 @@ impl Cylinder {
 
 impl ShapeLocal for Cylinder {
     fn local_normal(&self, object_point: &Tuple) -> Tuple {
-        Tuple::vector(object_point.x, 0, object_point.z)
+        // Compute the square of the distance from the y axis.
+        //
+        let dist = object_point.x.powi(2) + object_point.z.powi(2);
+
+        if dist < 1.0 && object_point.y.approximate_greater_or_equal(self.maximum) {
+            Tuple::vector(0, 1, 0)
+        } else if dist < 1.0 && object_point.y.approximate_less_or_equal(self.minimum) {
+            Tuple::vector(0, -1, 0)
+        } else {
+            Tuple::vector(object_point.x, 0, object_point.z)
+        }
     }
 
     fn local_intersections(&self, transformed_ray: &super::Ray) -> (Option<f64>, Option<f64>) {
