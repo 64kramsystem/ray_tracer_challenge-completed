@@ -12,17 +12,21 @@ use library::{
 use rayon::prelude::*;
 
 fn hit(ray: &Ray, sphere: &Sphere) -> Option<f64> {
-    if let Some((t1, t2)) = sphere.intersections(ray) {
+    let intersections = sphere.intersections(ray);
+
+    if let Some(t1) = intersections.0 {
         if t1 >= 0.0 {
-            Some(t1)
-        } else if t2 >= 0.0 {
-            Some(t2)
-        } else {
-            None
+            return Some(t1);
+        };
+
+        if let Some(t2) = intersections.0 {
+            if t2 >= 0.0 {
+                return Some(t2);
+            };
         }
-    } else {
-        None
     }
+
+    return None;
 }
 
 pub fn practice() {

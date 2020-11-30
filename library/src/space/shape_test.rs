@@ -33,7 +33,7 @@ demonstrate! {
 
                     let test_shape: Box<dyn Shape> = Box::new(test_shape.scale(2, 2, 2));
 
-                    assert_eq!(test_shape.intersections(&ray), Some((3.0, 7.0)));
+                    assert_eq!(test_shape.intersections(&ray), (Some(3.0), Some(7.0)));
                 }
 
                 it "translated" {
@@ -41,7 +41,7 @@ demonstrate! {
 
                     let test_shape: Box<dyn Shape> = Box::new(test_shape.translate(5, 0, 0));
 
-                    assert_eq!(test_shape.intersections(&ray), None);
+                    assert_eq!(test_shape.intersections(&ray), (None, None));
                 }
             } // context "with a transformed shape"
         }

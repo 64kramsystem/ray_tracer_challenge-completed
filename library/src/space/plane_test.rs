@@ -22,13 +22,13 @@ demonstrate! {
                 it "with a ray parallel to the plane" {
                     let ray = Ray::new((0, 10, 0), (0, 0, 1));
                     let intersections = plane.local_intersections(&ray);
-                    assert_eq!(intersections, None);
+                    assert_eq!(intersections, (None, None));
                 }
 
                 it "with a coplanar ray" {
                     let ray = Ray::new((0, 0, 0), (0, 0, 1));
                     let intersections = plane.local_intersections(&ray);
-                    assert_eq!(intersections, None);
+                    assert_eq!(intersections, (None, None));
                 }
             } // context "should be absent"
 
@@ -37,14 +37,14 @@ demonstrate! {
                     let ray = Ray::new((0, 1, 0), (0, -1, 0));
                     let intersections = plane.local_intersections(&ray);
 
-                    assert_eq!(intersections, Some((1.0, 1.0)));
+                    assert_eq!(intersections, (Some(1.0), Some(1.0)));
                 }
 
                 it "with a plane from below" {
                     let ray = Ray::new((0, -1, 0), (0, 1, 0));
                     let intersections = plane.local_intersections(&ray);
 
-                    assert_eq!(intersections, Some((1.0, 1.0)));
+                    assert_eq!(intersections, (Some(1.0), Some(1.0)));
                 }
             } // context "should be absent"
         } // context "intersections"

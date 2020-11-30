@@ -49,7 +49,7 @@ impl World {
         for object in self.objects.iter() {
             let object_intersections = object.intersections(ray);
 
-            if let Some((intersection_1, intersection_2)) = object_intersections {
+            if let Some(intersection_1) = object_intersections.0 {
                 if intersection_1 >= 0.0 {
                     all_intersections.insert(Intersection {
                         t: intersection_1,
@@ -66,17 +66,19 @@ impl World {
                     }
                 }
 
-                if intersection_2 >= 0.0 {
-                    all_intersections.insert(Intersection {
-                        t: intersection_2,
-                        object: object.as_ref(),
-                    });
-
-                    if hit.is_none() || intersection_2 < hit.as_ref().unwrap().t {
-                        hit = Some(Intersection {
+                if let Some(intersection_2) = object_intersections.1 {
+                    if intersection_2 >= 0.0 {
+                        all_intersections.insert(Intersection {
                             t: intersection_2,
                             object: object.as_ref(),
                         });
+
+                        if hit.is_none() || intersection_2 < hit.as_ref().unwrap().t {
+                            hit = Some(Intersection {
+                                t: intersection_2,
+                                object: object.as_ref(),
+                            });
+                        }
                     }
                 }
             }
@@ -93,11 +95,15 @@ impl World {
         for object in self.objects.iter() {
             let object_intersections = object.intersections(ray);
 
-            if let Some((intersection_1, intersection_2)) = object_intersections {
-                if (intersection_1 >= 0.0 && intersection_1 < distance)
-                    || (intersection_2 >= 0.0 && intersection_2 < distance)
-                {
+            if let Some(intersection_1) = object_intersections.0 {
+                if intersection_1 >= 0.0 && intersection_1 < distance {
                     return true;
+                }
+
+                if let Some(intersection_2) = object_intersections.1 {
+                    if intersection_2 >= 0.0 && intersection_2 < distance {
+                        return true;
+                    }
                 }
             }
         }
@@ -148,7 +154,14 @@ impl World {
         intersection_state: &IntersectionState,
         max_recursions: u8,
     ) -> Color {
-        if max_recursions == 0 || intersection_state.object.material().reflective.approximate() == 0.0 {
+        if max_recursions == 0
+            || intersection_state
+                .object
+                .material()
+                .reflective
+                .approximate()
+                == 0.0
+        {
             return COLOR_BLACK;
         }
 

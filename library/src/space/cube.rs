@@ -48,7 +48,7 @@ impl ShapeLocal for Cube {
         // };
     }
 
-    fn local_intersections(&self, transformed_ray: &Ray) -> Option<(f64, f64)> {
+    fn local_intersections(&self, transformed_ray: &Ray) -> (Option<f64>, Option<f64>) {
         let (xtmin, xtmax) =
             Self::check_axis(transformed_ray.origin.x, transformed_ray.direction.x);
         let (ytmin, ytmax) =
@@ -60,7 +60,7 @@ impl ShapeLocal for Cube {
         // Optimized version, as suggested in the practice section.
         //
         if tmin > tmax {
-            return None;
+            return (None, None);
         }
 
         let (ztmin, ztmax) =
@@ -70,9 +70,9 @@ impl ShapeLocal for Cube {
         tmax = tmax.min(ztmax);
 
         if tmin > tmax {
-            None
+            (None, None)
         } else {
-            Some((tmin, tmax))
+            (Some(tmin), Some(tmax))
         }
     }
 }

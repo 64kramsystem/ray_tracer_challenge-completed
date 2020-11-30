@@ -23,7 +23,7 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                assert_eq!(cylinder.local_intersections(&ray), None);
+                assert_eq!(cylinder.local_intersections(&ray), (None, None));
             }
         }
 
@@ -40,10 +40,10 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let (actual_t1, actual_t2) = cylinder.local_intersections(&ray).unwrap();
+                let (actual_t1, actual_t2) = cylinder.local_intersections(&ray);
 
-                assert!(actual_t1.approximate_equals(*t1));
-                assert!(actual_t2.approximate_equals(*t2));
+                assert!(actual_t1.unwrap().approximate_equals(*t1));
+                assert!(actual_t2.unwrap().approximate_equals(*t2));
             }
         }
 

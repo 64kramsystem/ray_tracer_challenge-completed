@@ -25,7 +25,7 @@ pub(crate) mod private {
 
     pub trait ShapeLocal {
         fn local_normal(&self, world_point: &Tuple) -> Tuple;
-        fn local_intersections(&self, transformed_ray: &Ray) -> Option<(f64, f64)>;
+        fn local_intersections(&self, transformed_ray: &Ray) -> (Option<f64>, Option<f64>);
     }
 }
 
@@ -48,9 +48,12 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
         world_normal.normalize()
     }
 
-    // Intersections are returned in order; negative values are valid.
+    // Return value properties:
     //
-    fn intersections(&self, ray: &Ray) -> Option<(f64, f64)> {
+    // - they're ordered numerically, and Some before None;
+    // - negative values are allowed.
+    //
+    fn intersections(&self, ray: &Ray) -> (Option<f64>, Option<f64>) {
         let transformed_ray = ray.inverse_transform(self.transform());
         self.local_intersections(&transformed_ray)
     }

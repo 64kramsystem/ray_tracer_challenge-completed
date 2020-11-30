@@ -20,13 +20,13 @@ impl ShapeLocal for Cylinder {
         Tuple::vector(object_point.x, 0, object_point.z)
     }
 
-    fn local_intersections(&self, transformed_ray: &super::Ray) -> Option<(f64, f64)> {
+    fn local_intersections(&self, transformed_ray: &super::Ray) -> (Option<f64>, Option<f64>) {
         let a = transformed_ray.direction.x.powi(2) + transformed_ray.direction.z.powi(2);
 
         // Ray is parallel to the y axis.
         //
         if a.approximate_equals(0.0) {
-            return None;
+            return (None, None);
         }
 
         let b = 2.0 * transformed_ray.origin.x * transformed_ray.direction.x
@@ -38,12 +38,12 @@ impl ShapeLocal for Cylinder {
         // Ray does not intersect the cylinder.
         //
         if disc < 0.0 {
-            None
+            (None, None)
         } else {
             let t0 = (-b - sqrt(disc)) / (2.0 * a);
             let t1 = (-b + sqrt(disc)) / (2.0 * a);
 
-            Some((t0, t1))
+            (Some(t0), Some(t1))
         }
     }
 }
