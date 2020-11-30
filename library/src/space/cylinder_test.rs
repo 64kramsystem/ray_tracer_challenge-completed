@@ -105,5 +105,45 @@ demonstrate! {
                 };
             }
         }
+
+        it "The default closed value for a cylinder" {
+            assert!(!cylinder.closed)
+        }
+
+        it "Intersecting the caps of a closed cylinder" {
+            let examples = [
+                // point      direction   count
+                ((0,  3,  0), (0, -1, 0), 2),
+                ((0,  3, -2), (0, -1, 2), 2),
+                ((0,  4, -2), (0, -1, 1), 2), // corner case
+                ((0,  0, -2), (0,  1, 2), 2),
+                ((0, -1, -2), (0,  1, 1), 2), // corner case
+            ];
+
+            cylinder.minimum = 1.0;
+            cylinder.maximum = 2.0;
+            cylinder.closed = true;
+
+            for ((ox, oy, oz), (dx, dy, dz), count) in examples.iter() {
+                let origin    = Tuple::point(*ox, *oy, *oz);
+                let direction = Tuple::vector(*dx, *dy, *dz).normalize();
+                let ray = Ray { origin, direction };
+
+                let intersections = cylinder.local_intersections(&ray);
+
+                match count {
+                    2 => {
+                        assert!(intersections.0.is_some());
+                        assert!(intersections.1.is_some());
+                    },
+                    0 => {
+                        assert_eq!(intersections, (None, None));
+                    },
+                    _ => {
+                        unreachable!();
+                    }
+                };
+            }
+        }
     }
 }
