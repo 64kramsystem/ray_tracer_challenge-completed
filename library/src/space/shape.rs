@@ -48,14 +48,14 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
         world_normal.normalize()
     }
 
-    // Intersections are returned in order.
+    // Intersections are returned in order; negative values are valid.
     //
     fn intersections(&self, ray: &Ray) -> Option<(f64, f64)> {
         let transformed_ray = ray.inverse_transform(self.transform());
         self.local_intersections(&transformed_ray)
     }
 
-    // Divergence from the book design. Having the lighting method herea voids going back and forth
+    // Divergence from the book design. Having the lighting method here avoids going back and forth
     // between Shape and Material, and makes World#shade_hit cleaner.
     //
     fn lighting(
