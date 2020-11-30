@@ -37,14 +37,14 @@ demonstrate! {
                     let ray = Ray::new((0, 1, 0), (0, -1, 0));
                     let intersections = plane.local_intersections(&ray);
 
-                    assert_eq!(intersections, (Some(1.0), Some(1.0)));
+                    assert_eq!(intersections, (Some(1.0), None));
                 }
 
                 it "with a plane from below" {
                     let ray = Ray::new((0, -1, 0), (0, 1, 0));
                     let intersections = plane.local_intersections(&ray);
 
-                    assert_eq!(intersections, (Some(1.0), Some(1.0)));
+                    assert_eq!(intersections, (Some(1.0), None));
                 }
             } // context "should be absent"
         } // context "intersections"

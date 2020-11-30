@@ -24,7 +24,7 @@ impl ShapeLocal for Plane {
             (None, None)
         } else {
             let t = -transformed_ray.origin.y / transformed_ray.direction.y;
-            (Some(t), Some(t))
+            (Some(t), None)
         }
     }
 }
