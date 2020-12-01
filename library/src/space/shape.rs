@@ -29,7 +29,7 @@ pub(crate) mod private {
     }
 }
 
-pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
+pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
     fn id(&self) -> u32;
     fn transform(&self) -> &Matrix;
     fn transform_mut(&mut self) -> &mut Matrix;

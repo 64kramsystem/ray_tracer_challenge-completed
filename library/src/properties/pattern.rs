@@ -3,7 +3,7 @@ use std::fmt;
 use super::Color;
 use crate::math::{Matrix, Tuple};
 
-pub trait Pattern: fmt::Debug + Sync {
+pub trait Pattern: fmt::Debug + Sync + Send {
     fn transform(&self) -> &Matrix;
     fn previous_pattern(&self) -> &Option<Box<dyn Pattern>>;
 
