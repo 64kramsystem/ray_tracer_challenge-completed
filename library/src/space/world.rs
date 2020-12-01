@@ -60,13 +60,21 @@ impl World {
                         object: object.as_ref(),
                     });
 
-                    // The if let version is theoretically cleaner, but in practice, it's uglier.
-                    //
-                    if hit.is_none() || intersection < hit.as_ref().unwrap().t {
-                        hit = Some(Intersection {
-                            t: intersection,
-                            object: object.as_ref(),
-                        });
+                    match hit {
+                        None => {
+                            hit.replace(Intersection {
+                                t: intersection,
+                                object: object.as_ref(),
+                            });
+                        }
+                        Some(Intersection { t, .. }) => {
+                            if intersection < t {
+                                hit.replace(Intersection {
+                                    t: intersection,
+                                    object: object.as_ref(),
+                                });
+                            }
+                        }
                     }
                 }
             }
