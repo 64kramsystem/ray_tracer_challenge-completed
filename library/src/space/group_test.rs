@@ -1,11 +1,15 @@
+#![allow(unused_imports)]
+
 use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Group" {
         use crate::math::*;
-        use crate::space::*;
+        use crate::space::{*, shape::private::ShapeLocal};
+        use std::sync::{Arc, Mutex, Weak};
 
         before {
+            #[allow(unused_variables)]
             let group = Group::default();
         }
 

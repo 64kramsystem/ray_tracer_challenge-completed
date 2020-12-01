@@ -1,4 +1,7 @@
-use std::{fmt, sync::Mutex};
+use std::{
+    fmt,
+    sync::{Arc, Mutex, Weak},
+};
 
 use super::{PointLight, Ray};
 use crate::{
@@ -31,6 +34,8 @@ pub(crate) mod private {
 
 pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
     fn id(&self) -> u32;
+    fn parent(&self) -> &Mutex<Weak<dyn Shape>>;
+    fn children(&self) -> &Mutex<Vec<Arc<dyn Shape>>>;
     fn transform(&self) -> &Matrix;
     fn transform_mut(&mut self) -> &mut Matrix;
     fn material(&self) -> &Material;

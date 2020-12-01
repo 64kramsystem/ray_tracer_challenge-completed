@@ -17,6 +17,17 @@ pub fn shape_accessors_derive(input: TokenStream) -> TokenStream {
                 self.id
             }
 
+            // It could be implemented the code to return Option<Arc<dyn Shape>>, however, it would
+            // then require the mutable version, in order to change the reference when required.
+            //
+            fn parent(&self) -> &Mutex<Weak<dyn Shape>> {
+                &self.parent
+            }
+
+            fn children(&self) -> &Mutex<Vec<Arc<dyn Shape>>> {
+                &self.children
+            }
+
             fn transform(&self) -> &Matrix {
                 &self.transform
             }

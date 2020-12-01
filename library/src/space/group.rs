@@ -26,6 +26,14 @@ impl Shape for Group {
         self.id
     }
 
+    fn parent(&self) -> &Mutex<Weak<dyn Shape>> {
+        &self.parent
+    }
+
+    fn children(&self) -> &Mutex<Vec<Arc<dyn Shape>>> {
+        &self.children
+    }
+
     fn transform(&self) -> &Matrix {
         &self.transform
     }
