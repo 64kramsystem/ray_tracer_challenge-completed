@@ -40,7 +40,7 @@ impl World {
 
     // Returns the hit, and all the (sorted) intersections.
     //
-    // Minor optimization could be applied, but they're possibly not meaningful.
+    // Minor optimizations could be applied, but they're possibly not meaningful.
     //
     pub fn intersections(&self, ray: &Ray) -> (Option<Intersection>, Vec<Intersection>) {
         let mut all_intersections = BTreeSet::new();
