@@ -2,6 +2,7 @@ mod camera;
 mod cone;
 mod cube;
 mod cylinder;
+mod group;
 mod intersection;
 mod intersection_state;
 mod plane;
@@ -15,6 +16,7 @@ pub use camera::Camera;
 pub use cone::Cone;
 pub use cube::Cube;
 pub use cylinder::Cylinder;
+pub use group::Group;
 pub use intersection::Intersection;
 pub use intersection_state::IntersectionState;
 pub use plane::Plane;
@@ -35,6 +37,9 @@ mod cone_test;
 
 #[cfg(test)]
 mod cylinder_test;
+
+#[cfg(test)]
+mod group_test;
 
 #[cfg(test)]
 mod intersection_state_test;
