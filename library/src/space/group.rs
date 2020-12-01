@@ -21,6 +21,16 @@ pub struct Group {
     pub children: Mutex<Vec<Arc<dyn Shape>>>,
 }
 
+impl Group {
+    pub fn add_child(group: &Arc<dyn Shape>, child: &Arc<dyn Shape>) {
+        group.children().lock().unwrap().push(Arc::clone(child));
+
+        let mut child_parent_ref = child.parent().lock().unwrap();
+
+        *child_parent_ref = Arc::downgrade(group);
+    }
+}
+
 impl Shape for Group {
     fn id(&self) -> u32 {
         self.id

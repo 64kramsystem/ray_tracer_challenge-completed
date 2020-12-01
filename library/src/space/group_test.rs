@@ -18,14 +18,22 @@ demonstrate! {
             assert_eq!(group.children.lock().unwrap().len(), 0);
         }
 
-        // it "Adding a child to a group" {
-        //     Given g ← group()
-        //     And s ← test_shape()
-        //     When add_child(g, s)
-        //     Then g is not empty
-        //     And g includes s
-        //     And s.parent = g
-        // }
+        it "Adding a child to a group" {
+            let shape: Arc<dyn Shape> = Arc::new(Plane::default());
+            let group: Arc<dyn Shape> = Arc::new(group);
+
+            Group::add_child(&group, &shape);
+
+            let actual_children = group.children().lock().unwrap();
+
+            assert_eq!(actual_children.len(), 1);
+            assert_eq!(actual_children[0].id(), shape.id());
+
+            let shape_parent_ref = &shape.parent().lock().unwrap();
+            let shape_parent = Weak::upgrade(shape_parent_ref).unwrap();
+
+            assert_eq!(shape_parent.id(), group.id());
+        }
 
         // it "Intersecting a ray with an empty group" {
         //     Given g ← group()
