@@ -25,7 +25,7 @@ const ROTATE_VOLUMES: bool = true;
 #[rustfmt::skip]
 fn add_objects(objects: &mut Vec<Box<dyn Shape>>) {
     let left_cylinder = Cylinder {
-        transform: Matrix::translation(-1.5, 0.33, -0.75) * &Matrix::scaling(0.33, 0.33, 0.33) * &random_rotation(),
+        transform: Matrix::translation(-2.0, 0.33, 0.0) * &Matrix::scaling(0.33, 0.33, 0.33) * &random_rotation(),
         material: random_material(None),
         maximum: 1.0,
         minimum: -1.0,
@@ -39,10 +39,13 @@ fn add_objects(objects: &mut Vec<Box<dyn Shape>>) {
         ..Sphere::default()
     };
 
-    let back_sphere = Sphere {
-        transform: Matrix::translation(0.0, 0.20, 3.0) * &Matrix::scaling(0.20, 0.20, 0.20) * &random_rotation(),
+    let back_cone = Cone {
+        transform: Matrix::translation(-0.6, 1.3, 3.0) * &random_rotation() * &Matrix::scaling(0.5, 0.9, 0.5) * &Matrix::translation(0.0, -0.5, 0.0),
         material: random_material(None),
-        ..Sphere::default()
+        minimum: 0.0,
+        maximum: 1.0,
+        closed: true,
+        ..Cone::default()
     };
 
     let right_cube = Cube {
@@ -70,7 +73,7 @@ fn add_objects(objects: &mut Vec<Box<dyn Shape>>) {
 
     objects.push(Box::new(left_cylinder));
     objects.push(Box::new(middle_sphere));
-    objects.push(Box::new(back_sphere));
+    objects.push(Box::new(back_cone));
     objects.push(Box::new(right_cube));
 
     objects.push(Box::new(left_wall));
