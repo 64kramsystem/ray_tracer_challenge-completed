@@ -42,7 +42,7 @@ demonstrate! {
 
                     let sphere = Sphere::default();
 
-                    assert_eq!(sphere.intersections(&ray), (Some(4.0), Some(6.0)));
+                    assert_eq!(sphere.intersections(&ray), vec![4.0, 6.0]);
                 }
 
                 it "at a tangent" {
@@ -50,7 +50,7 @@ demonstrate! {
 
                     let sphere = Sphere::default();
 
-                    assert_eq!(sphere.intersections(&ray), (Some(5.0), Some(5.0)));
+                    assert_eq!(sphere.intersections(&ray), vec![5.0, 5.0]);
                 }
 
                 it "at no point (miss)" {
@@ -58,7 +58,7 @@ demonstrate! {
 
                     let sphere = Sphere::default();
 
-                    assert_eq!(sphere.intersections(&ray), (None, None));
+                    assert_eq!(sphere.intersections(&ray), vec![]);
                 }
             } // context "with an untransformed sphere"
         } // context "returns the intersections"

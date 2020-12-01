@@ -24,7 +24,7 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                assert_eq!(cylinder.local_intersections(&ray), (None, None));
+                assert_eq!(cylinder.local_intersections(&ray), vec![]);
             }
         }
 
@@ -41,10 +41,10 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let (actual_t1, actual_t2) = cylinder.local_intersections(&ray);
+                let actual_intersections = cylinder.local_intersections(&ray);
 
-                assert!(actual_t1.unwrap().approximate_equals(*t1));
-                assert!(actual_t2.unwrap().approximate_equals(*t2));
+                assert!(actual_intersections[0].approximate_equals(*t1));
+                assert!(actual_intersections[1].approximate_equals(*t2));
             }
         }
 
@@ -84,25 +84,14 @@ demonstrate! {
                 ((0, 1.5, -2), (0.0, 0, 1), 2), // perpendicular through mid-cylinder
             ];
 
-            for ((ox, oy, oz), (dx, dy, dz), count) in examples.iter() {
+            for ((ox, oy, oz), (dx, dy, dz), expected_count) in examples.iter() {
                 let origin    = Tuple::point(*ox, *oy, *oz);
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let intersections = cylinder.local_intersections(&ray);
+                let actual_intersections = cylinder.local_intersections(&ray);
 
-                match count {
-                    2 => {
-                        assert!(intersections.0.is_some());
-                        assert!(intersections.1.is_some());
-                    },
-                    0 => {
-                        assert_eq!(intersections, (None, None));
-                    },
-                    _ => {
-                        unreachable!();
-                    }
-                };
+                assert_eq!(actual_intersections.len(), *expected_count);
             }
         }
 
@@ -124,25 +113,14 @@ demonstrate! {
             cylinder.maximum = 2.0;
             cylinder.closed = true;
 
-            for ((ox, oy, oz), (dx, dy, dz), count) in examples.iter() {
+            for ((ox, oy, oz), (dx, dy, dz), expected_count) in examples.iter() {
                 let origin    = Tuple::point(*ox, *oy, *oz);
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let intersections = cylinder.local_intersections(&ray);
+                let actual_intersections = cylinder.local_intersections(&ray);
 
-                match count {
-                    2 => {
-                        assert!(intersections.0.is_some());
-                        assert!(intersections.1.is_some());
-                    },
-                    0 => {
-                        assert_eq!(intersections, (None, None));
-                    },
-                    _ => {
-                        unreachable!();
-                    }
-                };
+                assert_eq!(actual_intersections.len(), *expected_count);
             }
         }
 

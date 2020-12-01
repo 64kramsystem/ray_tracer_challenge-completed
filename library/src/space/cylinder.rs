@@ -24,7 +24,7 @@ pub struct Cylinder {
 }
 
 impl Cylinder {
-    fn intersect_caps(&self, ray: &Ray, intersections: &mut (Option<f64>, Option<f64>)) {
+    fn intersect_caps(&self, ray: &Ray, intersections: &mut Vec<f64>) {
         // Caps only matter if the cylinder is closed, and might possibly be intersected by the ray.
         //
         if !self.closed || ray.direction.y.approximate() == 0.0 {
@@ -37,21 +37,13 @@ impl Cylinder {
         let t1 = (self.minimum - ray.origin.y) / ray.direction.y;
 
         if Self::check_cap(&ray, t1) {
-            if intersections.0.is_none() {
-                intersections.0 = Some(t1);
-            } else {
-                intersections.1 = Some(t1);
-            }
+            intersections.push(t1);
         }
 
         let t2 = (self.maximum - ray.origin.y) / ray.direction.y;
 
         if Self::check_cap(&ray, t2) {
-            if intersections.0.is_none() {
-                intersections.0 = Some(t2);
-            } else {
-                intersections.1 = Some(t2);
-            }
+            intersections.push(t2);
         }
     }
 
@@ -80,8 +72,8 @@ impl ShapeLocal for Cylinder {
         }
     }
 
-    fn local_intersections(&self, transformed_ray: &super::Ray) -> (Option<f64>, Option<f64>) {
-        let mut intersections = (None, None);
+    fn local_intersections(&self, transformed_ray: &super::Ray) -> Vec<f64> {
+        let mut intersections = Vec::with_capacity(2);
 
         let a = transformed_ray.direction.x.powi(2) + transformed_ray.direction.z.powi(2);
 
@@ -113,17 +105,13 @@ impl ShapeLocal for Cylinder {
             let y0 = transformed_ray.origin.y + t0 * transformed_ray.direction.y;
 
             if self.minimum < y0 && y0 < self.maximum {
-                intersections.0 = Some(t0);
+                intersections.push(t0);
             }
 
             let y1 = transformed_ray.origin.y + t1 * transformed_ray.direction.y;
 
             if self.minimum < y1 && y1 < self.maximum {
-                if intersections.0.is_none() {
-                    intersections.0 = Some(t1);
-                } else {
-                    intersections.1 = Some(t1);
-                }
+                intersections.push(t1);
             }
         }
 

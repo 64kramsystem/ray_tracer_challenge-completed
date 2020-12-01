@@ -25,7 +25,7 @@ pub(crate) mod private {
 
     pub trait ShapeLocal {
         fn local_normal(&self, world_point: &Tuple) -> Tuple;
-        fn local_intersections(&self, transformed_ray: &Ray) -> (Option<f64>, Option<f64>);
+        fn local_intersections(&self, transformed_ray: &Ray) -> Vec<f64>;
     }
 }
 
@@ -50,10 +50,13 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync {
 
     // Return value properties:
     //
-    // - they're ordered numerically, and Some before None;
+    // - they're not guaranteed to be ordered;
     // - negative values are allowed.
     //
-    fn intersections(&self, ray: &Ray) -> (Option<f64>, Option<f64>) {
+    // An possible optimization is to receive an ordered collection, and have the intersections added
+    // to it; this avoids allocating an array for each shape.
+    //
+    fn intersections(&self, ray: &Ray) -> Vec<f64> {
         let transformed_ray = ray.inverse_transform(self.transform());
         self.local_intersections(&transformed_ray)
     }
