@@ -48,7 +48,7 @@ impl ShapeLocal for Sphere {
         object_point - &Tuple::point(0, 0, 0)
     }
 
-    fn local_intersections(&self, transformed_ray: &super::Ray) -> Option<(f64, f64)> {
+    fn local_intersections(&self, transformed_ray: &super::Ray) -> Vec<f64> {
         let sphere_location = Tuple::point(0, 0, 0);
         let sphere_to_ray = transformed_ray.origin - &sphere_location;
 
@@ -61,12 +61,12 @@ impl ShapeLocal for Sphere {
         let discriminant = b.powi(2) - 4.0 * a * c;
 
         if discriminant < 0.0 {
-            None
+            vec![]
         } else {
             let t1 = (-b - sqrt(discriminant)) / (2.0 * a);
             let t2 = (-b + sqrt(discriminant)) / (2.0 * a);
 
-            Some((t1, t2))
+            vec![t1, t2]
         }
     }
 }

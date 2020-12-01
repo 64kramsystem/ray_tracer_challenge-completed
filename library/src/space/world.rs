@@ -40,7 +40,9 @@ impl World {
 
     // Returns the hit, and all the (sorted) intersections.
     //
-    // Minor optimization could be applied, but they're possibly not meaningful.
+    // Minor optimizations could be applied, but they're possibly not meaningful.
+    //
+    // See Shape#intersections() for an interesting optimization.
     //
     pub fn intersections(&self, ray: &Ray) -> (Option<Intersection>, Vec<Intersection>) {
         let mut all_intersections = BTreeSet::new();
@@ -49,34 +51,30 @@ impl World {
         for object in self.objects.iter() {
             let object_intersections = object.intersections(ray);
 
-            if let Some((intersection_1, intersection_2)) = object_intersections {
-                if intersection_1 >= 0.0 {
+            // Intersections are not ordered, so we need to go through all.
+            //
+            for intersection in object_intersections {
+                if intersection >= 0.0 {
                     all_intersections.insert(Intersection {
-                        t: intersection_1,
+                        t: intersection,
                         object: object.as_ref(),
                     });
 
-                    // The if let version is theoretically cleaner, but in practice, it's uglier.
-                    //
-                    if hit.is_none() || intersection_1 < hit.as_ref().unwrap().t {
-                        hit = Some(Intersection {
-                            t: intersection_1,
-                            object: object.as_ref(),
-                        });
-                    }
-                }
-
-                if intersection_2 >= 0.0 {
-                    all_intersections.insert(Intersection {
-                        t: intersection_2,
-                        object: object.as_ref(),
-                    });
-
-                    if hit.is_none() || intersection_2 < hit.as_ref().unwrap().t {
-                        hit = Some(Intersection {
-                            t: intersection_2,
-                            object: object.as_ref(),
-                        });
+                    match hit {
+                        None => {
+                            hit.replace(Intersection {
+                                t: intersection,
+                                object: object.as_ref(),
+                            });
+                        }
+                        Some(Intersection { t, .. }) => {
+                            if intersection < t {
+                                hit.replace(Intersection {
+                                    t: intersection,
+                                    object: object.as_ref(),
+                                });
+                            }
+                        }
                     }
                 }
             }
@@ -93,10 +91,8 @@ impl World {
         for object in self.objects.iter() {
             let object_intersections = object.intersections(ray);
 
-            if let Some((intersection_1, intersection_2)) = object_intersections {
-                if (intersection_1 >= 0.0 && intersection_1 < distance)
-                    || (intersection_2 >= 0.0 && intersection_2 < distance)
-                {
+            for intersection in object_intersections {
+                if intersection >= 0.0 && intersection < distance {
                     return true;
                 }
             }
@@ -148,7 +144,14 @@ impl World {
         intersection_state: &IntersectionState,
         max_recursions: u8,
     ) -> Color {
-        if max_recursions == 0 || intersection_state.object.material().reflective.approximate() == 0.0 {
+        if max_recursions == 0
+            || intersection_state
+                .object
+                .material()
+                .reflective
+                .approximate()
+                == 0.0
+        {
             return COLOR_BLACK;
         }
 

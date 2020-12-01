@@ -24,7 +24,7 @@ demonstrate! {
             for ((ox, oy, oz), (dx, dy, dz), t1, t2) in examples.iter() {
                 let ray = Ray::new((*ox, *oy, *oz), (*dx, *dy, *dz));
 
-                let expected_intersections = Some((*t1, *t2));
+                let expected_intersections = vec![*t1, *t2];
 
                 assert_eq!(cube.local_intersections(&ray), expected_intersections);
             }
@@ -47,7 +47,7 @@ demonstrate! {
                     direction: Tuple::vector(*dx, *dy, *dz),
                 };
 
-                assert_eq!(cube.local_intersections( &ray), None);
+                assert_eq!(cube.local_intersections(&ray), vec![]);
             }
         }
 

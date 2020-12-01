@@ -10,17 +10,9 @@ use library::{
 };
 
 fn hit(ray: &Ray, sphere: &Sphere) -> Option<f64> {
-    if let Some((t1, t2)) = sphere.intersections(ray) {
-        if t1 >= 0.0 {
-            Some(t1)
-        } else if t2 >= 0.0 {
-            Some(t2)
-        } else {
-            None
-        }
-    } else {
-        None
-    }
+    // At this stage, shapes always returned ordered hits, so we can use the first.
+    //
+    sphere.intersections(ray).get(0).cloned()
 }
 
 pub fn practice() {
