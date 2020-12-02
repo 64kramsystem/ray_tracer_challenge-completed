@@ -28,6 +28,8 @@ pub(crate) mod private {
 
     pub trait ShapeLocal {
         fn local_normal(&self, world_point: &Tuple) -> Tuple;
+        // In the book, this is local_intersect(), and returns also the shapes.
+        //
         fn local_intersections(&self, transformed_ray: &Ray) -> Vec<f64>;
     }
 }
