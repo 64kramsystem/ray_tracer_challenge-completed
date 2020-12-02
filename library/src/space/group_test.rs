@@ -35,31 +35,42 @@ demonstrate! {
             assert_eq!(shape_parent.id(), group.id());
         }
 
-        // it "Intersecting a ray with an empty group" {
-        //     Given g ← group()
-        //     And r ← ray(point(0, 0, 0), vector(0, 0, 1))
-        //     When xs ← local_intersect(g, r)
-        //     Then xs is empty
-        // }
+        it "Intersecting a ray with an empty group" {
+            let ray = Ray::new((0, 0, 0), (0, 0, 1));
 
-        // it "Intersecting a ray with a nonempty group" {
-        //     Given g ← group()
-        //     And s1 ← sphere()
-        //     And s2 ← sphere()
-        //     And set_transform(s2, translation(0, 0, -3))
-        //     And s3 ← sphere()
-        //     And set_transform(s3, translation(5, 0, 0))
-        //     And add_child(g, s1)
-        //     And add_child(g, s2)
-        //     And add_child(g, s3)
-        //     When r ← ray(point(0, 0, -5), vector(0, 0, 1))
-        //     And xs ← local_intersect(g, r)
-        //     Then xs.count = 4
-        //     And xs[0].object = s2
-        //     And xs[1].object = s2
-        //     And xs[2].object = s1
-        //     And xs[3].object = s1
-        // }
+            assert_eq!(group.local_intersections(&ray).len(), 0);
+        }
+
+        it "Intersecting a ray with a nonempty group" {
+            let group: Arc<dyn Shape> = Arc::new(group);
+
+            let sphere1: Arc<dyn Shape> = Arc::new(Sphere {
+                ..Sphere::default()
+            });
+            let sphere2: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(0, 0, -3),
+                ..Sphere::default()
+            });
+            let sphere3: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(5, 0, 0),
+                ..Sphere::default()
+            });
+
+            Group::add_child(&group, &sphere1);
+            Group::add_child(&group, &sphere2);
+            Group::add_child(&group, &sphere3);
+
+            let ray = Ray::new((0, 0, -5), (0, 0, 1));
+
+            let actual_intersections = group.local_intersections(&ray);
+
+            assert_eq!(actual_intersections.len(), 4);
+
+            assert_eq!(actual_intersections[0], 1.0);
+            assert_eq!(actual_intersections[1], 3.0);
+            assert_eq!(actual_intersections[2], 4.0);
+            assert_eq!(actual_intersections[3], 6.0);
+        }
 
         // it "Intersecting a transformed group" {
         //     Given g ← group()

@@ -66,7 +66,22 @@ impl ShapeLocal for Group {
         panic!("local normal is not meaningful for Group")
     }
 
-    fn local_intersections(&self, _transformed_ray: &Ray) -> Vec<f64> {
-        todo!()
+    fn local_intersections(&self, transformed_ray: &Ray) -> Vec<f64> {
+        // A more efficient implementation is to pass a BTreeSet, and have the children add elements.
+        // As of mid chapter 14, `local_intersections()` doesn't return the objects; in case they will
+        // need to be returned, then it will be cleaner to opt for BTreeSet, since Intersection implements
+        // floats ordering.
+        //
+        let mut intersections = self
+            .children()
+            .lock()
+            .unwrap()
+            .iter()
+            .flat_map(|child| child.intersections(transformed_ray))
+            .collect::<Vec<_>>();
+
+        intersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+        intersections
     }
 }
