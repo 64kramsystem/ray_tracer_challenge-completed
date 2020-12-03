@@ -9,18 +9,17 @@ demonstrate! {
         use std::sync::{Arc, Mutex, Weak};
 
         before {
-            #[allow(unused_mut,unused_variables)]
-            let mut group = Group::default();
+            #[allow(unused_variables)]
+            let group: Arc<dyn Shape> = Arc::new(Group::default());
         }
 
         it "Creating a new group" {
             assert_eq!(*group.transform(), Matrix::identity(4));
-            assert_eq!(group.children.lock().unwrap().len(), 0);
+            assert_eq!((*group).children().lock().unwrap().len(), 0);
         }
 
         it "Adding a child to a group" {
             let shape: Arc<dyn Shape> = Arc::new(Plane::default());
-            let group: Arc<dyn Shape> = Arc::new(group);
 
             Group::add_child(&group, &shape);
 
@@ -42,8 +41,6 @@ demonstrate! {
         }
 
         it "Intersecting a ray with a nonempty group" {
-            let group: Arc<dyn Shape> = Arc::new(group);
-
             let sphere1: Arc<dyn Shape> = Arc::new(Sphere {
                 ..Sphere::default()
             });
@@ -73,9 +70,10 @@ demonstrate! {
         }
 
         it "Intersecting a transformed group" {
-            *group.transform_mut() = Matrix::scaling(2, 2, 2);
-
-            let group: Arc<dyn Shape> = Arc::new(group);
+            let group: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::scaling(2, 2, 2),
+                ..Group::default()
+            });
 
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
