@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex, Weak};
+use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},
@@ -23,9 +23,9 @@ pub struct Group {
 
 impl Group {
     pub fn add_child(group: &Arc<dyn Shape>, child: &Arc<dyn Shape>) {
-        group.children().lock().unwrap().push(Arc::clone(child));
+        group.children().push(Arc::clone(child));
 
-        let mut child_parent_ref = child.parent().lock().unwrap();
+        let mut child_parent_ref = child.parent_mut();
 
         *child_parent_ref = Arc::downgrade(group);
     }
@@ -36,12 +36,16 @@ impl Shape for Group {
         self.id
     }
 
-    fn parent(&self) -> &Mutex<Weak<dyn Shape>> {
-        &self.parent
+    fn parent(&self) -> Option<Arc<dyn Shape>> {
+        Weak::upgrade(&*self.parent.lock().unwrap())
     }
 
-    fn children(&self) -> &Mutex<Vec<Arc<dyn Shape>>> {
-        &self.children
+    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>> {
+        self.parent.lock().unwrap()
+    }
+
+    fn children(&self) -> MutexGuard<Vec<Arc<dyn Shape>>> {
+        self.children.lock().unwrap()
     }
 
     fn transform(&self) -> &Matrix {
@@ -74,8 +78,6 @@ impl ShapeLocal for Group {
         //
         let mut intersections = self
             .children()
-            .lock()
-            .unwrap()
             .iter()
             .flat_map(|child| child.intersections(transformed_ray))
             .collect::<Vec<_>>();

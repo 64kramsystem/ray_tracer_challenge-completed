@@ -17,15 +17,18 @@ pub fn shape_accessors_derive(input: TokenStream) -> TokenStream {
                 self.id
             }
 
-            // It could be implemented the code to return Option<Arc<dyn Shape>>, however, it would
-            // then require the mutable version, in order to change the reference when required.
-            //
-            fn parent(&self) -> &Mutex<Weak<dyn Shape>> {
-                &self.parent
+            // The parent/children methods encapsulate (as possible) the typical access pattern.
+
+            fn parent(&self) -> Option<Arc<dyn Shape>> {
+                Weak::upgrade(&*self.parent.lock().unwrap())
             }
 
-            fn children(&self) -> &Mutex<Vec<Arc<dyn Shape>>> {
-                &self.children
+            fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>> {
+                self.parent.lock().unwrap()
+            }
+
+            fn children(&self) -> MutexGuard<Vec<Arc<dyn Shape>>> {
+                self.children.lock().unwrap()
             }
 
             fn transform(&self) -> &Matrix {

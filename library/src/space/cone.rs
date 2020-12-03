@@ -1,6 +1,6 @@
 use std::{
     mem,
-    sync::{Arc, Mutex, Weak},
+    sync::{Arc, Mutex, MutexGuard, Weak},
 };
 
 use super::{shape, shape::private::ShapeLocal, Ray, Shape};

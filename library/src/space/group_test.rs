@@ -15,7 +15,7 @@ demonstrate! {
 
         it "Creating a new group" {
             assert_eq!(*group.transform(), Matrix::identity(4));
-            assert_eq!((*group).children().lock().unwrap().len(), 0);
+            assert_eq!((*group).children().len(), 0);
         }
 
         it "Adding a child to a group" {
@@ -23,15 +23,12 @@ demonstrate! {
 
             Group::add_child(&group, &shape);
 
-            let actual_children = group.children().lock().unwrap();
+            let actual_children = group.children();
 
             assert_eq!(actual_children.len(), 1);
             assert_eq!(actual_children[0].id(), shape.id());
 
-            let shape_parent_ref = &shape.parent().lock().unwrap();
-            let shape_parent = Weak::upgrade(shape_parent_ref).unwrap();
-
-            assert_eq!(shape_parent.id(), group.id());
+            assert_eq!(shape.parent().unwrap().id(), group.id());
         }
 
         it "Intersecting a ray with an empty group" {

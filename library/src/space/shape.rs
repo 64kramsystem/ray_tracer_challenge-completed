@@ -1,6 +1,6 @@
 use std::{
     fmt,
-    sync::{Arc, Mutex, Weak},
+    sync::{Arc, Mutex, MutexGuard, Weak},
 };
 
 use super::{PointLight, Ray};
@@ -38,8 +38,9 @@ pub(crate) mod private {
 
 pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
     fn id(&self) -> u32;
-    fn parent(&self) -> &Mutex<Weak<dyn Shape>>;
-    fn children(&self) -> &Mutex<Vec<Arc<dyn Shape>>>;
+    fn parent(&self) -> Option<Arc<dyn Shape>>;
+    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>>;
+    fn children(&self) -> MutexGuard<Vec<Arc<dyn Shape>>>;
     fn transform(&self) -> &Matrix;
     fn transform_mut(&mut self) -> &mut Matrix;
     fn material(&self) -> &Material;
@@ -56,7 +57,7 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
     fn world_to_object(&self, world_point: &Tuple) -> Tuple {
         let transform_inverse = self.transform().inverse();
 
-        if let Some(parent) = Weak::upgrade(&*self.parent().lock().unwrap()) {
+        if let Some(parent) = self.parent() {
             transform_inverse * &parent.world_to_object(world_point)
         } else {
             transform_inverse * world_point
@@ -68,7 +69,7 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
         object_normal.w = 0.0;
         object_normal = object_normal.normalize();
 
-        if let Some(parent) = Weak::upgrade(&*self.parent().lock().unwrap()) {
+        if let Some(parent) = self.parent() {
             parent.normal_to_world(&object_normal)
         } else {
             object_normal
