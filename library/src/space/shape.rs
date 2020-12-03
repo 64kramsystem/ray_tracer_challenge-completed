@@ -55,6 +55,16 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
         world_normal.normalize()
     }
 
+    fn world_to_object(&self, world_point: &Tuple) -> Tuple {
+        let transform_inverse = self.transform().inverse();
+
+        if let Some(parent) = Weak::upgrade(&*self.parent().lock().unwrap()) {
+            transform_inverse * &parent.world_to_object(world_point)
+        } else {
+            transform_inverse * world_point
+        }
+    }
+
     // Return value properties:
     //
     // - they're not guaranteed to be ordered;

@@ -2,8 +2,11 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Shape" {
+        use crate::Axis;
         use crate::math::*;
         use crate::space::*;
+        use std::sync::Arc;
+        use std::f64::consts::PI;
 
         before {
             #[allow(unused_variables)]
@@ -44,6 +47,31 @@ demonstrate! {
                     assert_eq!(test_shape.intersections(&ray), vec![]);
                 }
             } // context "with a transformed shape"
+        }
+
+        it "Converting a point from world to object space" {
+            let group1: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::rotation(Axis::Y, PI / 2.0),
+                ..Group::default()
+            });
+
+            let group2: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::scaling(2, 2, 2),
+                ..Group::default()
+            });
+
+            Group::add_child(&group1, &group2);
+
+            let sphere: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(5, 0, 0),
+                ..Sphere::default()
+            });
+
+            Group::add_child(&group2, &sphere);
+
+            let expected_point = Tuple::point(0, 0, -1);
+
+            assert_eq!(sphere.world_to_object(&Tuple::point(-2, 0, -10)), expected_point);
         }
     }
 }
