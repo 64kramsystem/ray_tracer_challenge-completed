@@ -27,6 +27,8 @@ pub(crate) mod private {
     use crate::math::Tuple;
 
     pub trait ShapeLocal {
+        // In the book, this is local_normal_at().
+        //
         fn local_normal(&self, world_point: &Tuple) -> Tuple;
         // In the book, this is local_intersect(), and returns also the shapes.
         //
@@ -43,16 +45,12 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
     fn material(&self) -> &Material;
     fn material_mut(&mut self) -> &mut Material;
 
+    // In the book, this is normal_at().
+    //
     fn normal(&self, world_point: &Tuple) -> Tuple {
-        let object_point = self.transform().inverse() * world_point;
-
-        let object_normal = self.local_normal(&object_point);
-
-        let mut world_normal = self.transform().inverse().transpose() * &object_normal;
-
-        world_normal.w = 0.0;
-
-        world_normal.normalize()
+        let local_point = self.world_to_object(world_point);
+        let local_normal = self.local_normal(&local_point);
+        self.normal_to_world(&local_normal)
     }
 
     fn world_to_object(&self, world_point: &Tuple) -> Tuple {

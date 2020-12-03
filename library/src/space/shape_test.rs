@@ -99,5 +99,30 @@ demonstrate! {
 
             assert_eq!(actual_normal, Tuple::vector(0.2857, 0.4286, -0.8571));
         }
+
+        it "Finding the normal on a child object" {
+            let group1: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::rotation(Axis::Y, PI / 2.0),
+                ..Group::default()
+            });
+
+            let group2: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::scaling(1, 2, 3),
+                ..Group::default()
+            });
+
+            Group::add_child(&group1, &group2);
+
+            let sphere: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(5, 0, 0),
+                ..Sphere::default()
+            });
+
+            Group::add_child(&group2, &sphere);
+
+            let actual_normal = sphere.normal(&Tuple::point(1.7321, 1.1547, -5.5774));
+
+            assert_eq!(actual_normal, Tuple::vector(0.2857, 0.4286, -0.8571));
+        }
     }
 }
