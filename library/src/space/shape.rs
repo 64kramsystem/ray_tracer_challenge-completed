@@ -99,7 +99,7 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
         normalv: &Tuple,
         in_shadow: bool,
     ) -> Color {
-        let object_point = self.transform().inverse() * world_point;
+        let object_point = self.world_to_object(&world_point);
 
         self.material()
             .lighting(light, &object_point, world_point, eyev, normalv, in_shadow)
