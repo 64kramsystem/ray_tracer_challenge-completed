@@ -65,6 +65,18 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
         }
     }
 
+    fn normal_to_world(&self, object_normal: &Tuple) -> Tuple {
+        let mut object_normal = self.transform().inverse().transpose() * object_normal;
+        object_normal.w = 0.0;
+        object_normal = object_normal.normalize();
+
+        if let Some(parent) = Weak::upgrade(&*self.parent().lock().unwrap()) {
+            parent.normal_to_world(&object_normal)
+        } else {
+            object_normal
+        }
+    }
+
     // Return value properties:
     //
     // - they're not guaranteed to be ordered;

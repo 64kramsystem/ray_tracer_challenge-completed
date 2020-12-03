@@ -3,6 +3,7 @@ use demonstrate::demonstrate;
 demonstrate! {
     describe "Shape" {
         use crate::Axis;
+        use crate::lang::math::sqrt;
         use crate::math::*;
         use crate::space::*;
         use std::sync::Arc;
@@ -72,6 +73,31 @@ demonstrate! {
             let expected_point = Tuple::point(0, 0, -1);
 
             assert_eq!(sphere.world_to_object(&Tuple::point(-2, 0, -10)), expected_point);
+        }
+
+        it "Converting a normal from object to world space" {
+            let group1: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::rotation(Axis::Y, PI / 2.0),
+                ..Group::default()
+            });
+
+            let group2: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::scaling(1, 2, 3),
+                ..Group::default()
+            });
+
+            Group::add_child(&group1, &group2);
+
+            let sphere: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(5, 0, 0),
+                ..Sphere::default()
+            });
+
+            Group::add_child(&group2, &sphere);
+
+            let actual_normal = sphere.normal_to_world(&Tuple::vector(sqrt(3) / 3.0, sqrt(3) / 3.0, sqrt(3) / 3.0));
+
+            assert_eq!(actual_normal, Tuple::vector(0.2857, 0.4286, -0.8571));
         }
     }
 }
