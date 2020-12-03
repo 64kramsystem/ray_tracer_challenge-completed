@@ -9,8 +9,8 @@ demonstrate! {
         use std::sync::{Arc, Mutex, Weak};
 
         before {
-            #[allow(unused_variables)]
-            let group = Group::default();
+            #[allow(unused_mut,unused_variables)]
+            let mut group = Group::default();
         }
 
         it "Creating a new group" {
@@ -72,15 +72,23 @@ demonstrate! {
             assert_eq!(actual_intersections[3], 6.0);
         }
 
-        // it "Intersecting a transformed group" {
-        //     Given g ← group()
-        //     And set_transform(g, scaling(2, 2, 2))
-        //     And s ← sphere()
-        //     And set_transform(s, translation(5, 0, 0))
-        //     And add_child(g, s)
-        //     When r ← ray(point(10, 0, -10), vector(0, 0, 1))
-        //     And xs ← intersect(g, r)
-        //     Then xs.count = 2
-        // }
+        it "Intersecting a transformed group" {
+            *group.transform_mut() = Matrix::scaling(2, 2, 2);
+
+            let group: Arc<dyn Shape> = Arc::new(group);
+
+            let sphere: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(5, 0, 0),
+                ..Sphere::default()
+            });
+
+            Group::add_child(&group, &sphere);
+
+            let ray = Ray::new((10, 0, -10), (0, 0, 1));
+
+            let actual_intersections = group.intersections(&ray);
+
+            assert_eq!(actual_intersections.len(), 2);
+        }
     }
 }
