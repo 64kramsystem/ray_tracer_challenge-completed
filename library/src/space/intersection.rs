@@ -2,7 +2,7 @@ use std::{cmp::Ordering, fmt::Debug};
 
 use crate::space::Shape;
 
-// Setting NaN values for t is invalid; it will cause undefined behavior when sorting, likely panic.
+// Setting NaN values for t is invalid; it will cause undefined behavior/panic when sorting.
 //
 #[derive(Debug)]
 pub struct Intersection<'a> {
@@ -10,8 +10,6 @@ pub struct Intersection<'a> {
     pub object: &'a dyn Shape,
 }
 
-// This only informs the compiler that the type supports (full) equivalence.
-//
 impl<'a> Eq for Intersection<'a> {}
 
 // Important: this implementation is intended for exact matches; in addition to `object.id`, it compares
@@ -20,32 +18,18 @@ impl<'a> Eq for Intersection<'a> {}
 //
 impl<'a> PartialEq for Intersection<'a> {
     fn eq(&self, other: &Self) -> bool {
-        if self.t.is_nan() {
-            panic!()
-        } else {
-            self.t == other.t && self.object.id() == other.object.id()
-        }
+        self.t == other.t && self.object.id() == other.object.id()
     }
 }
 
 impl<'a> Ord for Intersection<'a> {
     fn cmp(&self, other: &Self) -> Ordering {
-        let (lhs, rhs) = (self.t, other.t);
-
-        if let Some(result) = lhs.partial_cmp(&rhs) {
-            result
-        } else {
-            if lhs.is_nan() {
-                panic!()
-            } else {
-                Ordering::Less
-            }
-        }
+        self.t.partial_cmp(&other.t).unwrap()
     }
 }
 
 impl<'a> PartialOrd for Intersection<'a> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+        self.t.partial_cmp(&other.t)
     }
 }
