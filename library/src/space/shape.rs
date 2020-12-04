@@ -3,7 +3,7 @@ use std::{
     sync::{Arc, Mutex, MutexGuard, Weak},
 };
 
-use super::{PointLight, Ray};
+use super::{BoundedShape, Bounds, PointLight, Ray};
 use crate::{
     math::{Matrix, Tuple},
     properties::{Color, Material},
@@ -36,7 +36,7 @@ pub(crate) mod private {
     }
 }
 
-pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
+pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     fn id(&self) -> u32;
     fn parent(&self) -> Option<Arc<dyn Shape>>;
     fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>>;
@@ -87,6 +87,55 @@ pub trait Shape: private::ShapeLocal + fmt::Debug + Sync + Send {
     fn intersections(&self, ray: &Ray) -> Vec<f64> {
         let transformed_ray = ray.inverse_transform(self.transform());
         self.local_intersections(&transformed_ray)
+    }
+
+    // Local (object-level) bounds, with the shape transformation applied.
+    //
+    fn bounds(&self) -> Bounds {
+        let local_bounds = self.local_bounds();
+
+        // This ugly processing (disassemble/transform/reassemble) is required because after the transformation,
+        // the bounding box can change completely.
+        // Some negligible processing is spared by flattening the transformations (see comment on the
+        // Group type).
+
+        let local_corners = [
+            Tuple::point(local_bounds.min.x, local_bounds.min.y, local_bounds.min.z),
+            Tuple::point(local_bounds.min.x, local_bounds.min.y, local_bounds.max.z),
+            Tuple::point(local_bounds.min.x, local_bounds.max.y, local_bounds.min.z),
+            Tuple::point(local_bounds.min.x, local_bounds.max.y, local_bounds.max.z),
+            Tuple::point(local_bounds.max.x, local_bounds.min.y, local_bounds.min.z),
+            Tuple::point(local_bounds.max.x, local_bounds.min.y, local_bounds.max.z),
+            Tuple::point(local_bounds.max.x, local_bounds.max.y, local_bounds.min.z),
+            Tuple::point(local_bounds.max.x, local_bounds.max.y, local_bounds.max.z),
+        ];
+
+        let transform = self.transform();
+        let mut bounds = Bounds::default();
+
+        for corner in local_corners.iter() {
+            let transformed_corner = transform * corner;
+
+            if transformed_corner.x < bounds.min.x {
+                bounds.min.x = transformed_corner.x
+            } else if transformed_corner.x > bounds.max.x {
+                bounds.max.x = transformed_corner.x
+            }
+
+            if transformed_corner.y < bounds.min.y {
+                bounds.min.y = transformed_corner.y
+            } else if transformed_corner.y > bounds.max.y {
+                bounds.max.y = transformed_corner.y
+            }
+
+            if transformed_corner.z < bounds.min.z {
+                bounds.min.z = transformed_corner.z
+            } else if transformed_corner.z > bounds.max.z {
+                bounds.max.z = transformed_corner.z
+            }
+        }
+
+        bounds
     }
 
     // Divergence from the book design. Having the lighting method here avoids going back and forth

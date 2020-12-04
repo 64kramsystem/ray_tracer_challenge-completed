@@ -3,7 +3,7 @@ use std::{
     sync::{Arc, Mutex, MutexGuard, Weak},
 };
 
-use super::{shape, shape::private::ShapeLocal, Ray, Shape};
+use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Ray, Shape};
 use crate::{
     lang::{math::sqrt, ApproximateFloat64Ops},
     math::{Matrix, Tuple},
@@ -125,5 +125,14 @@ impl ShapeLocal for Cylinder {
         self.intersect_caps(transformed_ray, &mut intersections);
 
         intersections
+    }
+}
+
+impl BoundedShape for Cylinder {
+    fn local_bounds(&self) -> Bounds {
+        Bounds {
+            min: Tuple::point(1, self.minimum, 1),
+            max: Tuple::point(1, self.maximum, 1),
+        }
     }
 }

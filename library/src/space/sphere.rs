@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
-use super::{shape, shape::private::ShapeLocal, Shape};
+use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Shape};
 use crate::{
     lang::math::sqrt,
     lang::HasFloat64Value,
@@ -73,6 +73,15 @@ impl ShapeLocal for Sphere {
             let t2 = (-b + sqrt(discriminant)) / (2.0 * a);
 
             vec![t1, t2]
+        }
+    }
+}
+
+impl BoundedShape for Sphere {
+    fn local_bounds(&self) -> Bounds {
+        Bounds {
+            min: Tuple::point(-1, -1, -1),
+            max: Tuple::point(1, 1, 1),
         }
     }
 }

@@ -2,10 +2,14 @@ use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},
-    Ray, Shape,
+    BoundedShape, Bounds, Cube, Ray, Shape,
 };
 use crate::{math::Matrix, math::Tuple, properties::Material};
 
+// For nested groups, an optimization is to reduce the transformations by pushing them to the children,
+// although it requires some modification. Since in this project there is a maximum of one level, the
+// optimization doesn't apply.
+//
 // Creating a struct with a single Mutex doesn't simplify things, since parent and children are not
 // accessed together (at least, currently, directly and in the same context).
 //
@@ -71,6 +75,12 @@ impl ShapeLocal for Group {
     }
 
     fn local_intersections(&self, transformed_ray: &Ray) -> Vec<f64> {
+        let local_bounds = self.local_bounds();
+
+        if Cube::generalized_intersections(&local_bounds, transformed_ray).is_empty() {
+            return vec![];
+        }
+
         // A more efficient implementation is to pass a BTreeSet, and have the children add elements.
         // As of mid chapter 14, `local_intersections()` doesn't return the objects; in case they will
         // need to be returned, then it will be cleaner to opt for BTreeSet, since Intersection implements
@@ -85,5 +95,26 @@ impl ShapeLocal for Group {
         intersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
         intersections
+    }
+}
+
+impl BoundedShape for Group {
+    fn local_bounds(&self) -> Bounds {
+        let mut group_bounds = Bounds::default();
+
+        for child in (*self.children.lock().unwrap()).iter() {
+            let child_bounds = child.bounds();
+
+            // "Optimized for readability".
+
+            group_bounds.min.x = group_bounds.min.x.min(child_bounds.min.x);
+            group_bounds.min.y = group_bounds.min.y.min(child_bounds.min.y);
+            group_bounds.min.z = group_bounds.min.z.min(child_bounds.min.z);
+            group_bounds.max.x = group_bounds.max.x.max(child_bounds.max.x);
+            group_bounds.max.y = group_bounds.max.y.max(child_bounds.max.y);
+            group_bounds.max.z = group_bounds.max.z.max(child_bounds.max.z);
+        }
+
+        group_bounds
     }
 }

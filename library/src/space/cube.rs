@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},
-    Ray, Shape,
+    BoundedShape, Bounds, Ray, Shape,
 };
 use crate::{math::Matrix, math::Tuple, properties::Material};
 
@@ -118,6 +118,15 @@ impl Cube {
             (tmax, tmin)
         } else {
             (tmin, tmax)
+        }
+    }
+}
+
+impl BoundedShape for Cube {
+    fn local_bounds(&self) -> Bounds {
+        Bounds {
+            min: Tuple::point(-1, -1, -1),
+            max: Tuple::point(1, 1, 1),
         }
     }
 }

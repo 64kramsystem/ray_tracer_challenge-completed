@@ -1,3 +1,5 @@
+mod bounded_shape;
+mod bounds;
 mod camera;
 mod cone;
 mod cube;
@@ -12,6 +14,8 @@ mod shape;
 mod sphere;
 mod world;
 
+pub use bounded_shape::BoundedShape;
+pub use bounds::Bounds;
 pub use camera::Camera;
 pub use cone::Cone;
 pub use cube::Cube;

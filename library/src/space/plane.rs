@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},
-    Ray, Shape,
+    BoundedShape, Bounds, Ray, Shape,
 };
 use crate::{lang::ApproximateFloat64Ops, math::Matrix, math::Tuple, properties::Material};
 
@@ -32,6 +32,15 @@ impl ShapeLocal for Plane {
             let t = -transformed_ray.origin.y / transformed_ray.direction.y;
 
             vec![t]
+        }
+    }
+}
+
+impl BoundedShape for Plane {
+    fn local_bounds(&self) -> Bounds {
+        Bounds {
+            min: Tuple::point(f64::NEG_INFINITY, 0, f64::INFINITY),
+            max: Tuple::point(f64::NEG_INFINITY, 0, f64::INFINITY),
         }
     }
 }
