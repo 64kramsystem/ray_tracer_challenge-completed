@@ -20,6 +20,48 @@ pub struct Cube {
     pub material: Material,
 }
 
+impl Cube {
+    pub fn generalized_intersections(bounds: &Bounds, transformed_ray: &Ray) -> Vec<f64> {
+        let (xtmin, xtmax) = Self::check_axis(
+            transformed_ray.origin.x,
+            transformed_ray.direction.x,
+            bounds.min.x,
+            bounds.max.x,
+        );
+        let (ytmin, ytmax) = Self::check_axis(
+            transformed_ray.origin.y,
+            transformed_ray.direction.y,
+            bounds.min.y,
+            bounds.max.y,
+        );
+
+        let mut tmin = xtmin.max(ytmin);
+        let mut tmax = xtmax.min(ytmax);
+
+        // Optimized version, as suggested in the practice section.
+        //
+        if tmin > tmax {
+            return vec![];
+        }
+
+        let (ztmin, ztmax) = Self::check_axis(
+            transformed_ray.origin.z,
+            transformed_ray.direction.z,
+            bounds.min.z,
+            bounds.max.z,
+        );
+
+        tmin = tmin.max(ztmin);
+        tmax = tmax.min(ztmax);
+
+        if tmin > tmax {
+            vec![]
+        } else {
+            vec![tmin, tmax]
+        }
+    }
+}
+
 impl ShapeLocal for Cube {
     fn local_normal(&self, object_point: &Tuple) -> Tuple {
         let x_abs = object_point.x.abs();
@@ -55,38 +97,19 @@ impl ShapeLocal for Cube {
     }
 
     fn local_intersections(&self, transformed_ray: &Ray) -> Vec<f64> {
-        let (xtmin, xtmax) =
-            Self::check_axis(transformed_ray.origin.x, transformed_ray.direction.x);
-        let (ytmin, ytmax) =
-            Self::check_axis(transformed_ray.origin.y, transformed_ray.direction.y);
+        let bounds = Bounds {
+            min: Tuple::point(-1, -1, -1),
+            max: Tuple::point(1, 1, 1),
+        };
 
-        let mut tmin = xtmin.max(ytmin);
-        let mut tmax = xtmax.min(ytmax);
-
-        // Optimized version, as suggested in the practice section.
-        //
-        if tmin > tmax {
-            return vec![];
-        }
-
-        let (ztmin, ztmax) =
-            Self::check_axis(transformed_ray.origin.z, transformed_ray.direction.z);
-
-        tmin = tmin.max(ztmin);
-        tmax = tmax.min(ztmax);
-
-        if tmin > tmax {
-            vec![]
-        } else {
-            vec![tmin, tmax]
-        }
+        Self::generalized_intersections(&bounds, transformed_ray)
     }
 }
 
 impl Cube {
-    fn check_axis(origin: f64, direction: f64) -> (f64, f64) {
-        let tmin_numerator = -1.0 - origin;
-        let tmax_numerator = 1.0 - origin;
+    fn check_axis(origin: f64, direction: f64, minimum: f64, maximum: f64) -> (f64, f64) {
+        let tmin_numerator = minimum - origin;
+        let tmax_numerator = maximum - origin;
 
         let tmin = tmin_numerator / direction;
         let tmax = tmax_numerator / direction;
