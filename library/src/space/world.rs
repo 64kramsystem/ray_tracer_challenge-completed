@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, sync::Arc};
 
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
@@ -9,7 +9,7 @@ use crate::{
 };
 
 pub struct World {
-    pub objects: Vec<Box<dyn Shape>>,
+    pub objects: Vec<Arc<dyn Shape>>,
     pub light_source: PointLight,
 }
 
@@ -17,7 +17,7 @@ impl World {
     pub fn default() -> Self {
         World {
             objects: vec![
-                Box::new(Sphere {
+                Arc::new(Sphere {
                     material: Material {
                         pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
                         diffuse: 0.7,
@@ -26,7 +26,7 @@ impl World {
                     },
                     ..Sphere::default()
                 }),
-                Box::new(Sphere {
+                Arc::new(Sphere {
                     transform: Matrix::scaling(0.5, 0.5, 0.5),
                     ..Sphere::default()
                 }),

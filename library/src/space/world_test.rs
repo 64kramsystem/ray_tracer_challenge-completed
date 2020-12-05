@@ -6,6 +6,7 @@ demonstrate! {
         use crate::lang::math::sqrt;
         use crate::properties::*;
         use crate::space::*;
+        use std::sync::Arc;
 
         before {
             #[allow(unused_variables,unused_mut)]
@@ -99,7 +100,8 @@ demonstrate! {
                     transform: Matrix::translation(0, 0, 10),
                     ..Sphere::default()
                 };
-                let objects: Vec<Box<dyn Shape>> = vec![Box::new(sphere1), Box::new(sphere2)];
+
+                let objects: Vec<Arc<dyn Shape>> = vec![Arc::new(sphere1), Arc::new(sphere2)];
 
                 let light_source = PointLight::new(
                     (0, 0, -10),
@@ -131,7 +133,7 @@ demonstrate! {
                     ..Plane::default()
                 };
 
-                world.objects.push(Box::new(plane));
+                world.objects.push(Arc::new(plane));
 
                 let ray = Ray::new((0, 0, -3), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
 
@@ -157,7 +159,7 @@ demonstrate! {
                     ..Plane::default()
                 };
 
-                world.objects.push(Box::new(lower_plane));
+                world.objects.push(Arc::new(lower_plane));
 
                 let upper_plane = Plane {
                     material: Material {
@@ -168,7 +170,7 @@ demonstrate! {
                     ..Plane::default()
                 };
 
-                world.objects.push(Box::new(upper_plane));
+                world.objects.push(Arc::new(upper_plane));
 
                 let ray = Ray::new((0, 0, 0), (0, 1, 0));
 
@@ -186,7 +188,7 @@ demonstrate! {
                     ..Plane::default()
                 };
 
-                world.objects.push(Box::new(floor));
+                world.objects.push(Arc::new(floor));
 
                 let ball = Sphere {
                     transform: Matrix::translation(0.0, -3.5, -0.5),
@@ -201,7 +203,7 @@ demonstrate! {
                     ..Sphere::default()
                 };
 
-                world.objects.push(Box::new(ball));
+                world.objects.push(Arc::new(ball));
 
                 let ray = Ray::new((0, 0, -3), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
 
@@ -229,7 +231,7 @@ demonstrate! {
                     ..Plane::default()
                 };
 
-                world.objects.push(Box::new(floor));
+                world.objects.push(Arc::new(floor));
 
                 let ball = Sphere {
                     transform: Matrix::translation(0.0, -3.5, -0.5),
@@ -241,7 +243,7 @@ demonstrate! {
                     ..Sphere::default()
                 };
 
-                world.objects.push(Box::new(ball));
+                world.objects.push(Arc::new(ball));
 
                 let intersections = [
                     Intersection { t: sqrt(2), object: world.objects[2].as_ref() },
@@ -272,8 +274,31 @@ demonstrate! {
             it "with the intersection behind the ray" {
                 let ray = Ray::new((0.0, 0.0, 0.75), (0, 0, -1));
 
-                world.objects[0].material_mut().ambient = 1.0;
-                world.objects[1].material_mut().ambient = 1.0;
+                // This requires RefCell.
+                //
+                // world.objects[0].material_mut().ambient = 1.0;
+                // world.objects[1].material_mut().ambient = 1.0;
+
+                world.objects = vec![
+                    Arc::new(Sphere {
+                        material: Material {
+                            pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
+                            diffuse: 0.7,
+                            specular: 0.2,
+                            ambient: 1.0,
+                            ..Material::default()
+                        },
+                        ..Sphere::default()
+                    }),
+                    Arc::new(Sphere {
+                        transform: Matrix::scaling(0.5, 0.5, 0.5),
+                        material: Material {
+                            ambient: 1.0,
+                            ..Material::default()
+                        },
+                        ..Sphere::default()
+                    }),
+                ];
 
                 // With the flat pattern, the color is the same at any point.
                 //
@@ -287,7 +312,18 @@ demonstrate! {
             it "should be computed for a nonreflective material" {
                 let ray = Ray::new((0, 0, 0), (0, 0, 1));
 
-                world.objects[1].material_mut().ambient = 1.0;
+                // This requires RefCell.
+                //
+                // world.objects[1].material_mut().ambient = 1.0;
+
+                world.objects[1] = Arc::new(Sphere {
+                    transform: Matrix::scaling(0.5, 0.5, 0.5),
+                    material: Material {
+                        ambient: 1.0,
+                        ..Material::default()
+                    },
+                    ..Sphere::default()
+                });
 
                 let intersection = Intersection {t: 1.0, object: world.objects[1].as_ref()};
                 let intersection_state = ray.intersection_state(&intersection, &[]);
@@ -308,7 +344,7 @@ demonstrate! {
                     ..Plane::default()
                 };
 
-                world.objects.push(Box::new(plane));
+                world.objects.push(Arc::new(plane));
 
                 let ray = Ray::new((0, 0, -3), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
 
@@ -334,8 +370,22 @@ demonstrate! {
             it "should be computed for a refractive material, at the maximum recursion depth" {
                 let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
-                world.objects[0].material_mut().transparency = 1.0;
-                world.objects[0].material_mut().refractive_index = 1.5;
+                // This requires RefCell.
+                //
+                // world.objects[0].material_mut().transparency = 1.0;
+                // world.objects[0].material_mut().refractive_index = 1.5;
+
+                world.objects[0] = Arc::new(Sphere {
+                    material: Material {
+                        pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
+                        diffuse: 0.7,
+                        specular: 0.2,
+                        transparency: 1.0,
+                        refractive_index: 1.5,
+                        ..Material::default()
+                    },
+                    ..Sphere::default()
+                });
 
                 let intersection = Intersection {t: 4.0, object: world.objects[0].as_ref()};
                 let intersection_state = ray.intersection_state(&intersection, &[]);
@@ -347,8 +397,22 @@ demonstrate! {
             it "should return black in case of total internal refraction" {
                 let ray = Ray::new((0.0, 0.0, sqrt(2) / 2.0), (0, 1, 1));
 
-                world.objects[0].material_mut().transparency = 1.0;
-                world.objects[0].material_mut().refractive_index = 1.5;
+                // This requires RefCell.
+                //
+                // world.objects[0].material_mut().transparency = 1.0;
+                // world.objects[0].material_mut().refractive_index = 1.5;
+
+                world.objects[0] = Arc::new(Sphere {
+                    material: Material {
+                        pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
+                        diffuse: 0.7,
+                        specular: 0.2,
+                        transparency: 1.0,
+                        refractive_index: 1.5,
+                        ..Material::default()
+                    },
+                    ..Sphere::default()
+                });
 
                 // We're taking the intersection from inside the sphere.
                 //
