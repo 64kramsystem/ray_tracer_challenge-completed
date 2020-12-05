@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},
-    BoundedShape, Bounds, Ray, Shape,
+    BoundedShape, Bounds, Intersection, Ray, Shape,
 };
 use crate::{math::Matrix, math::Tuple, properties::Material};
 
@@ -21,7 +21,14 @@ pub struct Cube {
 }
 
 impl Cube {
-    pub fn generalized_intersections(bounds: &Bounds, transformed_ray: &Ray) -> Vec<f64> {
+    // Passing the object as parameter rather than modeling this as associated method, it allows to
+    // use this logic on any Shape.
+    //
+    pub fn generalized_intersections<'a>(
+        object: Arc<dyn Shape>,
+        bounds: &Bounds,
+        transformed_ray: &Ray,
+    ) -> Vec<Intersection> {
         let (xtmin, xtmax) = Self::check_axis(
             transformed_ray.origin.x,
             transformed_ray.direction.x,
@@ -57,7 +64,16 @@ impl Cube {
         if tmin > tmax {
             vec![]
         } else {
-            vec![tmin, tmax]
+            vec![
+                Intersection {
+                    t: tmin,
+                    object: Arc::clone(&object),
+                },
+                Intersection {
+                    t: tmax,
+                    object: object,
+                },
+            ]
         }
     }
 }
@@ -96,13 +112,13 @@ impl ShapeLocal for Cube {
         // };
     }
 
-    fn local_intersections(&self, transformed_ray: &Ray) -> Vec<f64> {
+    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
         let bounds = Bounds {
             min: Tuple::point(-1, -1, -1),
             max: Tuple::point(1, 1, 1),
         };
 
-        Self::generalized_intersections(&bounds, transformed_ray)
+        Self::generalized_intersections(self as Arc<dyn Shape>, &bounds, transformed_ray)
     }
 }
 

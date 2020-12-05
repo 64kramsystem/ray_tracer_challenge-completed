@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},
-    BoundedShape, Bounds, Ray, Shape,
+    BoundedShape, Bounds, Intersection, Ray, Shape,
 };
 use crate::{lang::ApproximateFloat64Ops, math::Matrix, math::Tuple, properties::Material};
 
@@ -25,13 +25,13 @@ impl ShapeLocal for Plane {
         Tuple::vector(0, 1, 0)
     }
 
-    fn local_intersections(&self, transformed_ray: &Ray) -> Vec<f64> {
+    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
         if transformed_ray.direction.y.within_epsilon() {
             vec![]
         } else {
             let t = -transformed_ray.origin.y / transformed_ray.direction.y;
 
-            vec![t]
+            vec![Intersection { t, object: self }]
         }
     }
 }

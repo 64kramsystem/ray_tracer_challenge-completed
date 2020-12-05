@@ -1,4 +1,4 @@
-use std::f64::consts::PI;
+use std::{f64::consts::PI, sync::Arc};
 
 use library::{
     interface::Sdl2Interface,
@@ -75,13 +75,13 @@ fn prepare_world() -> World {
         ..Sphere::default()
     };
 
-    let objects: Vec<Box<dyn Shape>> = vec![
-        Box::new(floor),
-        Box::new(left_wall),
-        Box::new(right_wall),
-        Box::new(middle),
-        Box::new(right),
-        Box::new(left),
+    let objects: Vec<Arc<dyn Shape>> = vec![
+        Arc::new(floor),
+        Arc::new(left_wall),
+        Arc::new(right_wall),
+        Arc::new(middle),
+        Arc::new(right),
+        Arc::new(left),
     ];
 
     World {

@@ -2,27 +2,28 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "IntersectionState" {
+        use std::sync::Arc;
         use crate::lang::math::sqrt;
         use crate::properties::*;
         use crate::space::*;
 
         context "Schlick approximation" {
             before {
-                let glass_sphere = Sphere {
+                let glass_sphere: Arc<dyn Shape> = Arc::new(Sphere {
                     material: Material {
                         transparency: 1.0,
                         refractive_index: 1.5,
                         ..Material::default()
                     },
                     ..Sphere::default()
-                };
+                });
             }
 
             it "should be computed under total internal reflection" {
                 let ray = Ray::new((0.0, 0.0, sqrt(2) / 2.0), (0, 1, 0));
                 let intersections = [
-                    Intersection { t: -sqrt(2) / 2.0, object: &glass_sphere },
-                    Intersection { t: sqrt(2) / 2.0, object: &glass_sphere },
+                    Intersection { t: -sqrt(2) / 2.0, object: Arc::clone(&glass_sphere) },
+                    Intersection { t: sqrt(2) / 2.0, object: Arc::clone(&glass_sphere) },
                 ];
                 let intersection_state = ray.intersection_state(&intersections[1], &intersections);
 
@@ -34,8 +35,8 @@ demonstrate! {
             it "should be computed with a perpendicular viewing angle" {
                 let ray = Ray::new((0, 0, 0), (0, 1, 0));
                 let intersections = [
-                    Intersection { t: -1.0, object: &glass_sphere },
-                    Intersection { t: 1.0, object: &glass_sphere },
+                    Intersection { t: -1.0, object: Arc::clone(&glass_sphere) },
+                    Intersection { t: 1.0, object: Arc::clone(&glass_sphere) },
                 ];
                 let intersection_state = ray.intersection_state(&intersections[1], &intersections);
 
@@ -47,7 +48,7 @@ demonstrate! {
             it "should be computed with small angle and n2 > n1" {
                 let ray = Ray::new((0.0, 0.99, -2.0), (0, 0, 1));
                 let intersections = [
-                    Intersection { t: 1.8589, object: &glass_sphere },
+                    Intersection { t: 1.8589, object: Arc::clone(&glass_sphere) },
                 ];
                 let intersection_state = ray.intersection_state(&intersections[0], &intersections);
 

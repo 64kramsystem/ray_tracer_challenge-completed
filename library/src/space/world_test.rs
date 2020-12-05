@@ -27,40 +27,40 @@ demonstrate! {
         }
 
         it "should find the refractive indexes at various scenarios" {
-            let sphere_a = Sphere {
+            let sphere_a: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::scaling(2, 2, 2),
                 material: Material {
                     refractive_index: 1.5,
                     ..Material::default()
                 },
                 ..Sphere::default()
-            };
-            let sphere_b = Sphere {
+            });
+            let sphere_b: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(0.0, 0.0, -0.25),
                 material: Material {
                     refractive_index: 2.0,
                     ..Material::default()
                 },
                 ..Sphere::default()
-            };
-            let sphere_c = Sphere {
+            });
+            let sphere_c: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(0.0, 0.0, 0.25),
                 material: Material {
                     refractive_index: 2.5,
                     ..Material::default()
                 },
                 ..Sphere::default()
-            };
+            });
 
             let ray = Ray::new((0, 0, -4), (0, 0, 1));
 
             let intersections = [
-                Intersection { t: 2.0, object: &sphere_a },
-                Intersection { t: 2.75, object: &sphere_b },
-                Intersection { t: 3.25, object: &sphere_c },
-                Intersection { t: 4.75, object: &sphere_b },
-                Intersection { t: 5.25, object: &sphere_c },
-                Intersection { t: 6.0, object: &sphere_a },
+                Intersection { t: 2.0, object: Arc::clone(&sphere_a) },
+                Intersection { t: 2.75, object: Arc::clone(&sphere_b) },
+                Intersection { t: 3.25, object: Arc::clone(&sphere_c) },
+                Intersection { t: 4.75, object: Arc::clone(&sphere_b) },
+                Intersection { t: 5.25, object: Arc::clone(&sphere_c) },
+                Intersection { t: 6.0, object: Arc::clone(&sphere_a) },
             ];
 
             // [n1, n2]
@@ -86,7 +86,7 @@ demonstrate! {
             it "should be performed in direct light" {
                 let ray = Ray::new((0, 0, -5), (0, 0, 1));
                 let sphere = &world.objects[0];
-                let intersection = Intersection {t: 4.0, object: sphere.as_ref()};
+                let intersection = Intersection { t: 4.0, object: Arc::clone(&sphere) };
                 let intersection_state = ray.intersection_state(&intersection, &[]);
 
                 let expected_shade = Color::new(0.38066, 0.47583, 0.2855);
@@ -115,7 +115,7 @@ demonstrate! {
                     (0, 0, 1),
                 );
 
-                let intersection = Intersection {t: 4.0, object: world.objects[1].as_ref()};
+                let intersection = Intersection { t: 4.0, object: Arc::clone(&world.objects[1]) };
                 let intersection_state = ray.intersection_state(&intersection, &[]);
 
                 let expected_color = Color::new(0.1, 0.1, 0.1);
@@ -138,7 +138,7 @@ demonstrate! {
                 let ray = Ray::new((0, 0, -3), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
 
                 let intersections = [
-                    Intersection { t: sqrt(2), object: world.objects[2].as_ref() },
+                    Intersection { t: sqrt(2), object: Arc::clone(&world.objects[2]) },
                 ];
                 let intersection_state = ray.intersection_state(&intersections[0], &intersections);
 
@@ -208,7 +208,7 @@ demonstrate! {
                 let ray = Ray::new((0, 0, -3), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
 
                 let intersections = [
-                    Intersection { t: sqrt(2), object: world.objects[2].as_ref() },
+                    Intersection { t: sqrt(2), object: Arc::clone(&world.objects[2]) },
                 ];
                 let intersection_state = ray.intersection_state(&intersections[0], &intersections);
 
@@ -246,7 +246,7 @@ demonstrate! {
                 world.objects.push(Arc::new(ball));
 
                 let intersections = [
-                    Intersection { t: sqrt(2), object: world.objects[2].as_ref() },
+                    Intersection { t: sqrt(2), object: Arc::clone(&world.objects[2]) },
                 ];
                 let intersection_state = ray.intersection_state(&intersections[0], &intersections);
 
@@ -325,7 +325,7 @@ demonstrate! {
                     ..Sphere::default()
                 });
 
-                let intersection = Intersection {t: 1.0, object: world.objects[1].as_ref()};
+                let intersection = Intersection {t: 1.0, object: Arc::clone(&world.objects[1])};
                 let intersection_state = ray.intersection_state(&intersection, &[]);
 
                 let actual_color = world.reflected_color(&intersection_state, 0);
@@ -348,7 +348,7 @@ demonstrate! {
 
                 let ray = Ray::new((0, 0, -3), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
 
-                let intersection = Intersection {t: sqrt(2), object: world.objects.last().unwrap().as_ref()};
+                let intersection = Intersection {t: sqrt(2), object: Arc::clone(&world.objects.last().unwrap())};
                 let intersection_state = ray.intersection_state(&intersection, &[]);
 
                 let actual_color = world.reflected_color(&intersection_state, 1);
@@ -360,7 +360,7 @@ demonstrate! {
         context "refracted color" {
             it "should be computed for an opaque material" {
                 let ray = Ray::new((0, 0, -5), (0, 0, 1));
-                let intersection = Intersection {t: 4.0, object: world.objects[0].as_ref()};
+                let intersection = Intersection {t: 4.0, object: Arc::clone(&world.objects[0])};
                 let intersection_state = ray.intersection_state(&intersection, &[]);
                 let expected_color = COLOR_BLACK;
 
@@ -387,7 +387,7 @@ demonstrate! {
                     ..Sphere::default()
                 });
 
-                let intersection = Intersection {t: 4.0, object: world.objects[0].as_ref()};
+                let intersection = Intersection {t: 4.0, object: Arc::clone(&world.objects[0])};
                 let intersection_state = ray.intersection_state(&intersection, &[]);
                 let expected_color = COLOR_BLACK;
 
@@ -416,7 +416,7 @@ demonstrate! {
 
                 // We're taking the intersection from inside the sphere.
                 //
-                let intersection = Intersection {t: 5.0, object: world.objects[0].as_ref()};
+                let intersection = Intersection {t: 5.0, object: Arc::clone(&world.objects[0])};
                 let intersection_state = ray.intersection_state(&intersection, &[]);
                 let expected_color = COLOR_BLACK;
 
@@ -443,10 +443,10 @@ demonstrate! {
             //     let expected_color = Color::new(0, 0.99888, 0.04725);
 
             //     let intersections = [
-            //         Intersection { t: -0.9899, object: world.objects[0].as_ref() },
-            //         Intersection { t: -0.4899, object: world.objects[1].as_ref() },
-            //         Intersection { t: 0.4899, object: world.objects[1].as_ref() },
-            //         Intersection { t: 0.9899, object: world.objects[0].as_ref() },
+            //         Intersection { t: -0.9899, object: Arc::clone(&world.objects[0]) },
+            //         Intersection { t: -0.4899, object: Arc::clone(&world.objects[1]) },
+            //         Intersection { t: 0.4899, object: Arc::clone(&world.objects[1]) },
+            //         Intersection { t: 0.9899, object: Arc::clone(&world.objects[0]) },
             //     ];
             //     let intersection_state = ray.intersection_state(&intersections[2], &intersections);
 

@@ -9,6 +9,8 @@ use crate::{
 };
 
 pub struct World {
+    // In order to make the objects modifiable, a Mutex is required.
+    //
     pub objects: Vec<Arc<dyn Shape>>,
     pub light_source: PointLight,
 }
@@ -49,30 +51,23 @@ impl World {
         let mut hit: Option<Intersection> = None;
 
         for object in self.objects.iter() {
-            let object_intersections = object.intersections(ray);
+            let object_intersections = Arc::clone(object).intersections(ray);
 
             // Intersections are not ordered, so we need to go through all.
             //
             for intersection in object_intersections {
-                if intersection >= 0.0 {
-                    all_intersections.insert(Intersection {
-                        t: intersection,
-                        object: object.as_ref(),
-                    });
+                if intersection.t >= 0.0 {
+                    // Note that there is a case where we don't need to clone, but it's not worth bothering.
+                    //
+                    all_intersections.insert(intersection.clone());
 
                     match hit {
                         None => {
-                            hit.replace(Intersection {
-                                t: intersection,
-                                object: object.as_ref(),
-                            });
+                            hit.replace(intersection);
                         }
                         Some(Intersection { t, .. }) => {
-                            if intersection < t {
-                                hit.replace(Intersection {
-                                    t: intersection,
-                                    object: object.as_ref(),
-                                });
+                            if intersection.t < t {
+                                hit.replace(intersection);
                             }
                         }
                     }
@@ -89,10 +84,10 @@ impl World {
     //
     pub fn is_ray_obstructed(&self, ray: &Ray, distance: f64) -> bool {
         for object in self.objects.iter() {
-            let object_intersections = object.intersections(ray);
+            let object_intersections = Arc::clone(object).intersections(ray);
 
             for intersection in object_intersections {
-                if intersection >= 0.0 && intersection < distance {
+                if intersection.t >= 0.0 && intersection.t < distance {
                     return true;
                 }
             }

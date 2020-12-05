@@ -3,7 +3,7 @@ use std::{
     sync::{Arc, Mutex, MutexGuard, Weak},
 };
 
-use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Ray, Shape};
+use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Ray, Shape};
 use crate::{
     lang::{math::sqrt, ApproximateFloat64Ops},
     math::{Matrix, Tuple},
@@ -31,7 +31,7 @@ pub struct Cylinder {
 }
 
 impl Cylinder {
-    fn intersect_caps(&self, ray: &Ray, intersections: &mut Vec<f64>) {
+    fn intersect_caps(self: Arc<Self>, ray: &Ray, intersections: &mut Vec<Intersection>) {
         // Caps only matter if the cylinder is closed, and might possibly be intersected by the ray.
         //
         if !self.closed || ray.direction.y.approximate() == 0.0 {
@@ -44,13 +44,19 @@ impl Cylinder {
         let t1 = (self.minimum - ray.origin.y) / ray.direction.y;
 
         if Self::check_cap(&ray, t1) {
-            intersections.push(t1);
+            intersections.push(Intersection {
+                t: t1,
+                object: Arc::clone(&self) as Arc<dyn Shape>,
+            });
         }
 
         let t2 = (self.maximum - ray.origin.y) / ray.direction.y;
 
         if Self::check_cap(&ray, t2) {
-            intersections.push(t2);
+            intersections.push(Intersection {
+                t: t2,
+                object: self,
+            });
         }
     }
 
@@ -79,7 +85,7 @@ impl ShapeLocal for Cylinder {
         }
     }
 
-    fn local_intersections(&self, transformed_ray: &super::Ray) -> Vec<f64> {
+    fn local_intersections(self: Arc<Self>, transformed_ray: &super::Ray) -> Vec<Intersection> {
         let mut intersections = Vec::with_capacity(2);
 
         let a = transformed_ray.direction.x.powi(2) + transformed_ray.direction.z.powi(2);
@@ -112,13 +118,19 @@ impl ShapeLocal for Cylinder {
             let y0 = transformed_ray.origin.y + t0 * transformed_ray.direction.y;
 
             if self.minimum < y0 && y0 < self.maximum {
-                intersections.push(t0);
+                intersections.push(Intersection {
+                    t: t0,
+                    object: Arc::clone(&self) as Arc<dyn Shape>,
+                });
             }
 
             let y1 = transformed_ray.origin.y + t1 * transformed_ray.direction.y;
 
             if self.minimum < y1 && y1 < self.maximum {
-                intersections.push(t1);
+                intersections.push(Intersection {
+                    t: t1,
+                    object: Arc::clone(&self) as Arc<dyn Shape>,
+                });
             }
         }
 

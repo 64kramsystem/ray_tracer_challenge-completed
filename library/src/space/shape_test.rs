@@ -34,16 +34,20 @@ demonstrate! {
             context "with a transformed shape" {
                 it "scaled" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
+                    let test_shape: Arc<dyn Shape> = Arc::new(test_shape.scale(2, 2, 2));
 
-                    let test_shape: Box<dyn Shape> = Box::new(test_shape.scale(2, 2, 2));
+                    let actual_intersections = test_shape.intersections(&ray);
 
-                    assert_eq!(test_shape.intersections(&ray), vec![3.0, 7.0]);
+                    assert_eq!(actual_intersections.len(), 2);
+
+                    assert_eq!(actual_intersections[0].t, 3.0);
+                    assert_eq!(actual_intersections[1].t, 7.0);
                 }
 
                 it "translated" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
-                    let test_shape: Box<dyn Shape> = Box::new(test_shape.translate(5, 0, 0));
+                    let test_shape: Arc<dyn Shape> = Arc::new(test_shape.translate(5, 0, 0));
 
                     assert_eq!(test_shape.intersections(&ray), vec![]);
                 }

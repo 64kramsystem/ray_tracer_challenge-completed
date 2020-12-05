@@ -60,10 +60,10 @@ demonstrate! {
 
             assert_eq!(actual_intersections.len(), 4);
 
-            assert_eq!(actual_intersections[0], 1.0);
-            assert_eq!(actual_intersections[1], 3.0);
-            assert_eq!(actual_intersections[2], 4.0);
-            assert_eq!(actual_intersections[3], 6.0);
+            assert_eq!(actual_intersections[0].object.id(), sphere2.id());
+            assert_eq!(actual_intersections[1].object.id(), sphere2.id());
+            assert_eq!(actual_intersections[2].object.id(), sphere1.id());
+            assert_eq!(actual_intersections[3].object.id(), sphere1.id());
         }
 
         it "Intersecting a transformed group" {

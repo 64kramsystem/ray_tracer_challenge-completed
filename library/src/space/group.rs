@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},
-    BoundedShape, Bounds, Cube, Ray, Shape,
+    BoundedShape, Bounds, Cube, Intersection, Ray, Shape,
 };
 use crate::{math::Matrix, math::Tuple, properties::Material};
 
@@ -21,6 +21,10 @@ pub struct Group {
     pub transform: Matrix,
     #[default(Mutex::new(Weak::<Self>::new()))]
     pub parent: Mutex<Weak<dyn Shape>>,
+    // This is tricky. Wrapping the vector with the mutex will cause contention, but wrapping the shape
+    // will require all the Shape methods to be converted to functions taking Arc<Mutex<dyn shape>>;
+    // this is possible, but ugly.
+    //
     #[default(Mutex::new(vec![]))]
     pub children: Mutex<Vec<Arc<dyn Shape>>>,
 }
@@ -74,22 +78,23 @@ impl ShapeLocal for Group {
         panic!("local normal is not meaningful for Group")
     }
 
-    fn local_intersections(&self, transformed_ray: &Ray) -> Vec<f64> {
+    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
         let local_bounds = self.local_bounds();
 
-        if Cube::generalized_intersections(&local_bounds, transformed_ray).is_empty() {
+        let box_intersections = Cube::generalized_intersections(
+            Arc::clone(&self) as Arc<dyn Shape>,
+            &local_bounds,
+            transformed_ray,
+        );
+
+        if box_intersections.is_empty() {
             return vec![];
         }
 
-        // A more efficient implementation is to pass a BTreeSet, and have the children add elements.
-        // As of mid chapter 14, `local_intersections()` doesn't return the objects; in case they will
-        // need to be returned, then it will be cleaner to opt for BTreeSet, since Intersection implements
-        // floats ordering.
-        //
         let mut intersections = self
             .children()
             .iter()
-            .flat_map(|child| child.intersections(transformed_ray))
+            .flat_map(|child| Arc::clone(child).intersections(transformed_ray))
             .collect::<Vec<_>>();
 
         intersections.sort_by(|a, b| a.partial_cmp(b).unwrap());

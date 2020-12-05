@@ -1,9 +1,11 @@
+use std::sync::Arc;
+
 use crate::{math::Tuple, space::Shape};
 
-#[derive(Debug, PartialEq)]
-pub struct IntersectionState<'a> {
+#[derive(Debug)]
+pub struct IntersectionState {
     pub t: f64,
-    pub object: &'a dyn Shape,
+    pub object: Arc<dyn Shape>,
     pub point: Tuple,
     pub over_point: Tuple,
     pub under_point: Tuple,
@@ -15,7 +17,25 @@ pub struct IntersectionState<'a> {
     pub inside: bool,
 }
 
-impl<'a> IntersectionState<'a> {
+// Intended to match two exactly equal intersection states - FP error is not considered.
+//
+impl PartialEq for IntersectionState {
+    fn eq(&self, other: &Self) -> bool {
+        self.t == other.t
+            && self.object.eq(&other.object)
+            && self.point == other.point
+            && self.over_point == other.over_point
+            && self.under_point == other.under_point
+            && self.eyev == other.eyev
+            && self.normalv == other.normalv
+            && self.reflectv == other.reflectv
+            && self.n1 == other.n1
+            && self.n2 == other.n2
+            && self.inside == other.inside
+    }
+}
+
+impl IntersectionState {
     pub fn schlick(&self) -> f64 {
         let mut cos = self.eyev.dot_product(&self.normalv);
 

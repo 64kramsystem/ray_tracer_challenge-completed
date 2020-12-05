@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
-use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Shape};
+use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Shape};
 use crate::{
     lang::math::sqrt,
     lang::HasFloat64Value,
@@ -54,7 +54,7 @@ impl ShapeLocal for Sphere {
         object_point - &Tuple::point(0, 0, 0)
     }
 
-    fn local_intersections(&self, transformed_ray: &super::Ray) -> Vec<f64> {
+    fn local_intersections(self: Arc<Self>, transformed_ray: &super::Ray) -> Vec<Intersection> {
         let sphere_location = Tuple::point(0, 0, 0);
         let sphere_to_ray = transformed_ray.origin - &sphere_location;
 
@@ -72,7 +72,16 @@ impl ShapeLocal for Sphere {
             let t1 = (-b - sqrt(discriminant)) / (2.0 * a);
             let t2 = (-b + sqrt(discriminant)) / (2.0 * a);
 
-            vec![t1, t2]
+            vec![
+                Intersection {
+                    t: t1,
+                    object: Arc::clone(&self) as Arc<dyn Shape>,
+                },
+                Intersection {
+                    t: t2,
+                    object: self,
+                },
+            ]
         }
     }
 }

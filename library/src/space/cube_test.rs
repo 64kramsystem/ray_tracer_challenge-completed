@@ -2,11 +2,12 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Cube" {
+        use std::sync::Arc;
         use crate::math::*;
         use crate::space::{*, shape::private::ShapeLocal};
 
         before {
-            let cube = Cube::default();
+            let cube = Arc::new(Cube::default());
         }
 
         it "a ray intersects a cube" {
@@ -24,9 +25,13 @@ demonstrate! {
             for ((ox, oy, oz), (dx, dy, dz), t1, t2) in examples.iter() {
                 let ray = Ray::new((*ox, *oy, *oz), (*dx, *dy, *dz));
 
-                let expected_intersections = vec![*t1, *t2];
+                let actual_intersections = Arc::clone(&cube).local_intersections(&ray);
 
-                assert_eq!(cube.local_intersections(&ray), expected_intersections);
+                assert_eq!(actual_intersections.len(), 2);
+
+                assert_eq!(actual_intersections[0].t, *t1);
+                assert_eq!(actual_intersections[1].t, *t2);
+
             }
         }
 
@@ -47,7 +52,7 @@ demonstrate! {
                     direction: Tuple::vector(*dx, *dy, *dz),
                 };
 
-                assert_eq!(cube.local_intersections(&ray), vec![]);
+                assert_eq!(Arc::clone(&cube).local_intersections(&ray), vec![]);
             }
         }
 

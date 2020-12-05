@@ -3,7 +3,7 @@ use std::{
     sync::{Arc, Mutex, MutexGuard, Weak},
 };
 
-use super::{BoundedShape, Bounds, PointLight, Ray};
+use super::{BoundedShape, Bounds, Intersection, PointLight, Ray};
 use crate::{
     math::{Matrix, Tuple},
     properties::{Color, Material},
@@ -23,8 +23,10 @@ pub(crate) fn new_shape_id() -> u32 {
 }
 
 pub(crate) mod private {
+    use std::sync::Arc;
+
     use super::Ray;
-    use crate::math::Tuple;
+    use crate::{math::Tuple, space::Intersection};
 
     pub trait ShapeLocal {
         // In the book, this is local_normal_at().
@@ -32,7 +34,7 @@ pub(crate) mod private {
         fn local_normal(&self, world_point: &Tuple) -> Tuple;
         // In the book, this is local_intersect(), and returns also the shapes.
         //
-        fn local_intersections(&self, transformed_ray: &Ray) -> Vec<f64>;
+        fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection>;
     }
 }
 
@@ -84,7 +86,7 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     // An possible optimization is to receive an ordered collection, and have the intersections added
     // to it; this avoids allocating an array for each shape.
     //
-    fn intersections(&self, ray: &Ray) -> Vec<f64> {
+    fn intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
         let transformed_ray = ray.inverse_transform(self.transform());
         self.local_intersections(&transformed_ray)
     }

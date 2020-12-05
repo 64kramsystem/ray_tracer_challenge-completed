@@ -2,11 +2,12 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Plane" {
+        use std::sync::Arc;
         use crate::math::*;
         use crate::space::{*, shape::private::ShapeLocal};
 
         before {
-            let plane = Plane::default();
+            let plane = Arc::new(Plane::default());
         }
 
         it "should have a constant normal, everywhere" {
@@ -35,16 +36,18 @@ demonstrate! {
             context "should be present"  {
                 it "with a plane from above" {
                     let ray = Ray::new((0, 1, 0), (0, -1, 0));
-                    let intersections = plane.local_intersections(&ray);
+                    let actual_intersections = plane.local_intersections(&ray);
 
-                    assert_eq!(intersections, vec![1.0]);
+                    assert_eq!(actual_intersections.len(), 1);
+                    assert_eq!(actual_intersections[0].t, 1.0);
                 }
 
                 it "with a plane from below" {
                     let ray = Ray::new((0, -1, 0), (0, 1, 0));
-                    let intersections = plane.local_intersections(&ray);
+                    let actual_intersections = plane.local_intersections(&ray);
 
-                    assert_eq!(intersections, vec![1.0]);
+                    assert_eq!(actual_intersections.len(), 1);
+                    assert_eq!(actual_intersections[0].t, 1.0);
                 }
             } // context "should be absent"
         } // context "intersections"

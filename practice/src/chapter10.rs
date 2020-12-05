@@ -1,4 +1,4 @@
-use std::f64::consts::PI;
+use std::{f64::consts::PI, sync::Arc};
 
 use library::{
     interface::Sdl2Interface,
@@ -86,7 +86,7 @@ fn random_rotation() -> Matrix {
     }
 }
 
-fn add_spheres(objects: &mut Vec<Box<dyn Shape>>) {
+fn add_spheres(objects: &mut Vec<Arc<dyn Shape>>) {
     fn prepare_material() -> Material {
         Material {
             pattern: random_pattern(),
@@ -128,12 +128,12 @@ fn add_spheres(objects: &mut Vec<Box<dyn Shape>>) {
         ..Sphere::default()
     };
 
-    objects.push(Box::new(middle));
-    objects.push(Box::new(right));
-    objects.push(Box::new(left));
+    objects.push(Arc::new(middle));
+    objects.push(Arc::new(right));
+    objects.push(Arc::new(left));
 }
 
-fn add_walls(objects: &mut Vec<Box<dyn Shape>>) {
+fn add_walls(objects: &mut Vec<Arc<dyn Shape>>) {
     fn prepare_material() -> Material {
         Material {
             pattern: random_pattern(),
@@ -163,9 +163,9 @@ fn add_walls(objects: &mut Vec<Box<dyn Shape>>) {
         ..Plane::default()
     };
 
-    objects.push(Box::new(floor));
-    objects.push(Box::new(left));
-    objects.push(Box::new(right));
+    objects.push(Arc::new(floor));
+    objects.push(Arc::new(left));
+    objects.push(Arc::new(right));
 }
 
 fn prepare_world() -> World {

@@ -1,17 +1,20 @@
-use std::io::{self, Write};
 use std::{f64::consts::PI, sync::Mutex};
+use std::{
+    io::{self, Write},
+    sync::Arc,
+};
 
 use library::{
     interface::{Image, Sdl2Interface},
     math::{Matrix, Tuple},
     properties::FlatPattern,
     properties::COLOR_BLACK,
-    space::{PointLight, Ray, Shape, Sphere},
+    space::{Intersection, PointLight, Ray, Shape, Sphere},
     Axis,
 };
 use rayon::prelude::*;
 
-fn hit(ray: &Ray, sphere: &Sphere) -> Option<f64> {
+fn hit(ray: &Ray, sphere: Arc<Sphere>) -> Option<Intersection> {
     // At this stage, shapes always returned ordered hits, so we can use the first.
     //
     sphere.intersections(ray).get(0).cloned()
@@ -32,6 +35,8 @@ pub fn practice() {
     sphere.transform = Matrix::translation(10, 0, 0)
         * &Matrix::rotation(Axis::Z, -PI / 4.0)
         * &Matrix::scaling(6.25, 12.5, 12.5);
+
+    let sphere = Arc::new(sphere);
 
     let light = PointLight::new(light_position, (1, 1, 1));
 
@@ -58,8 +63,8 @@ pub fn practice() {
                     direction: eye_ray_direction,
                 };
 
-                if let Some(hit) = hit(&eye_ray, &sphere) {
-                    let hit_point = eye_ray.position(hit);
+                if let Some(hit) = hit(&eye_ray, Arc::clone(&sphere)) {
+                    let hit_point = eye_ray.position(hit.t);
                     let hit_normal = sphere.normal(&hit_point);
 
                     let light_color = sphere.lighting(
