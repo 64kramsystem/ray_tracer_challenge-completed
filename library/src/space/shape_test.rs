@@ -2,8 +2,12 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Shape" {
+        use crate::Axis;
+        use crate::lang::math::sqrt;
         use crate::math::*;
         use crate::space::*;
+        use std::sync::Arc;
+        use std::f64::consts::PI;
 
         before {
             #[allow(unused_variables)]
@@ -30,20 +34,99 @@ demonstrate! {
             context "with a transformed shape" {
                 it "scaled" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
+                    let test_shape: Arc<dyn Shape> = Arc::new(test_shape.scale(2, 2, 2));
 
-                    let test_shape: Box<dyn Shape> = Box::new(test_shape.scale(2, 2, 2));
+                    let actual_intersections = test_shape.intersections(&ray);
 
-                    assert_eq!(test_shape.intersections(&ray), vec![3.0, 7.0]);
+                    assert_eq!(actual_intersections.len(), 2);
+
+                    assert_eq!(actual_intersections[0].t, 3.0);
+                    assert_eq!(actual_intersections[1].t, 7.0);
                 }
 
                 it "translated" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
-                    let test_shape: Box<dyn Shape> = Box::new(test_shape.translate(5, 0, 0));
+                    let test_shape: Arc<dyn Shape> = Arc::new(test_shape.translate(5, 0, 0));
 
                     assert_eq!(test_shape.intersections(&ray), vec![]);
                 }
             } // context "with a transformed shape"
+        }
+
+        it "Converting a point from world to object space" {
+            let group1: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::rotation(Axis::Y, PI / 2.0),
+                ..Group::default()
+            });
+
+            let group2: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::scaling(2, 2, 2),
+                ..Group::default()
+            });
+
+            Group::add_child(&group1, &group2);
+
+            let sphere: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(5, 0, 0),
+                ..Sphere::default()
+            });
+
+            Group::add_child(&group2, &sphere);
+
+            let expected_point = Tuple::point(0, 0, -1);
+
+            assert_eq!(sphere.world_to_object(&Tuple::point(-2, 0, -10)), expected_point);
+        }
+
+        it "Converting a normal from object to world space" {
+            let group1: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::rotation(Axis::Y, PI / 2.0),
+                ..Group::default()
+            });
+
+            let group2: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::scaling(1, 2, 3),
+                ..Group::default()
+            });
+
+            Group::add_child(&group1, &group2);
+
+            let sphere: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(5, 0, 0),
+                ..Sphere::default()
+            });
+
+            Group::add_child(&group2, &sphere);
+
+            let actual_normal = sphere.normal_to_world(&Tuple::vector(sqrt(3) / 3.0, sqrt(3) / 3.0, sqrt(3) / 3.0));
+
+            assert_eq!(actual_normal, Tuple::vector(0.2857, 0.4286, -0.8571));
+        }
+
+        it "Finding the normal on a child object" {
+            let group1: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::rotation(Axis::Y, PI / 2.0),
+                ..Group::default()
+            });
+
+            let group2: Arc<dyn Shape> = Arc::new(Group {
+                transform: Matrix::scaling(1, 2, 3),
+                ..Group::default()
+            });
+
+            Group::add_child(&group1, &group2);
+
+            let sphere: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(5, 0, 0),
+                ..Sphere::default()
+            });
+
+            Group::add_child(&group2, &sphere);
+
+            let actual_normal = sphere.normal(&Tuple::point(1.7321, 1.1547, -5.5774));
+
+            assert_eq!(actual_normal, Tuple::vector(0.2857, 0.4286, -0.8571));
         }
     }
 }

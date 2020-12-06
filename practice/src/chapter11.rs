@@ -1,4 +1,4 @@
-use std::f64::consts::PI;
+use std::{f64::consts::PI, sync::Arc};
 
 use library::{
     interface::Sdl2Interface,
@@ -24,7 +24,7 @@ const REFRACTIVE_INDEX: f64 = 1.07;
 const ROTATE_SPHERES: bool = true;
 
 #[rustfmt::skip]
-fn add_objects(objects: &mut Vec<Box<dyn Shape>>) {
+fn add_objects(objects: &mut Vec<Arc<dyn Shape>>) {
     let left_sphere = Sphere {
         transform: Matrix::translation(-1.5, 0.33, -0.75) * &Matrix::scaling(0.33, 0.33, 0.33) * &random_rotation(),
         material: random_material(None),
@@ -66,14 +66,14 @@ fn add_objects(objects: &mut Vec<Box<dyn Shape>>) {
         ..Plane::default()
     };
 
-    objects.push(Box::new(left_sphere));
-    objects.push(Box::new(middle_sphere));
-    objects.push(Box::new(back_sphere));
-    objects.push(Box::new(right_sphere));
+    objects.push(Arc::new(left_sphere));
+    objects.push(Arc::new(middle_sphere));
+    objects.push(Arc::new(back_sphere));
+    objects.push(Arc::new(right_sphere));
 
-    objects.push(Box::new(left_wall));
-    objects.push(Box::new(floor));
-    objects.push(Box::new(right_wall));
+    objects.push(Arc::new(left_wall));
+    objects.push(Arc::new(floor));
+    objects.push(Arc::new(right_wall));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

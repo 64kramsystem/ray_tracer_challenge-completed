@@ -2,13 +2,14 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Cylinder" {
+        use std::sync::Arc;
         use crate::math::*;
         use crate::lang::ApproximateFloat64Ops;
         use crate::space::{*, shape::private::ShapeLocal};
 
         before {
-            #[allow(unused_mut)]
-            let mut cylinder = Cylinder::default();
+            #[allow(unused_mut,unused_variables)]
+            let cylinder = Arc::new(Cylinder::default());
         }
 
         it "A ray misses a cylinder" {
@@ -24,7 +25,7 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                assert_eq!(cylinder.local_intersections(&ray), vec![]);
+                assert_eq!(Arc::clone(&cylinder).local_intersections(&ray), vec![]);
             }
         }
 
@@ -41,10 +42,10 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let actual_intersections = cylinder.local_intersections(&ray);
+                let actual_intersections = Arc::clone(&cylinder).local_intersections(&ray);
 
-                assert!(actual_intersections[0].approximate_equals(*t1));
-                assert!(actual_intersections[1].approximate_equals(*t2));
+                assert!(actual_intersections[0].t.approximate_equals(*t1));
+                assert!(actual_intersections[1].t.approximate_equals(*t2));
             }
         }
 
@@ -71,8 +72,11 @@ demonstrate! {
         }
 
         it "Intersecting a constrained cylinder" {
-            cylinder.minimum = 1.0;
-            cylinder.maximum = 2.0;
+            let cylinder = Arc::new(Cylinder {
+                minimum: 1.0,
+                maximum: 2.0,
+                ..Cylinder::default()
+            });
 
             let examples = [
                 // origin      direction    count
@@ -89,7 +93,7 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let actual_intersections = cylinder.local_intersections(&ray);
+                let actual_intersections = Arc::clone(&cylinder).local_intersections(&ray);
 
                 assert_eq!(actual_intersections.len(), *expected_count);
             }
@@ -109,25 +113,31 @@ demonstrate! {
                 ((0, -1, -2), (0,  1, 1), 2), // corner case
             ];
 
-            cylinder.minimum = 1.0;
-            cylinder.maximum = 2.0;
-            cylinder.closed = true;
+            let cylinder = Arc::new(Cylinder {
+                minimum: 1.0,
+                maximum: 2.0,
+                closed: true,
+                ..Cylinder::default()
+            });
 
             for ((ox, oy, oz), (dx, dy, dz), expected_count) in examples.iter() {
                 let origin    = Tuple::point(*ox, *oy, *oz);
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let actual_intersections = cylinder.local_intersections(&ray);
+                let actual_intersections = Arc::clone(&cylinder).local_intersections(&ray);
 
                 assert_eq!(actual_intersections.len(), *expected_count);
             }
         }
 
         it "The normal vector on a cylinder\'s end caps" {
-            cylinder.minimum = 1.0;
-            cylinder.maximum = 2.0;
-            cylinder.closed = true;
+            let cylinder = Arc::new(Cylinder {
+                minimum: 1.0,
+                maximum: 2.0,
+                closed: true,
+                ..Cylinder::default()
+            });
 
             let examples = [
                 // point        normal

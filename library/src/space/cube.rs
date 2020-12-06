@@ -1,6 +1,8 @@
+use std::sync::{Arc, Mutex, MutexGuard, Weak};
+
 use super::{
     shape::{self, private::ShapeLocal},
-    Ray, Shape,
+    BoundedShape, Bounds, Intersection, Ray, Shape,
 };
 use crate::{math::Matrix, math::Tuple, properties::Material};
 
@@ -8,10 +10,72 @@ use crate::{math::Matrix, math::Tuple, properties::Material};
 pub struct Cube {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
+    #[default(Mutex::new(Weak::<Self>::new()))]
+    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Mutex::new(vec![]))]
+    pub children: Mutex<Vec<Arc<dyn Shape>>>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]
     pub material: Material,
+}
+
+impl Cube {
+    // Passing the object as parameter rather than modeling this as associated method, it allows to
+    // use this logic on any Shape.
+    //
+    pub fn generalized_intersections<'a>(
+        object: Arc<dyn Shape>,
+        bounds: &Bounds,
+        transformed_ray: &Ray,
+    ) -> Vec<Intersection> {
+        let (xtmin, xtmax) = Self::check_axis(
+            transformed_ray.origin.x,
+            transformed_ray.direction.x,
+            bounds.min.x,
+            bounds.max.x,
+        );
+        let (ytmin, ytmax) = Self::check_axis(
+            transformed_ray.origin.y,
+            transformed_ray.direction.y,
+            bounds.min.y,
+            bounds.max.y,
+        );
+
+        let mut tmin = xtmin.max(ytmin);
+        let mut tmax = xtmax.min(ytmax);
+
+        // Optimized version, as suggested in the practice section.
+        //
+        if tmin > tmax {
+            return vec![];
+        }
+
+        let (ztmin, ztmax) = Self::check_axis(
+            transformed_ray.origin.z,
+            transformed_ray.direction.z,
+            bounds.min.z,
+            bounds.max.z,
+        );
+
+        tmin = tmin.max(ztmin);
+        tmax = tmax.min(ztmax);
+
+        if tmin > tmax {
+            vec![]
+        } else {
+            vec![
+                Intersection {
+                    t: tmin,
+                    object: Arc::clone(&object),
+                },
+                Intersection {
+                    t: tmax,
+                    object: object,
+                },
+            ]
+        }
+    }
 }
 
 impl ShapeLocal for Cube {
@@ -48,39 +112,20 @@ impl ShapeLocal for Cube {
         // };
     }
 
-    fn local_intersections(&self, transformed_ray: &Ray) -> Vec<f64> {
-        let (xtmin, xtmax) =
-            Self::check_axis(transformed_ray.origin.x, transformed_ray.direction.x);
-        let (ytmin, ytmax) =
-            Self::check_axis(transformed_ray.origin.y, transformed_ray.direction.y);
+    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
+        let bounds = Bounds {
+            min: Tuple::point(-1, -1, -1),
+            max: Tuple::point(1, 1, 1),
+        };
 
-        let mut tmin = xtmin.max(ytmin);
-        let mut tmax = xtmax.min(ytmax);
-
-        // Optimized version, as suggested in the practice section.
-        //
-        if tmin > tmax {
-            return vec![];
-        }
-
-        let (ztmin, ztmax) =
-            Self::check_axis(transformed_ray.origin.z, transformed_ray.direction.z);
-
-        tmin = tmin.max(ztmin);
-        tmax = tmax.min(ztmax);
-
-        if tmin > tmax {
-            vec![]
-        } else {
-            vec![tmin, tmax]
-        }
+        Self::generalized_intersections(self as Arc<dyn Shape>, &bounds, transformed_ray)
     }
 }
 
 impl Cube {
-    fn check_axis(origin: f64, direction: f64) -> (f64, f64) {
-        let tmin_numerator = -1.0 - origin;
-        let tmax_numerator = 1.0 - origin;
+    fn check_axis(origin: f64, direction: f64, minimum: f64, maximum: f64) -> (f64, f64) {
+        let tmin_numerator = minimum - origin;
+        let tmax_numerator = maximum - origin;
 
         let tmin = tmin_numerator / direction;
         let tmax = tmax_numerator / direction;
@@ -89,6 +134,15 @@ impl Cube {
             (tmax, tmin)
         } else {
             (tmin, tmax)
+        }
+    }
+}
+
+impl BoundedShape for Cube {
+    fn local_bounds(&self) -> Bounds {
+        Bounds {
+            min: Tuple::point(-1, -1, -1),
+            max: Tuple::point(1, 1, 1),
         }
     }
 }

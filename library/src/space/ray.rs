@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use super::{Intersection, IntersectionState};
 use crate::{
     lang::HasFloat64Value,
@@ -56,7 +58,7 @@ impl Ray {
         &self,
         intersection: &'a Intersection,
         intersections: &[Intersection],
-    ) -> IntersectionState<'a> {
+    ) -> IntersectionState {
         let point = self.position(intersection.t);
         let eyev = -self.direction;
         let mut normalv = intersection.object.normal(&point);
@@ -73,7 +75,7 @@ impl Ray {
 
         IntersectionState {
             t: intersection.t,
-            object: intersection.object,
+            object: Arc::clone(&intersection.object),
             point,
             over_point,
             under_point,
@@ -89,7 +91,7 @@ impl Ray {
     // In the book, this is part of `prepare_computations(i, r)`.
     //
     pub fn refraction_indexes(hit: &Intersection, intersections: &[Intersection]) -> (f64, f64) {
-        let mut containers = Vec::<&dyn Shape>::new();
+        let mut containers = Vec::<Arc<dyn Shape>>::new();
         let mut comps = (None, None);
 
         for intersection in intersections.iter() {
@@ -109,7 +111,7 @@ impl Ray {
             {
                 containers.remove(pos);
             } else {
-                containers.push(intersection.object);
+                containers.push(Arc::clone(&intersection.object));
             }
 
             if intersection == hit {

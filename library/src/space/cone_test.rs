@@ -2,14 +2,15 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Cone" {
+        use std::sync::Arc;
         use crate::math::*;
         use crate::lang::math::sqrt;
         use crate::lang::ApproximateFloat64Ops;
         use crate::space::{*, shape::private::ShapeLocal};
 
         before {
-            #[allow(unused_mut)]
-            let mut cone = Cone::default();
+            #[allow(unused_mut,unused_variables)]
+            let cone = Arc::new(Cone::default());
         }
 
         it "Intersecting a cone with a ray" {
@@ -25,11 +26,11 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let actual_intersections = cone.local_intersections(&ray);
+                let actual_intersections = Arc::clone(&cone).local_intersections(&ray);
 
                 assert_eq!(actual_intersections.len(), 2);
-                assert!(actual_intersections[0].approximate_equals(*t1));
-                assert!(actual_intersections[1].approximate_equals(*t2));
+                assert!(actual_intersections[0].t.approximate_equals(*t1));
+                assert!(actual_intersections[1].t.approximate_equals(*t2));
             }
         }
 
@@ -42,7 +43,7 @@ demonstrate! {
             let actual_intersections = cone.local_intersections(&ray);
 
             assert_eq!(actual_intersections.len(), 1);
-            assert!(actual_intersections[0].approximate_equals(0.35355));
+            assert!(actual_intersections[0].t.approximate_equals(0.35355));
         }
 
         it "Intersecting a cone\'s end caps" {
@@ -53,16 +54,20 @@ demonstrate! {
                 ((0, 0, -0.25), (0, 1, 0), 4),
             ];
 
-            cone.minimum = -0.5;
-            cone.maximum = 0.5;
-            cone.closed = true;
+            let cone = Arc::new(Cone {
+                minimum: -0.5,
+                maximum: 0.5,
+                closed: true,
+                ..Cone::default()
+            });
+
 
             for ((ox, oy, oz), (dx, dy, dz), expected_count) in examples.iter() {
                 let origin    = Tuple::point(*ox, *oy, *oz);
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let intersections = cone.local_intersections(&ray);
+                let intersections = Arc::clone(&cone).local_intersections(&ray);
 
                 assert_eq!(intersections.len(), *expected_count);
             }

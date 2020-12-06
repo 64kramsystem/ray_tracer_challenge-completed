@@ -1,6 +1,9 @@
-use std::mem;
+use std::{
+    mem,
+    sync::{Arc, Mutex, MutexGuard, Weak},
+};
 
-use super::{shape, shape::private::ShapeLocal, Ray, Shape};
+use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Ray, Shape};
 use crate::{
     lang::{math::sqrt, ApproximateFloat64Ops},
     math::{Matrix, Tuple},
@@ -11,6 +14,10 @@ use crate::{
 pub struct Cone {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
+    #[default(Mutex::new(Weak::<Self>::new()))]
+    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Mutex::new(vec![]))]
+    pub children: Mutex<Vec<Arc<dyn Shape>>>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]
@@ -24,7 +31,7 @@ pub struct Cone {
 }
 
 impl Cone {
-    fn intersect_caps(&self, ray: &Ray, intersections: &mut Vec<f64>) {
+    fn intersect_caps(self: Arc<Self>, ray: &Ray, intersections: &mut Vec<Intersection>) {
         // Caps only matter if the Cone is closed, and might possibly be intersected by the ray.
         //
         if !self.closed || ray.direction.y.approximate() == 0.0 {
@@ -37,13 +44,19 @@ impl Cone {
         let t1 = (self.minimum - ray.origin.y) / ray.direction.y;
 
         if Self::check_cap(&ray, t1, self.minimum) {
-            intersections.push(t1);
+            intersections.push(Intersection {
+                t: t1,
+                object: Arc::clone(&self) as Arc<dyn Shape>,
+            });
         }
 
         let t2 = (self.maximum - ray.origin.y) / ray.direction.y;
 
         if Self::check_cap(&ray, t2, self.maximum) {
-            intersections.push(t2);
+            intersections.push(Intersection {
+                t: t2,
+                object: self,
+            });
         }
     }
 
@@ -78,7 +91,7 @@ impl ShapeLocal for Cone {
         }
     }
 
-    fn local_intersections(&self, transformed_ray: &super::Ray) -> Vec<f64> {
+    fn local_intersections(self: Arc<Self>, transformed_ray: &super::Ray) -> Vec<Intersection> {
         let mut intersections = Vec::with_capacity(4);
 
         let a = transformed_ray.direction.x.powi(2) - transformed_ray.direction.y.powi(2)
@@ -99,7 +112,10 @@ impl ShapeLocal for Cone {
             } else {
                 let t = -c / (2.0 * b);
 
-                intersections.push(t);
+                intersections.push(Intersection {
+                    t,
+                    object: Arc::clone(&self) as Arc<dyn Shape>,
+                });
             }
         }
 
@@ -118,18 +134,33 @@ impl ShapeLocal for Cone {
             let y0 = transformed_ray.origin.y + t0 * transformed_ray.direction.y;
 
             if self.minimum < y0 && y0 < self.maximum {
-                intersections.push(t0);
+                intersections.push(Intersection {
+                    t: t0,
+                    object: Arc::clone(&self) as Arc<dyn Shape>,
+                });
             }
 
             let y1 = transformed_ray.origin.y + t1 * transformed_ray.direction.y;
 
             if self.minimum < y1 && y1 < self.maximum {
-                intersections.push(t1);
+                intersections.push(Intersection {
+                    t: t1,
+                    object: Arc::clone(&self) as Arc<dyn Shape>,
+                });
             }
         }
 
         self.intersect_caps(transformed_ray, &mut intersections);
 
         intersections
+    }
+}
+
+impl BoundedShape for Cone {
+    fn local_bounds(&self) -> Bounds {
+        Bounds {
+            min: Tuple::point(-1, self.minimum, -1),
+            max: Tuple::point(1, self.maximum, 1),
+        }
     }
 }

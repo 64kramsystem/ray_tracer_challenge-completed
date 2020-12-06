@@ -1,15 +1,15 @@
-use std::f64::consts::PI;
+use std::{f64::consts::PI, sync::Arc};
 
 use library::{
     interface::{Image, Sdl2Interface},
     math::{Matrix, Tuple},
     properties::Color,
     space::Shape,
-    space::{Ray, Sphere},
+    space::{Intersection, Ray, Sphere},
     Axis,
 };
 
-fn hit(ray: &Ray, sphere: &Sphere) -> Option<f64> {
+fn hit(ray: &Ray, sphere: Arc<Sphere>) -> Option<Intersection> {
     // At this stage, shapes always returned ordered hits, so we can use the first.
     //
     sphere.intersections(ray).get(0).cloned()
@@ -41,6 +41,8 @@ pub fn practice() {
         * &Matrix::scaling(6.25, 12.5, 12.5);
     sphere.transform = transformation;
 
+    let sphere = Arc::new(sphere);
+
     let ray_origin = Tuple::point(0, 0, eye_z);
 
     for y in -center_y..center_y {
@@ -54,7 +56,7 @@ pub fn practice() {
                 direction: ray_direction,
             };
 
-            if let Some(_) = hit(&ray, &sphere) {
+            if let Some(_) = hit(&ray, Arc::clone(&sphere)) {
                 interface.write_pixel(x, y, hit_color);
             };
         }

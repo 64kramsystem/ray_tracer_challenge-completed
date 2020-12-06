@@ -1,4 +1,6 @@
-use super::{shape, shape::private::ShapeLocal, Shape};
+use std::sync::{Arc, Mutex, MutexGuard, Weak};
+
+use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Shape};
 use crate::{
     lang::math::sqrt,
     lang::HasFloat64Value,
@@ -11,6 +13,10 @@ use crate::{
 pub struct Sphere {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
+    #[default(Mutex::new(Weak::<Self>::new()))]
+    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Mutex::new(vec![]))]
+    pub children: Mutex<Vec<Arc<dyn Shape>>>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]
@@ -48,7 +54,7 @@ impl ShapeLocal for Sphere {
         object_point - &Tuple::point(0, 0, 0)
     }
 
-    fn local_intersections(&self, transformed_ray: &super::Ray) -> Vec<f64> {
+    fn local_intersections(self: Arc<Self>, transformed_ray: &super::Ray) -> Vec<Intersection> {
         let sphere_location = Tuple::point(0, 0, 0);
         let sphere_to_ray = transformed_ray.origin - &sphere_location;
 
@@ -66,7 +72,25 @@ impl ShapeLocal for Sphere {
             let t1 = (-b - sqrt(discriminant)) / (2.0 * a);
             let t2 = (-b + sqrt(discriminant)) / (2.0 * a);
 
-            vec![t1, t2]
+            vec![
+                Intersection {
+                    t: t1,
+                    object: Arc::clone(&self) as Arc<dyn Shape>,
+                },
+                Intersection {
+                    t: t2,
+                    object: self,
+                },
+            ]
+        }
+    }
+}
+
+impl BoundedShape for Sphere {
+    fn local_bounds(&self) -> Bounds {
+        Bounds {
+            min: Tuple::point(-1, -1, -1),
+            max: Tuple::point(1, 1, 1),
         }
     }
 }

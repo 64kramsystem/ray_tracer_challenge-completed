@@ -2,6 +2,7 @@ use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Sphere" {
+        use std::sync::Arc;
         use crate::space::*;
         use crate::math::*;
 
@@ -40,23 +41,31 @@ demonstrate! {
                 it "at two points" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
-                    let sphere = Sphere::default();
+                    let sphere = Arc::new(Sphere::default());
+                    let actual_intersections = sphere.intersections(&ray);
 
-                    assert_eq!(sphere.intersections(&ray), vec![4.0, 6.0]);
+                    assert_eq!(actual_intersections.len(), 2);
+
+                    assert_eq!(actual_intersections[0].t, 4.0);
+                    assert_eq!(actual_intersections[1].t, 6.0);
                 }
 
                 it "at a tangent" {
                     let ray = Ray::new((0, 1, -5), (0, 0, 1));
 
-                    let sphere = Sphere::default();
+                    let sphere = Arc::new(Sphere::default());
+                    let actual_intersections = sphere.intersections(&ray);
 
-                    assert_eq!(sphere.intersections(&ray), vec![5.0, 5.0]);
+                    assert_eq!(actual_intersections.len(), 2);
+
+                    assert_eq!(actual_intersections[0].t, 5.0);
+                    assert_eq!(actual_intersections[1].t, 5.0);
                 }
 
                 it "at no point (miss)" {
                     let ray = Ray::new((0, 2, -5), (0, 0, 1));
 
-                    let sphere = Sphere::default();
+                    let sphere = Arc::new(Sphere::default());
 
                     assert_eq!(sphere.intersections(&ray), vec![]);
                 }
