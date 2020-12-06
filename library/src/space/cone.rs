@@ -159,7 +159,7 @@ impl ShapeLocal for Cone {
 impl BoundedShape for Cone {
     fn local_bounds(&self) -> Bounds {
         Bounds {
-            min: Tuple::point(1, self.minimum, 1),
+            min: Tuple::point(-1, self.minimum, -1),
             max: Tuple::point(1, self.maximum, 1),
         }
     }

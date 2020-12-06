@@ -39,8 +39,8 @@ impl ShapeLocal for Plane {
 impl BoundedShape for Plane {
     fn local_bounds(&self) -> Bounds {
         Bounds {
-            min: Tuple::point(f64::NEG_INFINITY, 0, f64::INFINITY),
-            max: Tuple::point(f64::NEG_INFINITY, 0, f64::INFINITY),
+            min: Tuple::point(f64::NEG_INFINITY, 0, f64::NEG_INFINITY),
+            max: Tuple::point(f64::INFINITY, 0, f64::INFINITY),
         }
     }
 }
