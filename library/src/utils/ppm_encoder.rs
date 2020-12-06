@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use crate::image::Image;
+use crate::interface::Image;
 
 pub struct PpmEncoder {}
 
