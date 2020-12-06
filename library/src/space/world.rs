@@ -53,7 +53,7 @@ impl World {
         for object in self.objects.iter() {
             let object_intersections = Arc::clone(object).intersections(ray);
 
-            // Intersections are not ordered, so we need to go through all.
+            // Object intersections are not guaranteed to be ordered, so we need to go through each.
             //
             for intersection in object_intersections {
                 if intersection.t >= 0.0 {

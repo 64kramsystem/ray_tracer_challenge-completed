@@ -81,10 +81,11 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     // Return value properties:
     //
     // - they're not guaranteed to be ordered;
-    // - negative values are allowed.
+    // - negative values are allowed (required to compute refraction indexes).
     //
-    // An possible optimization is to receive an ordered collection, and have the intersections added
-    // to it; this avoids allocating an array for each shape.
+    // A possible optimization is to pass from the top an ordered collection (e.g. BTreeSet), and add
+    // the intersections while traversing the tree, instead of creating separate arrays and sorting
+    // the end result. This is a valid design even without considering the performance, as it fits nicely.
     //
     fn intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
         let transformed_ray = ray.inverse_transform(self.transform());
