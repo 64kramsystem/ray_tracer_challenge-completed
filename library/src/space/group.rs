@@ -1,3 +1,6 @@
+#[cfg(test)]
+use std::any::Any;
+
 use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
 use super::{
@@ -70,6 +73,11 @@ impl Shape for Group {
 
     fn material_mut(&mut self) -> &mut Material {
         panic!()
+    }
+
+    #[cfg(test)]
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 

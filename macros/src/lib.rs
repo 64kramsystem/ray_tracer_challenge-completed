@@ -46,6 +46,13 @@ pub fn shape_accessors_derive(input: TokenStream) -> TokenStream {
             fn material_mut(&mut self) -> &mut Material {
                 &mut self.material
             }
+
+            // Not actually a Shape "accessor", but it's the exception, and this design is the simplest.
+            //
+            #[cfg(test)]
+            fn as_any(&self) -> &dyn Any {
+                self
+            }
         }
     };
 

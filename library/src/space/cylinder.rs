@@ -1,3 +1,6 @@
+#[cfg(test)]
+use std::any::Any;
+
 use std::{
     mem,
     sync::{Arc, Mutex, MutexGuard, Weak},

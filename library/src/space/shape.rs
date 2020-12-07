@@ -1,3 +1,6 @@
+#[cfg(test)]
+use std::any::Any;
+
 use std::{
     fmt,
     sync::{Arc, Mutex, MutexGuard, Weak},
@@ -157,6 +160,9 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
         self.material()
             .lighting(light, &object_point, world_point, eyev, normalv, in_shadow)
     }
+
+    #[cfg(test)]
+    fn as_any(&self) -> &dyn Any;
 }
 
 impl PartialEq for dyn Shape + '_ {
