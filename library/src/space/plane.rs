@@ -1,7 +1,4 @@
-#[cfg(test)]
-use std::any::Any;
-
-use std::sync::{Arc, Mutex, MutexGuard, Weak};
+use std::sync::{Arc, Mutex, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},

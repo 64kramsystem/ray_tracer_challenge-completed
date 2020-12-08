@@ -1,9 +1,6 @@
-#[cfg(test)]
-use std::any::Any;
-
 use std::{
     mem,
-    sync::{Arc, Mutex, MutexGuard, Weak},
+    sync::{Arc, Mutex, Weak},
 };
 
 use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Ray, Shape};
