@@ -17,6 +17,7 @@ use ParsedElement::*;
 lazy_static::lazy_static! {
     static ref VERTEX_REGEX: Regex = Regex::new(r"^v (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?)$").unwrap();
     static ref FACES_REGEX: Regex = Regex::new(r"^f (\d+) (\d+(?: \d+)+)$").unwrap();
+    static ref GROUP_REGEX: Regex = Regex::new(r"^g (\w+)$").unwrap();
 }
 
 // The book doesn't actually clarify what happens to the default group once group definitions parsing
@@ -27,6 +28,7 @@ const DEFAULT_GROUP_NAME: &str = "default";
 enum ParsedElement {
     Vertex(Tuple),
     Faces(Vec<(usize, usize, usize)>),
+    Group(String),
     Invalid,
 }
 
@@ -54,7 +56,7 @@ impl ObjParser {
             groups,
         };
 
-        let current_group_name = DEFAULT_GROUP_NAME.to_string();
+        let mut current_group_name = DEFAULT_GROUP_NAME.to_string();
 
         for line in reader.lines() {
             let parsed_element = Self::parse_line(line?);
@@ -72,6 +74,13 @@ impl ObjParser {
                         let group = parser.groups.entry(current_group_name.to_string());
                         group.and_modify(|group| Group::add_child(group, &triangle));
                     }
+                }
+                Group(group_name) => {
+                    let groups = &mut parser.groups;
+                    groups
+                        .entry(group_name.clone())
+                        .or_insert(Arc::new(Group::default()));
+                    current_group_name = group_name;
                 }
                 Invalid => {}
             }
@@ -117,6 +126,10 @@ impl ObjParser {
             }
 
             ParsedElement::Faces(faces)
+        } else if let Some(captures) = GROUP_REGEX.captures(&line) {
+            let name = captures[1].to_string();
+
+            ParsedElement::Group(name)
         } else {
             Invalid
         }

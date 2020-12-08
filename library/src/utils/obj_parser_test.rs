@@ -1,12 +1,16 @@
 use demonstrate::demonstrate;
 
+const ASSETS_PATH: &str = "../testing_assets";
+
 demonstrate! {
     describe "ObjParser" {
+        use super::ASSETS_PATH;
         use indoc::indoc;
         use crate::utils::ObjParser;
         use crate::math::Tuple;
         use crate::space::Triangle;
         use std::sync::Arc;
+        use std::{io::BufReader, fs::File, path::Path};
 
         it "Ignoring unrecognized lines" {
             let input = indoc! {"
@@ -98,20 +102,28 @@ demonstrate! {
             assert_eq!(t3.p3, parser.vertex(5));
         }
 
-        // it "Triangles in groups" {
-        // Given file ← the file "triangles.obj"
-        // let parser = parse_obj_file(file)
-        //     And g1 ← "FirstGroup" from parser
-        //     And g2 ← "SecondGroup" from parser
-        //     And t1 ← first child of g1
-        //     And t2 ← first child of g2
-        // Then t1.p1 = parser.vertices[1]
-        //     And t1.p2 = parser.vertices[2]
-        //     And t1.p3 = parser.vertices[3]
-        //     And t2.p1 = parser.vertices[1]
-        //     And t2.p2 = parser.vertices[3]
-        //     And t2.p3 = parser.vertices[4]
-        // }
+        it "Triangles in groups" {
+            let file_path = Path::new(ASSETS_PATH).join("triangles.obj");
+            let file_reader = BufReader::new(File::open(file_path).unwrap());
+
+            let parser = ObjParser::parse(file_reader).unwrap();
+
+            let group1 = parser.group("FirstGroup");
+            let group2 = parser.group("SecondGroup");
+
+            let t1 = Arc::clone(&group1.children()[0]);
+            let t2 = Arc::clone(&group2.children()[0]);
+
+            let t1 = t1.as_any().downcast_ref::<Triangle>().unwrap();
+            let t2 = t2.as_any().downcast_ref::<Triangle>().unwrap();
+
+            assert_eq!(t1.p1, parser.vertex(1));
+            assert_eq!(t1.p2, parser.vertex(2));
+            assert_eq!(t1.p3, parser.vertex(3));
+            assert_eq!(t2.p1, parser.vertex(1));
+            assert_eq!(t2.p2, parser.vertex(3));
+            assert_eq!(t2.p3, parser.vertex(4));
+        }
 
         // it "Converting an OBJ file to a group" {
         // Given file ← the file "triangles.obj"
