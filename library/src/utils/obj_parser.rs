@@ -26,7 +26,7 @@ const DEFAULT_GROUP_NAME: &str = "default";
 
 enum ParsedElement {
     Vertex(Tuple),
-    Faces(Vec<Arc<dyn Shape>>),
+    Faces(Vec<(usize, usize, usize)>),
     Invalid,
 }
 
@@ -57,12 +57,18 @@ impl ObjParser {
         let current_group_name = DEFAULT_GROUP_NAME.to_string();
 
         for line in reader.lines() {
-            let parsed_element = parser.parse_line(line?);
+            let parsed_element = Self::parse_line(line?);
 
             match parsed_element {
                 Vertex(vertex) => parser.vertices.push(vertex),
-                Faces(triangles) => {
-                    for triangle in triangles {
+                Faces(vertex_indexes) => {
+                    for (p1i, p2i, p3i) in vertex_indexes {
+                        let p1 = parser.vertex(p1i);
+                        let p2 = parser.vertex(p2i);
+                        let p3 = parser.vertex(p3i);
+
+                        let triangle: Arc<dyn Shape> = Arc::new(Triangle::new(p1, p2, p3));
+
                         let group = parser.groups.entry(current_group_name.to_string());
                         group.and_modify(|group| Group::add_child(group, &triangle));
                     }
@@ -86,7 +92,7 @@ impl ObjParser {
         self.vertices[i - 1]
     }
 
-    fn parse_line(&self, line: String) -> ParsedElement {
+    fn parse_line(line: String) -> ParsedElement {
         if let Some(captures) = VERTEX_REGEX.captures(&line) {
             let x: f64 = captures[1].parse().unwrap();
             let y: f64 = captures[2].parse().unwrap();
@@ -97,7 +103,6 @@ impl ObjParser {
             let mut faces = vec![];
 
             let p1i: usize = captures[1].parse().unwrap();
-            let p1 = self.vertex(p1i);
 
             let all_other_ps_i = captures[2]
                 .split(" ")
@@ -108,16 +113,7 @@ impl ObjParser {
                 let p2i = other_ps_i[0];
                 let p3i = other_ps_i[1];
 
-                // Watch out the 1-base.
-                //
-                let p2 = self.vertex(p2i);
-                let p3 = self.vertex(p3i);
-
-                let face: Arc<dyn Shape> = Arc::new(Triangle::new(p1, p2, p3));
-
-                // Watch out the 1-base.
-                //
-                faces.push(face);
+                faces.push((p1i, p2i, p3i));
             }
 
             ParsedElement::Faces(faces)
