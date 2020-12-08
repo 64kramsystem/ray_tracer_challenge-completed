@@ -51,7 +51,7 @@ demonstrate! {
 
             let parser = ObjParser::parse(input.as_bytes()).unwrap();
 
-            let group = &parser.default_group;
+            let group = &parser.default_group();
 
             let children = &group.children().iter().map(|child| Arc::clone(&child)).collect::<Vec<_>>();
 
@@ -79,7 +79,7 @@ demonstrate! {
 
             let parser = ObjParser::parse(input.as_bytes()).unwrap();
 
-            let group = &parser.default_group;
+            let group = &parser.default_group();
 
             let children = &group.children().iter().map(|child| Arc::clone(&child)).collect::<Vec<_>>();
 
