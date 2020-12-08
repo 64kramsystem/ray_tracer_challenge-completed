@@ -3,6 +3,7 @@ pub mod lang;
 pub mod math;
 pub mod properties;
 pub mod space;
+pub mod utils;
 
 pub enum Axis {
     X,
