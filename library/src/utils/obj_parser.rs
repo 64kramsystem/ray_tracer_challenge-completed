@@ -97,6 +97,19 @@ impl ObjParser {
         Arc::clone(&self.groups[group_name])
     }
 
+    // Export the groups as tree, with thre group as leaves of a new root group.
+    // In the group, this is `obj_to_group()`;
+    //
+    pub fn export_tree(&self) -> Arc<dyn Shape> {
+        let root_group: Arc<dyn Shape> = Arc::new(Group::default());
+
+        for group in self.groups.values() {
+            Group::add_child(&root_group, &group)
+        }
+
+        root_group
+    }
+
     pub fn vertex(&self, i: usize) -> Tuple {
         self.vertices[i - 1]
     }

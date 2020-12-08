@@ -125,13 +125,21 @@ demonstrate! {
             assert_eq!(t2.p3, parser.vertex(4));
         }
 
-        // it "Converting an OBJ file to a group" {
-        // Given file ← the file "triangles.obj"
-        //     And parser ← parse_obj_file(file)
-        // When g ← obj_to_group(parser)
-        // Then g includes "FirstGroup" from parser
-        //     And g includes "SecondGroup" from parser
-        // }
+        it "Converting an OBJ file to a group" {
+            let file_path = Path::new(ASSETS_PATH).join("triangles.obj");
+            let file_reader = BufReader::new(File::open(file_path).unwrap());
+
+            let parser = ObjParser::parse(file_reader).unwrap();
+            let root_group = parser.export_tree();
+
+            for group_name in &["FirstGroup", "SecondGroup"] {
+                root_group
+                    .children()
+                    .iter()
+                    .find(|group| group.id() == parser.group(group_name).id())
+                    .unwrap();
+            };
+        }
 
         // it "Vertex normal records" {
         // let input = indoc! {"
