@@ -1,12 +1,17 @@
 use std::{cmp::Ordering, fmt::Debug, sync::Arc};
 
-use crate::space::Shape;
+use crate::space::{Shape, Triangle};
 
-// Setting NaN values for t is invalid; it will cause undefined behavior/panic when sorting.
+// Setting NaN values for `t` is invalid; it will cause undefined behavior/panic when sorting.
+// `u` and `v` are used only by triangles.
+// The `object` default is not meaningful, but it's required in order to allow type defaulting.
 //
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, SmartDefault)]
 pub struct Intersection {
     pub t: f64,
+    pub u: Option<f64>,
+    pub v: Option<f64>,
+    #[default(Arc::new(Triangle::default()))]
     pub object: Arc<dyn Shape>,
 }
 

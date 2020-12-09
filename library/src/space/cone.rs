@@ -47,6 +47,7 @@ impl Cone {
             intersections.push(Intersection {
                 t: t1,
                 object: Arc::clone(&self) as Arc<dyn Shape>,
+                ..Intersection::default()
             });
         }
 
@@ -56,6 +57,7 @@ impl Cone {
             intersections.push(Intersection {
                 t: t2,
                 object: self,
+                ..Intersection::default()
             });
         }
     }
@@ -115,6 +117,7 @@ impl ShapeLocal for Cone {
                 intersections.push(Intersection {
                     t,
                     object: Arc::clone(&self) as Arc<dyn Shape>,
+                    ..Intersection::default()
                 });
             }
         }
@@ -137,6 +140,7 @@ impl ShapeLocal for Cone {
                 intersections.push(Intersection {
                     t: t0,
                     object: Arc::clone(&self) as Arc<dyn Shape>,
+                    ..Intersection::default()
                 });
             }
 
@@ -146,6 +150,7 @@ impl ShapeLocal for Cone {
                 intersections.push(Intersection {
                     t: t1,
                     object: Arc::clone(&self) as Arc<dyn Shape>,
+                    ..Intersection::default()
                 });
             }
         }

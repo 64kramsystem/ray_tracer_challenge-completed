@@ -68,10 +68,12 @@ impl Cube {
                 Intersection {
                     t: tmin,
                     object: Arc::clone(&object),
+                    ..Intersection::default()
                 },
                 Intersection {
                     t: tmax,
                     object: object,
+                    ..Intersection::default()
                 },
             ]
         }

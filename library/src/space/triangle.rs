@@ -97,7 +97,11 @@ impl ShapeLocal for Triangle {
 
         let t = f * self.e2.dot_product(&origin_cross_e1);
 
-        vec![Intersection { t, object: self }]
+        vec![Intersection {
+            t,
+            object: self,
+            ..Intersection::default()
+        }]
     }
 }
 

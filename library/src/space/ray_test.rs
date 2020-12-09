@@ -21,7 +21,7 @@ demonstrate! {
             context "should be computed from an intersection and an object" {
                 it "with the ray outside the object" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
-                    let intersection = Intersection { t: 4.0, object: Arc::new(Sphere::default()) };
+                    let intersection = Intersection { t: 4.0, object: Arc::new(Sphere::default()), ..Intersection::default() };
                     let intersection_clone = intersection.clone();
 
                     let expected_intersection_state = IntersectionState {
@@ -45,7 +45,7 @@ demonstrate! {
 
                 it "with the ray inside the object" {
                     let ray = Ray::new((0, 0, 0), (0, 0, 1));
-                    let intersection = Intersection { t: 1.0, object: Arc::new(Sphere::default()) };
+                    let intersection = Intersection { t: 1.0, object: Arc::new(Sphere::default()), ..Intersection::default() };
                     let intersection_clone = intersection.clone();
 
                     let expected_intersection_state = IntersectionState {
@@ -70,7 +70,7 @@ demonstrate! {
                 it "with reflection" {
                     let object = Arc::new(Plane::default());
                     let ray = Ray::new((0, 1, -1), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
-                    let intersection = Intersection { t: sqrt(2), object: object };
+                    let intersection = Intersection { t: sqrt(2), object: object, ..Intersection::default() };
 
                     let actual_intersection_state = ray.intersection_state(&intersection, &[]);
                     let expected_reflectv = Tuple::vector(0.0, sqrt(2) / 2.0, sqrt(2) / 2.0);

@@ -22,8 +22,8 @@ demonstrate! {
             it "should be computed under total internal reflection" {
                 let ray = Ray::new((0.0, 0.0, sqrt(2) / 2.0), (0, 1, 0));
                 let intersections = [
-                    Intersection { t: -sqrt(2) / 2.0, object: Arc::clone(&glass_sphere) },
-                    Intersection { t: sqrt(2) / 2.0, object: Arc::clone(&glass_sphere) },
+                    Intersection { t: -sqrt(2) / 2.0, object: Arc::clone(&glass_sphere), ..Intersection::default() },
+                    Intersection { t: sqrt(2) / 2.0, object: Arc::clone(&glass_sphere), ..Intersection::default() },
                 ];
                 let intersection_state = ray.intersection_state(&intersections[1], &intersections);
 
@@ -35,8 +35,8 @@ demonstrate! {
             it "should be computed with a perpendicular viewing angle" {
                 let ray = Ray::new((0, 0, 0), (0, 1, 0));
                 let intersections = [
-                    Intersection { t: -1.0, object: Arc::clone(&glass_sphere) },
-                    Intersection { t: 1.0, object: Arc::clone(&glass_sphere) },
+                    Intersection { t: -1.0, object: Arc::clone(&glass_sphere), ..Intersection::default() },
+                    Intersection { t: 1.0, object: Arc::clone(&glass_sphere), ..Intersection::default() },
                 ];
                 let intersection_state = ray.intersection_state(&intersections[1], &intersections);
 
@@ -48,7 +48,7 @@ demonstrate! {
             it "should be computed with small angle and n2 > n1" {
                 let ray = Ray::new((0.0, 0.99, -2.0), (0, 0, 1));
                 let intersections = [
-                    Intersection { t: 1.8589, object: Arc::clone(&glass_sphere) },
+                    Intersection { t: 1.8589, object: Arc::clone(&glass_sphere), ..Intersection::default() },
                 ];
                 let intersection_state = ray.intersection_state(&intersections[0], &intersections);
 

@@ -31,7 +31,11 @@ impl ShapeLocal for Plane {
         } else {
             let t = -transformed_ray.origin.y / transformed_ray.direction.y;
 
-            vec![Intersection { t, object: self }]
+            vec![Intersection {
+                t,
+                object: self,
+                ..Intersection::default()
+            }]
         }
     }
 }
