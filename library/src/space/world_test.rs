@@ -432,16 +432,38 @@ demonstrate! {
             // from the color of the shape 2 pattern.
             //
             // it "return the color of a refracted ray" {
-            //     world.objects[0].material_mut().ambient = 1.0;
-
-            //     world.objects[1].material_mut().transparency = 1.0;
-            //     world.objects[1].material_mut().refractive_index = 1.5;
-            //     *world.objects[1].transform_mut() = Matrix::scaling(0.5, 0.5, 0.5);
-
+            //     let world = World {
+            //         objects: vec![
+            //             Arc::new(Sphere {
+            //                 material: Material {
+            //                     pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
+            //                     diffuse: 0.7,
+            //                     specular: 0.2,
+            //                     ambient: 1.0, // added
+            //                     ..Material::default()
+            //                 },
+            //                 ..Sphere::default()
+            //             }),
+            //             Arc::new(Sphere {
+            //                 transform: Matrix::scaling(0.5, 0.5, 0.5),
+            //                 material: Material {
+            //                     transparency: 1.0, // added
+            //                     refractive_index: 1.5, // added
+            //                     ..Material::default()
+            //                 },
+            //                 ..Sphere::default()
+            //             }),
+            //         ],
+            //         light_source: PointLight {
+            //             position: Tuple::point(-10, 10, -10),
+            //             intensity: COLOR_WHITE,
+            //         },
+            //     };
+            //
             //     let ray = Ray::new((0.0, 0.0, 0.1), (0, 1, 0));
-
+            //
             //     let expected_color = Color::new(0, 0.99888, 0.04725);
-
+            //
             //     let intersections = [
             //         Intersection { t: -0.9899, object: Arc::clone(&world.objects[0]) },
             //         Intersection { t: -0.4899, object: Arc::clone(&world.objects[1]) },
@@ -449,7 +471,7 @@ demonstrate! {
             //         Intersection { t: 0.9899, object: Arc::clone(&world.objects[0]) },
             //     ];
             //     let intersection_state = ray.intersection_state(&intersections[2], &intersections);
-
+            //
             //     assert_eq!(world.refracted_color(&intersection_state, 5), expected_color);
             // }
         } // context "refracted color"
