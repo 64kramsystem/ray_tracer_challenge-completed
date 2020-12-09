@@ -73,7 +73,7 @@ impl Cone {
 }
 
 impl ShapeLocal for Cone {
-    fn local_normal(&self, object_point: &Tuple) -> Tuple {
+    fn local_normal(&self, object_point: &Tuple, _intersection: &Intersection) -> Tuple {
         // Compute the square of the distance from the y axis.
         //
         let dist = object_point.x.powi(2) + object_point.z.powi(2);

@@ -21,7 +21,7 @@ pub struct Plane {
 }
 
 impl ShapeLocal for Plane {
-    fn local_normal(&self, _object_point: &Tuple) -> Tuple {
+    fn local_normal(&self, _object_point: &Tuple, _intersection: &Intersection) -> Tuple {
         Tuple::vector(0, 1, 0)
     }
 

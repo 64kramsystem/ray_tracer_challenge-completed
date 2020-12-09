@@ -61,7 +61,7 @@ impl Ray {
     ) -> IntersectionState {
         let point = self.position(intersection.t);
         let eyev = -self.direction;
-        let mut normalv = intersection.object.normal(&point);
+        let mut normalv = intersection.object.normal(&point, intersection);
         let inside = if normalv.dot_product(&eyev) >= 0.0 {
             false
         } else {

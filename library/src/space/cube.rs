@@ -81,7 +81,7 @@ impl Cube {
 }
 
 impl ShapeLocal for Cube {
-    fn local_normal(&self, object_point: &Tuple) -> Tuple {
+    fn local_normal(&self, object_point: &Tuple, _intersection: &Intersection) -> Tuple {
         let x_abs = object_point.x.abs();
         let y_abs = object_point.y.abs();
         let z_abs = object_point.z.abs();

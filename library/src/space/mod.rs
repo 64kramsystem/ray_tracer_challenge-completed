@@ -51,6 +51,9 @@ mod group_test;
 mod intersection_state_test;
 
 #[cfg(test)]
+mod intersection_test;
+
+#[cfg(test)]
 mod plane_test;
 
 #[cfg(test)]

@@ -50,7 +50,7 @@ impl Sphere {
 }
 
 impl ShapeLocal for Sphere {
-    fn local_normal(&self, object_point: &Tuple) -> Tuple {
+    fn local_normal(&self, object_point: &Tuple, _intersection: &Intersection) -> Tuple {
         object_point - &Tuple::point(0, 0, 0)
     }
 

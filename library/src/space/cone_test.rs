@@ -86,7 +86,7 @@ demonstrate! {
                 let point = Tuple::point(*px, *py, *pz);
                 let expected_normal = Tuple::vector(*nx, *ny, *nz);
 
-                assert_eq!(cone.local_normal(&point), expected_normal);
+                assert_eq!(cone.local_normal(&point, &Intersection::default()), expected_normal);
             }
         }
     }

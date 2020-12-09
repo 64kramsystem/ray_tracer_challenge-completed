@@ -82,7 +82,7 @@ impl Shape for Group {
 }
 
 impl ShapeLocal for Group {
-    fn local_normal(&self, _object_point: &Tuple) -> Tuple {
+    fn local_normal(&self, _object_point: &Tuple, _intersection: &Intersection) -> Tuple {
         panic!("local normal is not meaningful for Group")
     }
 
