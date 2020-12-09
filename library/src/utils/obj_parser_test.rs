@@ -141,18 +141,19 @@ demonstrate! {
             };
         }
 
-        // it "Vertex normal records" {
-        // let input = indoc! {"
-        //     """
-        //     vn 0 0 1
-        //     vn 0.707 0 -0.707
-        //     vn 1 2 3
-        //     """
-        // let parser = parse_obj_file(file)
-        // Then parser.normals[1] = vector(0, 0, 1)
-        //     And parser.normals[2] = vector(0.707, 0, -0.707)
-        //     And parser.normals[3] = vector(1, 2, 3)
-        // }
+        it "Vertex normal records" {
+            let input = indoc! {"
+                vn 0 0 1
+                vn 0.707 0 -0.707
+                vn 1 2 3
+            "};
+
+            let parser = ObjParser::parse(input.as_bytes()).unwrap();
+
+            assert_eq!(parser.normal(1), Tuple::vector(0, 0, 1));
+            assert_eq!(parser.normal(2), Tuple::vector(0.707, 0, -0.707));
+            assert_eq!(parser.normal(3), Tuple::vector(1, 2, 3));
+        }
 
         // it "Faces with normals" {
         // let input = indoc! {"

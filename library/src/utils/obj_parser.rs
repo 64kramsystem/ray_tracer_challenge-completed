@@ -16,6 +16,7 @@ use ParsedElement::*;
 
 lazy_static::lazy_static! {
     static ref VERTEX_REGEX: Regex = Regex::new(r"^v (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?)$").unwrap();
+    static ref VERTEX_NORMAL_REGEX: Regex = Regex::new(r"^vn (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?)$").unwrap();
     static ref FACES_REGEX: Regex = Regex::new(r"^f (\d+) (\d+(?: \d+)+)$").unwrap();
     static ref GROUP_REGEX: Regex = Regex::new(r"^g (\w+)$").unwrap();
 }
@@ -27,16 +28,18 @@ const DEFAULT_GROUP_NAME: &str = "default";
 
 enum ParsedElement {
     Vertex(Tuple),
+    VertexNormal(Tuple),
     Faces(Vec<(usize, usize, usize)>),
     Group(String),
     Invalid,
 }
 
 pub struct ObjParser {
-    // WATCH OUT!!! DON'T ACCESS THIS DIRECTLY, WHILE PARSING!!!
+    // WATCH OUT!!! DON'T ACCESS VERTICES/NORMALS DIRECTLY, WHILE PARSING!!!
     // The indexes are 1-based, which are extremely easy to mistake.
     //
     vertices: Vec<Tuple>,
+    normals: Vec<Tuple>,
     groups: HashMap<String, Arc<dyn Shape>>,
 }
 
@@ -53,6 +56,7 @@ impl ObjParser {
 
         let mut parser = Self {
             vertices: vec![],
+            normals: vec![],
             groups,
         };
 
@@ -63,6 +67,7 @@ impl ObjParser {
 
             match parsed_element {
                 Vertex(vertex) => parser.vertices.push(vertex),
+                VertexNormal(normal) => parser.normals.push(normal),
                 Faces(vertex_indexes) => {
                     for (p1i, p2i, p3i) in vertex_indexes {
                         let p1 = parser.vertex(p1i);
@@ -114,6 +119,10 @@ impl ObjParser {
         self.vertices[i - 1]
     }
 
+    pub fn normal(&self, i: usize) -> Tuple {
+        self.normals[i - 1]
+    }
+
     fn parse_line(line: String) -> ParsedElement {
         if let Some(captures) = VERTEX_REGEX.captures(&line) {
             let x: f64 = captures[1].parse().unwrap();
@@ -121,6 +130,12 @@ impl ObjParser {
             let z: f64 = captures[3].parse().unwrap();
 
             ParsedElement::Vertex(Tuple::point(x, y, z))
+        } else if let Some(captures) = VERTEX_NORMAL_REGEX.captures(&line) {
+            let x: f64 = captures[1].parse().unwrap();
+            let y: f64 = captures[2].parse().unwrap();
+            let z: f64 = captures[3].parse().unwrap();
+
+            ParsedElement::VertexNormal(Tuple::vector(x, y, z))
         } else if let Some(captures) = FACES_REGEX.captures(&line) {
             let mut faces = vec![];
 
