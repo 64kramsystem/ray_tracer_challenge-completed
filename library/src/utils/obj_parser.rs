@@ -15,9 +15,13 @@ use crate::{
 use ParsedElement::*;
 
 lazy_static::lazy_static! {
+    // Faces with texture vertices (`f a/b/c...`) are decoded as faces with normals only, as texture
+    // vertices are not supported.
+
     static ref VERTEX_REGEX: Regex = Regex::new(r"^v (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?)$").unwrap();
     static ref VERTEX_NORMAL_REGEX: Regex = Regex::new(r"^vn (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?)$").unwrap();
     static ref FACES_REGEX: Regex = Regex::new(r"^f (\d+) (\d+(?: \d+)+)$").unwrap();
+    static ref FACE_WITH_NORMAL_REGEX: Regex = Regex::new(r"^f (\d+)/\d*/(\d+) (\d+)/\d*/(\d+) (\d+)/\d*/(\d+)$").unwrap();
     static ref GROUP_REGEX: Regex = Regex::new(r"^g (\w+)$").unwrap();
 }
 
@@ -30,6 +34,7 @@ enum ParsedElement {
     Vertex(Tuple),
     VertexNormal(Tuple),
     Faces(Vec<(usize, usize, usize)>),
+    FaceWithNormal((usize, usize), (usize, usize), (usize, usize)),
     Group(String),
     Invalid,
 }
@@ -79,6 +84,20 @@ impl ObjParser {
                         let group = parser.groups.entry(current_group_name.to_string());
                         group.and_modify(|group| Group::add_child(group, &triangle));
                     }
+                }
+                FaceWithNormal((p1i, n1i), (p2i, n2i), (p3i, n3i)) => {
+                    let p1 = parser.vertex(p1i);
+                    let p2 = parser.vertex(p2i);
+                    let p3 = parser.vertex(p3i);
+                    let n1 = parser.normal(n1i);
+                    let n2 = parser.normal(n2i);
+                    let n3 = parser.normal(n3i);
+
+                    let triangle: Arc<dyn Shape> =
+                        Arc::new(Triangle::smooth(p1, p2, p3, n1, n2, n3));
+
+                    let group = parser.groups.entry(current_group_name.to_string());
+                    group.and_modify(|group| Group::add_child(group, &triangle));
                 }
                 Group(group_name) => {
                     let groups = &mut parser.groups;
@@ -154,6 +173,21 @@ impl ObjParser {
             }
 
             ParsedElement::Faces(faces)
+        } else if let Some(captures) = FACE_WITH_NORMAL_REGEX.captures(&line) {
+            // MWAHAHAHA
+
+            let values = captures
+                .iter()
+                .skip(1)
+                .map(|c| c.unwrap().as_str())
+                .map(|c| c.parse().unwrap())
+                .collect::<Vec<_>>();
+
+            if let [v1, n1, v2, n2, v3, n3] = values.as_slice() {
+                FaceWithNormal((*v1, *n1), (*v2, *n2), (*v3, *n3))
+            } else {
+                unreachable!()
+            }
         } else if let Some(captures) = GROUP_REGEX.captures(&line) {
             let name = captures[1].to_string();
 

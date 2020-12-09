@@ -155,31 +155,53 @@ demonstrate! {
             assert_eq!(parser.normal(3), Tuple::vector(1, 2, 3));
         }
 
-        // it "Faces with normals" {
-        // let input = indoc! {"
-        //     """
-        //     v 0 1 0
-        //     v -1 0 0
-        //     v 1 0 0
+        it "Faces with normals" {
+            let input = indoc! {"
+                v 0 1 0
+                v -1 0 0
+                v 1 0 0
 
-        //     vn -1 0 0
-        //     vn 1 0 0
-        //     vn 0 1 0
+                vn -1 0 0
+                vn 1 0 0
+                vn 0 1 0
 
-        //     f 1//3 2//1 3//2
-        //     f 1/0/3 2/102/1 3/14/2
-        //     """
-        // let parser = parse_obj_file(file)
-        //     And g ← parser.default_group
-        //     And t1 ← first child of g
-        //     And t2 ← second child of g
-        // Then t1.p1 = parser.vertices[1]
-        //     And t1.p2 = parser.vertices[2]
-        //     And t1.p3 = parser.vertices[3]
-        //     And t1.n1 = parser.normals[3]
-        //     And t1.n2 = parser.normals[1]
-        //     And t1.n3 = parser.normals[2]
-        //     And t2 = t1
-        // }
+                f 1//3 2//1 3//2
+                f 1/0/3 2/102/1 3/14/2
+            "};
+
+            let parser = ObjParser::parse(input.as_bytes()).unwrap();
+
+            let group = parser.default_group();
+
+            let t1 = Arc::clone(&group.children()[0]);
+            let t2 = Arc::clone(&group.children()[1]);
+
+            let t1 = t1.as_any().downcast_ref::<Triangle>().unwrap();
+            let t2 = t2.as_any().downcast_ref::<Triangle>().unwrap();
+
+            assert_eq!(t1.p1, parser.vertex(1));
+            assert_eq!(t1.p2, parser.vertex(2));
+            assert_eq!(t1.p3, parser.vertex(3));
+
+            let (n1, n2, n3) = t1.vertex_normals.unwrap();
+
+            assert_eq!(n1, parser.normal(3));
+            assert_eq!(n2, parser.normal(1));
+            assert_eq!(n3, parser.normal(2));
+
+            // The book here tests equality, but it's not worth implementing just for a test.
+            //
+            // And t2 = t1
+
+            assert_eq!(t2.p1, parser.vertex(1));
+            assert_eq!(t2.p2, parser.vertex(2));
+            assert_eq!(t2.p3, parser.vertex(3));
+
+            let (n1, n2, n3) = t2.vertex_normals.unwrap();
+
+            assert_eq!(n1, parser.normal(3));
+            assert_eq!(n2, parser.normal(1));
+            assert_eq!(n3, parser.normal(2));
+        }
     }
 }
