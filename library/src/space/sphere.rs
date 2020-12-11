@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex, MutexGuard, Weak};
+use std::sync::{Arc, Mutex, Weak};
 
 use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Shape};
 use crate::{
@@ -50,7 +50,7 @@ impl Sphere {
 }
 
 impl ShapeLocal for Sphere {
-    fn local_normal(&self, object_point: &Tuple) -> Tuple {
+    fn local_normal(&self, object_point: &Tuple, _intersection: &Intersection) -> Tuple {
         object_point - &Tuple::point(0, 0, 0)
     }
 
@@ -76,10 +76,12 @@ impl ShapeLocal for Sphere {
                 Intersection {
                     t: t1,
                     object: Arc::clone(&self) as Arc<dyn Shape>,
+                    ..Intersection::default()
                 },
                 Intersection {
                     t: t2,
                     object: self,
+                    ..Intersection::default()
                 },
             ]
         }

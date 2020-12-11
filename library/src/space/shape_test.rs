@@ -17,7 +17,7 @@ demonstrate! {
         it "should return the normal on a transformed sphere" {
             let sphere: Box<dyn Shape> = Box::new(test_shape.translate(0, 1, 0));
 
-            let actual_normal = sphere.normal(&Tuple::point(0.0, 1.70711, -0.70711));
+            let actual_normal = sphere.normal(&Tuple::point(0.0, 1.70711, -0.70711), &Intersection::default());
             let expected_normal = Tuple::vector(0, 0.70711, -0.70711);
 
             assert_eq!(actual_normal, expected_normal);
@@ -124,7 +124,7 @@ demonstrate! {
 
             Group::add_child(&group2, &sphere);
 
-            let actual_normal = sphere.normal(&Tuple::point(1.7321, 1.1547, -5.5774));
+            let actual_normal = sphere.normal(&Tuple::point(1.7321, 1.1547, -5.5774), &Intersection::default());
 
             assert_eq!(actual_normal, Tuple::vector(0.2857, 0.4286, -0.8571));
         }

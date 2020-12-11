@@ -1,6 +1,6 @@
 use std::{
     mem,
-    sync::{Arc, Mutex, MutexGuard, Weak},
+    sync::{Arc, Mutex, Weak},
 };
 
 use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Ray, Shape};
@@ -47,6 +47,7 @@ impl Cylinder {
             intersections.push(Intersection {
                 t: t1,
                 object: Arc::clone(&self) as Arc<dyn Shape>,
+                ..Intersection::default()
             });
         }
 
@@ -56,6 +57,7 @@ impl Cylinder {
             intersections.push(Intersection {
                 t: t2,
                 object: self,
+                ..Intersection::default()
             });
         }
     }
@@ -71,7 +73,7 @@ impl Cylinder {
 }
 
 impl ShapeLocal for Cylinder {
-    fn local_normal(&self, object_point: &Tuple) -> Tuple {
+    fn local_normal(&self, object_point: &Tuple, _intersection: &Intersection) -> Tuple {
         // Compute the square of the distance from the y axis.
         //
         let dist = object_point.x.powi(2) + object_point.z.powi(2);
@@ -121,6 +123,7 @@ impl ShapeLocal for Cylinder {
                 intersections.push(Intersection {
                     t: t0,
                     object: Arc::clone(&self) as Arc<dyn Shape>,
+                    ..Intersection::default()
                 });
             }
 
@@ -130,6 +133,7 @@ impl ShapeLocal for Cylinder {
                 intersections.push(Intersection {
                     t: t1,
                     object: Arc::clone(&self) as Arc<dyn Shape>,
+                    ..Intersection::default()
                 });
             }
         }

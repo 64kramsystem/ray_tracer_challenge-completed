@@ -65,7 +65,7 @@ pub fn practice() {
 
                 if let Some(hit) = hit(&eye_ray, Arc::clone(&sphere)) {
                     let hit_point = eye_ray.position(hit.t);
-                    let hit_normal = sphere.normal(&hit_point);
+                    let hit_normal = sphere.normal(&hit_point, &Intersection::default());
 
                     let light_color = sphere.lighting(
                         &light,

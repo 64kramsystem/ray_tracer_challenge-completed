@@ -12,6 +12,7 @@ mod point_light;
 mod ray;
 mod shape;
 mod sphere;
+mod triangle;
 mod world;
 
 pub use bounded_shape::BoundedShape;
@@ -28,6 +29,7 @@ pub use point_light::PointLight;
 pub use ray::Ray;
 pub use shape::Shape;
 pub use sphere::Sphere;
+pub use triangle::Triangle;
 pub use world::World;
 
 #[cfg(test)]
@@ -49,6 +51,9 @@ mod group_test;
 mod intersection_state_test;
 
 #[cfg(test)]
+mod intersection_test;
+
+#[cfg(test)]
 mod plane_test;
 
 #[cfg(test)]
@@ -59,6 +64,9 @@ mod shape_test;
 
 #[cfg(test)]
 mod sphere_test;
+
+#[cfg(test)]
+mod triangle_test;
 
 #[cfg(test)]
 mod world_test;

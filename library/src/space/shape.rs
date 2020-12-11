@@ -1,3 +1,6 @@
+#[cfg(test)]
+use std::any::Any;
+
 use std::{
     fmt,
     sync::{Arc, Mutex, MutexGuard, Weak},
@@ -29,9 +32,12 @@ pub(crate) mod private {
     use crate::{math::Tuple, space::Intersection};
 
     pub trait ShapeLocal {
+        // See `Shape#normal()` for the `intersection` explanation.
+        //
         // In the book, this is local_normal_at().
         //
-        fn local_normal(&self, world_point: &Tuple) -> Tuple;
+        fn local_normal(&self, world_point: &Tuple, intersection: &Intersection) -> Tuple;
+
         // In the book, this is local_intersect(), and returns also the shapes.
         //
         fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection>;
@@ -48,11 +54,15 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     fn material(&self) -> &Material;
     fn material_mut(&mut self) -> &mut Material;
 
+    // The `intersection` is used only by smooth triangles, but it's not an option because it's always
+    // passed when computing the IntersectionState.
+    // In tests, just pass the `Intersection::default()`.
+    //
     // In the book, this is normal_at().
     //
-    fn normal(&self, world_point: &Tuple) -> Tuple {
+    fn normal(&self, world_point: &Tuple, intersection: &Intersection) -> Tuple {
         let local_point = self.world_to_object(world_point);
-        let local_normal = self.local_normal(&local_point);
+        let local_normal = self.local_normal(&local_point, intersection);
         self.normal_to_world(&local_normal)
     }
 
@@ -157,6 +167,9 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
         self.material()
             .lighting(light, &object_point, world_point, eyev, normalv, in_shadow)
     }
+
+    #[cfg(test)]
+    fn as_any(&self) -> &dyn Any;
 }
 
 impl PartialEq for dyn Shape + '_ {

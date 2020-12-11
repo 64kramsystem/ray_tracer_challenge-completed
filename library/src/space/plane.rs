@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex, MutexGuard, Weak};
+use std::sync::{Arc, Mutex, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},
@@ -21,7 +21,7 @@ pub struct Plane {
 }
 
 impl ShapeLocal for Plane {
-    fn local_normal(&self, _object_point: &Tuple) -> Tuple {
+    fn local_normal(&self, _object_point: &Tuple, _intersection: &Intersection) -> Tuple {
         Tuple::vector(0, 1, 0)
     }
 
@@ -31,7 +31,11 @@ impl ShapeLocal for Plane {
         } else {
             let t = -transformed_ray.origin.y / transformed_ray.direction.y;
 
-            vec![Intersection { t, object: self }]
+            vec![Intersection {
+                t,
+                object: self,
+                ..Intersection::default()
+            }]
         }
     }
 }
