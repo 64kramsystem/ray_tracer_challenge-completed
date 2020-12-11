@@ -45,7 +45,7 @@ pub struct ObjParser {
     //
     vertices: Vec<Tuple>,
     normals: Vec<Tuple>,
-    groups: HashMap<String, Arc<dyn Shape>>,
+    groups: HashMap<String, Arc<Group>>,
 }
 
 impl ObjParser {
@@ -56,7 +56,7 @@ impl ObjParser {
         // for loop (match) scope, they don't survive this (the outer) scope.
         //
         let mut groups = HashMap::new();
-        let default_group: Arc<dyn Shape> = Arc::new(Group::default());
+        let default_group: Arc<Group> = Arc::new(Group::default());
         groups.insert(DEFAULT_GROUP_NAME.to_string(), default_group);
 
         let mut parser = Self {
@@ -113,21 +113,22 @@ impl ObjParser {
         Ok(parser)
     }
 
-    pub fn default_group(&self) -> &Arc<dyn Shape> {
+    pub fn default_group(&self) -> &Arc<Group> {
         &self.groups[DEFAULT_GROUP_NAME]
     }
 
-    pub fn group(&self, group_name: &str) -> Arc<dyn Shape> {
+    pub fn group(&self, group_name: &str) -> Arc<Group> {
         Arc::clone(&self.groups[group_name])
     }
 
     // Export the groups as tree, with thre group as leaves of a new root group.
     // In the group, this is `obj_to_group()`;
     //
-    pub fn export_tree(&self) -> Arc<dyn Shape> {
-        let root_group: Arc<dyn Shape> = Arc::new(Group::default());
+    pub fn export_tree(&self) -> Arc<Group> {
+        let root_group: Arc<Group> = Arc::new(Group::default());
 
         for group in self.groups.values() {
+            let group = Arc::clone(group) as Arc<dyn Shape>;
             Group::add_child(&root_group, &group)
         }
 

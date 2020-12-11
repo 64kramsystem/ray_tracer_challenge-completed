@@ -31,7 +31,7 @@ fn hexagon_edge() -> Arc<dyn Shape> {
 }
 
 fn hexagon_side(transform: Matrix) -> Arc<dyn Shape> {
-    let side: Arc<dyn Shape> = Arc::new(Group {
+    let side: Arc<Group> = Arc::new(Group {
         transform,
         ..Group::default()
     });
@@ -45,7 +45,7 @@ fn hexagon_side(transform: Matrix) -> Arc<dyn Shape> {
 fn hexagon() -> Arc<dyn Shape> {
     // Transformation added to make it look nicer.
     //
-    let hex: Arc<dyn Shape> = Arc::new(Group {
+    let hex: Arc<Group> = Arc::new(Group {
         transform: Matrix::translation(-0.2, 0.7, 0.0)
             * &Matrix::rotation(Axis::Y, PI / 6.0)
             * &Matrix::rotation(Axis::X, -PI / 6.0),

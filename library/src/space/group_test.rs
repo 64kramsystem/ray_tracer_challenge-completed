@@ -10,7 +10,7 @@ demonstrate! {
 
         before {
             #[allow(unused_variables)]
-            let group: Arc<dyn Shape> = Arc::new(Group::default());
+            let group: Arc<Group> = Arc::new(Group::default());
         }
 
         it "Creating a new group" {
@@ -67,7 +67,7 @@ demonstrate! {
         }
 
         it "Intersecting a transformed group" {
-            let group: Arc<dyn Shape> = Arc::new(Group {
+            let group: Arc<Group> = Arc::new(Group {
                 transform: Matrix::scaling(2, 2, 2),
                 ..Group::default()
             });

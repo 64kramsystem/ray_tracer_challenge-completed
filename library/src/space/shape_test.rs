@@ -55,17 +55,17 @@ demonstrate! {
         }
 
         it "Converting a point from world to object space" {
-            let group1: Arc<dyn Shape> = Arc::new(Group {
+            let group1: Arc<Group> = Arc::new(Group {
                 transform: Matrix::rotation(Axis::Y, PI / 2.0),
                 ..Group::default()
             });
 
-            let group2: Arc<dyn Shape> = Arc::new(Group {
+            let group2: Arc<Group> = Arc::new(Group {
                 transform: Matrix::scaling(2, 2, 2),
                 ..Group::default()
             });
 
-            Group::add_child(&group1, &group2);
+            Group::add_child(&group1, &(Arc::clone(&group2) as Arc<dyn Shape>));
 
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
@@ -80,17 +80,17 @@ demonstrate! {
         }
 
         it "Converting a normal from object to world space" {
-            let group1: Arc<dyn Shape> = Arc::new(Group {
+            let group1: Arc<Group> = Arc::new(Group {
                 transform: Matrix::rotation(Axis::Y, PI / 2.0),
                 ..Group::default()
             });
 
-            let group2: Arc<dyn Shape> = Arc::new(Group {
+            let group2: Arc<Group> = Arc::new(Group {
                 transform: Matrix::scaling(1, 2, 3),
                 ..Group::default()
             });
 
-            Group::add_child(&group1, &group2);
+            Group::add_child(&group1, &(Arc::clone(&group2) as Arc<dyn Shape>));
 
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
@@ -105,17 +105,17 @@ demonstrate! {
         }
 
         it "Finding the normal on a child object" {
-            let group1: Arc<dyn Shape> = Arc::new(Group {
+            let group1: Arc<Group> = Arc::new(Group {
                 transform: Matrix::rotation(Axis::Y, PI / 2.0),
                 ..Group::default()
             });
 
-            let group2: Arc<dyn Shape> = Arc::new(Group {
+            let group2: Arc<Group> = Arc::new(Group {
                 transform: Matrix::scaling(1, 2, 3),
                 ..Group::default()
             });
 
-            Group::add_child(&group1, &group2);
+            Group::add_child(&group1, &(Arc::clone(&group2) as Arc<dyn Shape>));
 
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
