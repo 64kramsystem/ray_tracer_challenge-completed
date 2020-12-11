@@ -82,7 +82,7 @@ impl ObjParser {
                         let triangle: Arc<dyn Shape> = Arc::new(Triangle::new(p1, p2, p3));
 
                         let group = parser.groups.entry(current_group_name.to_string());
-                        group.and_modify(|group| Group::add_child(group, &triangle));
+                        group.and_modify(|group| group.add_child(&triangle));
                     }
                 }
                 FaceWithNormal((p1i, n1i), (p2i, n2i), (p3i, n3i)) => {
@@ -97,7 +97,7 @@ impl ObjParser {
                         Arc::new(Triangle::smooth(p1, p2, p3, n1, n2, n3));
 
                     let group = parser.groups.entry(current_group_name.to_string());
-                    group.and_modify(|group| Group::add_child(group, &triangle));
+                    group.and_modify(|group| group.add_child(&triangle));
                 }
                 Group(group_name) => {
                     let groups = &mut parser.groups;
@@ -129,7 +129,7 @@ impl ObjParser {
 
         for group in self.groups.values() {
             let group = Arc::clone(group) as Arc<dyn Shape>;
-            Group::add_child(&root_group, &group)
+            root_group.add_child(&group)
         }
 
         root_group

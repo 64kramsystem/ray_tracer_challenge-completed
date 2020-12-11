@@ -21,7 +21,7 @@ demonstrate! {
         it "Adding a child to a group" {
             let shape: Arc<dyn Shape> = Arc::new(Plane::default());
 
-            Group::add_child(&group, &shape);
+            group.add_child(&shape);
 
             let actual_children = group.children();
 
@@ -50,9 +50,9 @@ demonstrate! {
                 ..Sphere::default()
             });
 
-            Group::add_child(&group, &sphere1);
-            Group::add_child(&group, &sphere2);
-            Group::add_child(&group, &sphere3);
+            group.add_child(&sphere1);
+            group.add_child(&sphere2);
+            group.add_child(&sphere3);
 
             let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
@@ -77,7 +77,7 @@ demonstrate! {
                 ..Sphere::default()
             });
 
-            Group::add_child(&group, &sphere);
+            group.add_child(&sphere);
 
             let ray = Ray::new((10, 0, -10), (0, 0, 1));
 

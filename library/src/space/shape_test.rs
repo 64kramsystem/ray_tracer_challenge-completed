@@ -65,14 +65,14 @@ demonstrate! {
                 ..Group::default()
             });
 
-            Group::add_child(&group1, &(Arc::clone(&group2) as Arc<dyn Shape>));
+            group1.add_child(&(Arc::clone(&group2) as Arc<dyn Shape>));
 
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
                 ..Sphere::default()
             });
 
-            Group::add_child(&group2, &sphere);
+            group2.add_child(&sphere);
 
             let expected_point = Tuple::point(0, 0, -1);
 
@@ -90,14 +90,14 @@ demonstrate! {
                 ..Group::default()
             });
 
-            Group::add_child(&group1, &(Arc::clone(&group2) as Arc<dyn Shape>));
+            group1.add_child(&(Arc::clone(&group2) as Arc<dyn Shape>));
 
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
                 ..Sphere::default()
             });
 
-            Group::add_child(&group2, &sphere);
+            group2.add_child(&sphere);
 
             let actual_normal = sphere.normal_to_world(&Tuple::vector(sqrt(3) / 3.0, sqrt(3) / 3.0, sqrt(3) / 3.0));
 
@@ -115,14 +115,14 @@ demonstrate! {
                 ..Group::default()
             });
 
-            Group::add_child(&group1, &(Arc::clone(&group2) as Arc<dyn Shape>));
+            group1.add_child(&(Arc::clone(&group2) as Arc<dyn Shape>));
 
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
                 ..Sphere::default()
             });
 
-            Group::add_child(&group2, &sphere);
+            group2.add_child(&sphere);
 
             let actual_normal = sphere.normal(&Tuple::point(1.7321, 1.1547, -5.5774), &Intersection::default());
 

@@ -33,12 +33,12 @@ pub struct Group {
 }
 
 impl Group {
-    pub fn add_child(group: &Arc<Group>, child: &Arc<dyn Shape>) {
-        group.children().push(Arc::clone(child));
+    pub fn add_child(self: &Arc<Self>, child: &Arc<dyn Shape>) {
+        self.children().push(Arc::clone(child));
 
         let mut child_parent_ref = child.parent_mut();
 
-        *child_parent_ref = Arc::downgrade(group);
+        *child_parent_ref = Arc::downgrade(&self);
     }
 
     // Convenience method.
