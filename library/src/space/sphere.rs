@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex, Weak};
 
-use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Group, Intersection, Shape};
+use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Shape};
 use crate::{
     lang::math::sqrt,
     lang::HasFloat64Value,
@@ -13,8 +13,8 @@ use crate::{
 pub struct Sphere {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
-    #[default(Mutex::new(Weak::<Group>::new()))]
-    pub parent: Mutex<Weak<Group>>,
+    #[default(Mutex::new(Weak::<Self>::new()))]
+    pub parent: Mutex<Weak<dyn Shape>>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]

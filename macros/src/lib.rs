@@ -14,7 +14,7 @@ pub fn shape_accessors_derive(input: TokenStream) -> TokenStream {
     let gen = quote! {
         use crate::properties::Material as ShapeAccessorsMaterial;
         use crate::math::Matrix as ShapeAccessorsMatrix;
-        use crate::space::Group as ShapeAccessorsGroup;
+        use crate::space::Shape as ShapeAccessorsShape;
         use std::sync::Arc as ShapeAccessorsArc;
         use std::sync::MutexGuard as ShapeAccessorsMutexGuard;
         use std::sync::Weak as ShapeAccessorsWeak;
@@ -29,11 +29,11 @@ pub fn shape_accessors_derive(input: TokenStream) -> TokenStream {
 
             // The parent/children methods encapsulate (as possible) the typical access pattern.
 
-            fn parent(&self) -> Option<ShapeAccessorsArc<ShapeAccessorsGroup>> {
+            fn parent(&self) -> Option<ShapeAccessorsArc<dyn ShapeAccessorsShape>> {
                 ShapeAccessorsWeak::upgrade(&*self.parent.lock().unwrap())
             }
 
-            fn parent_mut(&self) -> ShapeAccessorsMutexGuard<ShapeAccessorsWeak<ShapeAccessorsGroup>> {
+            fn parent_mut(&self) -> ShapeAccessorsMutexGuard<ShapeAccessorsWeak<dyn ShapeAccessorsShape>> {
                 self.parent.lock().unwrap()
             }
 
