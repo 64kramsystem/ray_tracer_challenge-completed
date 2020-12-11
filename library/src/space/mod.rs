@@ -2,6 +2,7 @@ mod bounded_shape;
 mod bounds;
 mod camera;
 mod cone;
+pub mod csg;
 mod cube;
 mod cylinder;
 mod group;
@@ -19,6 +20,7 @@ pub use bounded_shape::BoundedShape;
 pub use bounds::Bounds;
 pub use camera::Camera;
 pub use cone::Cone;
+pub use csg::Csg;
 pub use cube::Cube;
 pub use cylinder::Cylinder;
 pub use group::Group;
@@ -34,6 +36,9 @@ pub use world::World;
 
 #[cfg(test)]
 mod camera_test;
+
+#[cfg(test)]
+mod csg_test;
 
 #[cfg(test)]
 mod cube_test;
