@@ -55,24 +55,24 @@ demonstrate! {
         }
 
         it "Converting a point from world to object space" {
-            let group1: Arc<dyn Shape> = Arc::new(Group {
+            let group1: Arc<Group> = Arc::new(Group {
                 transform: Matrix::rotation(Axis::Y, PI / 2.0),
                 ..Group::default()
             });
 
-            let group2: Arc<dyn Shape> = Arc::new(Group {
+            let group2: Arc<Group> = Arc::new(Group {
                 transform: Matrix::scaling(2, 2, 2),
                 ..Group::default()
             });
 
-            Group::add_child(&group1, &group2);
+            group1.add_child(&(Arc::clone(&group2) as Arc<dyn Shape>));
 
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
                 ..Sphere::default()
             });
 
-            Group::add_child(&group2, &sphere);
+            group2.add_child(&sphere);
 
             let expected_point = Tuple::point(0, 0, -1);
 
@@ -80,24 +80,24 @@ demonstrate! {
         }
 
         it "Converting a normal from object to world space" {
-            let group1: Arc<dyn Shape> = Arc::new(Group {
+            let group1: Arc<Group> = Arc::new(Group {
                 transform: Matrix::rotation(Axis::Y, PI / 2.0),
                 ..Group::default()
             });
 
-            let group2: Arc<dyn Shape> = Arc::new(Group {
+            let group2: Arc<Group> = Arc::new(Group {
                 transform: Matrix::scaling(1, 2, 3),
                 ..Group::default()
             });
 
-            Group::add_child(&group1, &group2);
+            group1.add_child(&(Arc::clone(&group2) as Arc<dyn Shape>));
 
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
                 ..Sphere::default()
             });
 
-            Group::add_child(&group2, &sphere);
+            group2.add_child(&sphere);
 
             let actual_normal = sphere.normal_to_world(&Tuple::vector(sqrt(3) / 3.0, sqrt(3) / 3.0, sqrt(3) / 3.0));
 
@@ -105,24 +105,24 @@ demonstrate! {
         }
 
         it "Finding the normal on a child object" {
-            let group1: Arc<dyn Shape> = Arc::new(Group {
+            let group1: Arc<Group> = Arc::new(Group {
                 transform: Matrix::rotation(Axis::Y, PI / 2.0),
                 ..Group::default()
             });
 
-            let group2: Arc<dyn Shape> = Arc::new(Group {
+            let group2: Arc<Group> = Arc::new(Group {
                 transform: Matrix::scaling(1, 2, 3),
                 ..Group::default()
             });
 
-            Group::add_child(&group1, &group2);
+            group1.add_child(&(Arc::clone(&group2) as Arc<dyn Shape>));
 
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
                 ..Sphere::default()
             });
 
-            Group::add_child(&group2, &sphere);
+            group2.add_child(&sphere);
 
             let actual_normal = sphere.normal(&Tuple::point(1.7321, 1.1547, -5.5774), &Intersection::default());
 

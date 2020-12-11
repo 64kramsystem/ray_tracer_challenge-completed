@@ -22,8 +22,8 @@ pub struct Group {
     pub id: u32,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
-    #[default(Mutex::new(Weak::<Self>::new()))]
-    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Mutex::new(Weak::<Group>::new()))]
+    pub parent: Mutex<Weak<Group>>,
     // This is tricky. Wrapping the vector with the mutex will cause contention, but wrapping the shape
     // will require all the Shape methods to be converted to functions taking Arc<Mutex<dyn shape>>;
     // this is possible, but ugly.
@@ -33,12 +33,18 @@ pub struct Group {
 }
 
 impl Group {
-    pub fn add_child(group: &Arc<dyn Shape>, child: &Arc<dyn Shape>) {
-        group.children().push(Arc::clone(child));
+    pub fn add_child(self: &Arc<Self>, child: &Arc<dyn Shape>) {
+        self.children().push(Arc::clone(child));
 
         let mut child_parent_ref = child.parent_mut();
 
-        *child_parent_ref = Arc::downgrade(group);
+        *child_parent_ref = Arc::downgrade(&self);
+    }
+
+    // Convenience method.
+    //
+    pub fn children(&self) -> MutexGuard<Vec<Arc<dyn Shape>>> {
+        self.children.lock().unwrap()
     }
 }
 
@@ -47,16 +53,12 @@ impl Shape for Group {
         self.id
     }
 
-    fn parent(&self) -> Option<Arc<dyn Shape>> {
+    fn parent(&self) -> Option<Arc<Group>> {
         Weak::upgrade(&*self.parent.lock().unwrap())
     }
 
-    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>> {
+    fn parent_mut(&self) -> MutexGuard<Weak<Group>> {
         self.parent.lock().unwrap()
-    }
-
-    fn children(&self) -> MutexGuard<Vec<Arc<dyn Shape>>> {
-        self.children.lock().unwrap()
     }
 
     fn transform(&self) -> &Matrix {

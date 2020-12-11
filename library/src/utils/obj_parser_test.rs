@@ -8,7 +8,7 @@ demonstrate! {
         use indoc::indoc;
         use crate::utils::ObjParser;
         use crate::math::Tuple;
-        use crate::space::Triangle;
+        use crate::space::{Shape, Triangle};
         use std::sync::Arc;
         use std::{io::BufReader, fs::File, path::Path};
 
