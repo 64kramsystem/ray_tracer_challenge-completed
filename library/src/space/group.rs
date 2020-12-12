@@ -30,6 +30,12 @@ pub struct Group {
     //
     #[default(Mutex::new(vec![]))]
     pub children: Mutex<Vec<Arc<dyn Shape>>>,
+
+    // Simple optimization. Needs to be behind a Mutex since it's used in an Arc<Self> context (damn);
+    // otherwise, it should be manipulated from outside.
+    // It saves relatively little (10% on the astronaut1 test), however, it's very simple and fits nicely.
+    //
+    pub local_bounds: Mutex<Bounds>,
 }
 
 impl Group {
@@ -39,6 +45,10 @@ impl Group {
         let mut child_parent_ref = child.parent_mut();
 
         *child_parent_ref = Arc::downgrade(&(Arc::clone(self) as Arc<dyn Shape>));
+
+        let mut local_bounds_mtx = self.local_bounds.lock().unwrap();
+
+        Bounds::update_from_bound(&mut *local_bounds_mtx, &child.local_bounds());
     }
 
     // Convenience method.
@@ -119,13 +129,6 @@ impl ShapeLocal for Group {
 
 impl BoundedShape for Group {
     fn local_bounds(&self) -> Bounds {
-        let mut group_bounds = Bounds::default();
-
-        for child in self.children().iter() {
-            let child_bounds = child.bounds();
-            Bounds::update_from_bound(&mut group_bounds, &child_bounds);
-        }
-
-        group_bounds
+        *self.local_bounds.lock().unwrap()
     }
 }
