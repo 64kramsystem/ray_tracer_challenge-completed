@@ -23,7 +23,7 @@ impl Cube {
     // use this logic on any Shape.
     //
     pub fn generalized_intersections<'a>(
-        object: Arc<dyn Shape>,
+        object: &Arc<dyn Shape>,
         bounds: &Bounds,
         transformed_ray: &Ray,
     ) -> Vec<Intersection> {
@@ -65,12 +65,12 @@ impl Cube {
             vec![
                 Intersection {
                     t: tmin,
-                    object: Arc::clone(&object),
+                    object: Arc::clone(object),
                     ..Intersection::default()
                 },
                 Intersection {
                     t: tmax,
-                    object: object,
+                    object: Arc::clone(object),
                     ..Intersection::default()
                 },
             ]
@@ -112,13 +112,17 @@ impl ShapeLocal for Cube {
         // };
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
+    fn local_intersections(
+        &self,
+        self_arc: &Arc<dyn Shape>,
+        transformed_ray: &Ray,
+    ) -> Vec<Intersection> {
         let bounds = Bounds {
             min: Tuple::point(-1, -1, -1),
             max: Tuple::point(1, 1, 1),
         };
 
-        Self::generalized_intersections(self as Arc<dyn Shape>, &bounds, transformed_ray)
+        Self::generalized_intersections(self_arc, &bounds, transformed_ray)
     }
 }
 

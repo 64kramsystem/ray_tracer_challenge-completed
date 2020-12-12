@@ -23,7 +23,11 @@ impl ShapeLocal for Plane {
         Tuple::vector(0, 1, 0)
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
+    fn local_intersections(
+        &self,
+        self_arc: &Arc<dyn Shape>,
+        transformed_ray: &Ray,
+    ) -> Vec<Intersection> {
         if transformed_ray.direction.y.within_epsilon() {
             vec![]
         } else {
@@ -31,7 +35,7 @@ impl ShapeLocal for Plane {
 
             vec![Intersection {
                 t,
-                object: self,
+                object: Arc::clone(self_arc),
                 ..Intersection::default()
             }]
         }

@@ -9,10 +9,10 @@ use library::{
     Axis,
 };
 
-fn hit(ray: &Ray, sphere: Arc<Sphere>) -> Option<Intersection> {
+fn hit(ray: &Ray, sphere: &Arc<dyn Shape>) -> Option<Intersection> {
     // At this stage, shapes always returned ordered hits, so we can use the first.
     //
-    sphere.intersections(ray).get(0).cloned()
+    sphere.intersections(sphere, ray).get(0).cloned()
 }
 
 pub fn practice() {
@@ -41,7 +41,7 @@ pub fn practice() {
         * &Matrix::scaling(6.25, 12.5, 12.5);
     sphere.transform = transformation;
 
-    let sphere = Arc::new(sphere);
+    let sphere: Arc<dyn Shape> = Arc::new(sphere);
 
     let ray_origin = Tuple::point(0, 0, eye_z);
 
@@ -56,7 +56,7 @@ pub fn practice() {
                 direction: ray_direction,
             };
 
-            if let Some(_) = hit(&ray, Arc::clone(&sphere)) {
+            if let Some(_) = hit(&ray, &sphere) {
                 interface.write_pixel(x, y, hit_color);
             };
         }

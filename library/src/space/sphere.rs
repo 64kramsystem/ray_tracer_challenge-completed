@@ -52,7 +52,11 @@ impl ShapeLocal for Sphere {
         object_point - &Tuple::point(0, 0, 0)
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &super::Ray) -> Vec<Intersection> {
+    fn local_intersections(
+        &self,
+        self_arc: &Arc<dyn Shape>,
+        transformed_ray: &super::Ray,
+    ) -> Vec<Intersection> {
         let sphere_location = Tuple::point(0, 0, 0);
         let sphere_to_ray = transformed_ray.origin - &sphere_location;
 
@@ -73,12 +77,12 @@ impl ShapeLocal for Sphere {
             vec![
                 Intersection {
                     t: t1,
-                    object: Arc::clone(&self) as Arc<dyn Shape>,
+                    object: Arc::clone(self_arc),
                     ..Intersection::default()
                 },
                 Intersection {
                     t: t2,
-                    object: self,
+                    object: Arc::clone(self_arc),
                     ..Intersection::default()
                 },
             ]

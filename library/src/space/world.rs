@@ -51,7 +51,7 @@ impl World {
         let mut hit: Option<Intersection> = None;
 
         for object in self.objects.iter() {
-            let object_intersections = Arc::clone(object).intersections(ray);
+            let object_intersections = object.intersections(object, ray);
 
             // Object intersections are not guaranteed to be ordered, so we need to go through each.
             //
@@ -84,7 +84,7 @@ impl World {
     //
     pub fn is_ray_obstructed(&self, ray: &Ray, distance: f64) -> bool {
         for object in self.objects.iter() {
-            let object_intersections = Arc::clone(object).intersections(ray);
+            let object_intersections = object.intersections(object, ray);
 
             for intersection in object_intersections {
                 if intersection.t >= 0.0 && intersection.t < distance {

@@ -102,14 +102,15 @@ impl ShapeLocal for Group {
         panic!("local normal is not meaningful for Group")
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
+    fn local_intersections(
+        &self,
+        self_arc: &Arc<dyn Shape>,
+        transformed_ray: &Ray,
+    ) -> Vec<Intersection> {
         let local_bounds = self.local_bounds();
 
-        let box_intersections = Cube::generalized_intersections(
-            Arc::clone(&self) as Arc<dyn Shape>,
-            &local_bounds,
-            transformed_ray,
-        );
+        let box_intersections =
+            Cube::generalized_intersections(self_arc, &local_bounds, transformed_ray);
 
         if box_intersections.is_empty() {
             return vec![];
@@ -118,7 +119,7 @@ impl ShapeLocal for Group {
         let mut intersections = self
             .children()
             .iter()
-            .flat_map(|child| Arc::clone(child).intersections(transformed_ray))
+            .flat_map(|child| child.intersections(child, transformed_ray))
             .collect::<Vec<_>>();
 
         intersections.sort_by(|a, b| a.partial_cmp(b).unwrap());

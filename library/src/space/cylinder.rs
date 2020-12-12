@@ -29,7 +29,12 @@ pub struct Cylinder {
 }
 
 impl Cylinder {
-    fn intersect_caps(self: &Arc<Self>, ray: &Ray, intersections: &mut Vec<Intersection>) {
+    fn intersect_caps(
+        &self,
+        self_arc: &Arc<dyn Shape>,
+        ray: &Ray,
+        intersections: &mut Vec<Intersection>,
+    ) {
         // Caps only matter if the cylinder is closed, and might possibly be intersected by the ray.
         //
         if !self.closed || ray.direction.y.approximate() == 0.0 {
@@ -44,7 +49,7 @@ impl Cylinder {
         if Self::check_cap(&ray, t1) {
             intersections.push(Intersection {
                 t: t1,
-                object: Arc::clone(self) as Arc<dyn Shape>,
+                object: Arc::clone(self_arc),
                 ..Intersection::default()
             });
         }
@@ -54,7 +59,7 @@ impl Cylinder {
         if Self::check_cap(&ray, t2) {
             intersections.push(Intersection {
                 t: t2,
-                object: Arc::clone(self) as Arc<dyn Shape>,
+                object: Arc::clone(self_arc),
                 ..Intersection::default()
             });
         }
@@ -85,7 +90,11 @@ impl ShapeLocal for Cylinder {
         }
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &super::Ray) -> Vec<Intersection> {
+    fn local_intersections(
+        &self,
+        self_arc: &Arc<dyn Shape>,
+        transformed_ray: &super::Ray,
+    ) -> Vec<Intersection> {
         let mut intersections = Vec::with_capacity(2);
 
         let a = transformed_ray.direction.x.powi(2) + transformed_ray.direction.z.powi(2);
@@ -93,7 +102,7 @@ impl ShapeLocal for Cylinder {
         // Ray is parallel to the y axis.
         //
         if a.approximate_equals(0.0) {
-            self.intersect_caps(transformed_ray, &mut intersections);
+            self.intersect_caps(self_arc, transformed_ray, &mut intersections);
 
             return intersections;
         }
@@ -120,7 +129,7 @@ impl ShapeLocal for Cylinder {
             if self.minimum < y0 && y0 < self.maximum {
                 intersections.push(Intersection {
                     t: t0,
-                    object: Arc::clone(&self) as Arc<dyn Shape>,
+                    object: Arc::clone(self_arc),
                     ..Intersection::default()
                 });
             }
@@ -130,13 +139,13 @@ impl ShapeLocal for Cylinder {
             if self.minimum < y1 && y1 < self.maximum {
                 intersections.push(Intersection {
                     t: t1,
-                    object: Arc::clone(&self) as Arc<dyn Shape>,
+                    object: Arc::clone(self_arc),
                     ..Intersection::default()
                 });
             }
         }
 
-        self.intersect_caps(transformed_ray, &mut intersections);
+        self.intersect_caps(self_arc, transformed_ray, &mut intersections);
 
         intersections
     }

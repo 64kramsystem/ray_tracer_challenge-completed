@@ -14,10 +14,10 @@ use library::{
 };
 use rayon::prelude::*;
 
-fn hit(ray: &Ray, sphere: Arc<Sphere>) -> Option<Intersection> {
+fn hit(ray: &Ray, sphere: &Arc<dyn Shape>) -> Option<Intersection> {
     // At this stage, shapes always returned ordered hits, so we can use the first.
     //
-    sphere.intersections(ray).get(0).cloned()
+    sphere.intersections(sphere, ray).get(0).cloned()
 }
 
 pub fn practice() {
@@ -36,7 +36,7 @@ pub fn practice() {
         * &Matrix::rotation(Axis::Z, -PI / 4.0)
         * &Matrix::scaling(6.25, 12.5, 12.5);
 
-    let sphere = Arc::new(sphere);
+    let sphere: Arc<dyn Shape> = Arc::new(sphere);
 
     let light = PointLight::new(light_position, (1, 1, 1));
 
@@ -63,7 +63,7 @@ pub fn practice() {
                     direction: eye_ray_direction,
                 };
 
-                if let Some(hit) = hit(&eye_ray, Arc::clone(&sphere)) {
+                if let Some(hit) = hit(&eye_ray, &sphere) {
                     let hit_point = eye_ray.position(hit.t);
                     let hit_normal = sphere.normal(&hit_point, &Intersection::default());
 

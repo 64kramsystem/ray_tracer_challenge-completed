@@ -190,14 +190,18 @@ impl ShapeLocal for Csg {
         todo!()
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
+    fn local_intersections(
+        &self,
+        _self_arc: &Arc<dyn Shape>,
+        transformed_ray: &Ray,
+    ) -> Vec<Intersection> {
         // filter_intersections() locks the children, so we need to drop the mutex before then.
         //
         let mut all_intersections = {
             let (left_child, right_child) = &(*self.children());
 
-            let mut left_intersections = Arc::clone(left_child).intersections(&transformed_ray);
-            let right_intersections = Arc::clone(right_child).intersections(&transformed_ray);
+            let mut left_intersections = left_child.intersections(left_child, transformed_ray);
+            let right_intersections = right_child.intersections(right_child, transformed_ray);
 
             left_intersections.extend(right_intersections);
 
