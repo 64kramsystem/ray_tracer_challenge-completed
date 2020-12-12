@@ -17,10 +17,12 @@ use ParsedElement::*;
 lazy_static::lazy_static! {
     // Faces with texture vertices (`f a/b/c...`) are decoded as faces with normals only, as texture
     // vertices are not supported.
+    // The "Faces with texture" regex could be merged into the bare "Faces" one, but it gets too messy.
 
     static ref VERTEX_REGEX: Regex = Regex::new(r"^v (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)$").unwrap();
     static ref VERTEX_NORMAL_REGEX: Regex = Regex::new(r"^vn (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)$").unwrap();
     static ref FACES_REGEX: Regex = Regex::new(r"^f (\d+) (\d+(?: \d+)+)$").unwrap();
+    static ref FACES_WITH_TEXTURE_REGEX: Regex = Regex::new(r"^f (\d+)/\d*/ (\d+)/\d*/ (\d+)/\d*/$").unwrap();
     static ref FACE_WITH_NORMAL_REGEX: Regex = Regex::new(r"^f (\d+)/\d*/(\d+) (\d+)/\d*/(\d+) (\d+)/\d*/(\d+)$").unwrap();
     static ref GROUP_REGEX: Regex = Regex::new(r"^g (\w+)$").unwrap();
 }
@@ -172,6 +174,14 @@ impl ObjParser {
 
                 faces.push((p1i, p2i, p3i));
             }
+
+            ParsedElement::Faces(faces)
+        } else if let Some(captures) = FACES_WITH_TEXTURE_REGEX.captures(&line) {
+            let p1i: usize = captures[1].parse().unwrap();
+            let p2i: usize = captures[2].parse().unwrap();
+            let p3i: usize = captures[3].parse().unwrap();
+
+            let faces = vec![(p1i, p2i, p3i)];
 
             ParsedElement::Faces(faces)
         } else if let Some(captures) = FACE_WITH_NORMAL_REGEX.captures(&line) {
