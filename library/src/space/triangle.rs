@@ -150,13 +150,7 @@ impl BoundedShape for Triangle {
         let mut bounds = Bounds::default();
 
         for p in &[self.p1, self.p2, self.p3] {
-            bounds.min.x = bounds.min.x.min(p.x);
-            bounds.min.y = bounds.min.y.min(p.y);
-            bounds.min.z = bounds.min.z.min(p.z);
-
-            bounds.max.x = bounds.max.x.max(p.x);
-            bounds.max.y = bounds.max.y.max(p.y);
-            bounds.max.z = bounds.max.z.max(p.z);
+            Bounds::update_from_tuple(&mut bounds, p);
         }
 
         bounds

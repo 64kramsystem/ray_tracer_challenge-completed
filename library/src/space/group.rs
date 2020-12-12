@@ -123,15 +123,7 @@ impl BoundedShape for Group {
 
         for child in self.children().iter() {
             let child_bounds = child.bounds();
-
-            // "Optimized for readability".
-
-            group_bounds.min.x = group_bounds.min.x.min(child_bounds.min.x);
-            group_bounds.min.y = group_bounds.min.y.min(child_bounds.min.y);
-            group_bounds.min.z = group_bounds.min.z.min(child_bounds.min.z);
-            group_bounds.max.x = group_bounds.max.x.max(child_bounds.max.x);
-            group_bounds.max.y = group_bounds.max.y.max(child_bounds.max.y);
-            group_bounds.max.z = group_bounds.max.z.max(child_bounds.max.z);
+            Bounds::update_from_bound(&mut group_bounds, &child_bounds);
         }
 
         group_bounds
