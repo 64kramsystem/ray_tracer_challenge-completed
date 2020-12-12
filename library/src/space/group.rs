@@ -77,6 +77,10 @@ impl Shape for Group {
         panic!()
     }
 
+    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
+        self.children().iter().any(|child| child.includes(object))
+    }
+
     #[cfg(test)]
     fn as_any(&self) -> &dyn Any {
         self

@@ -101,6 +101,12 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
         self.local_intersections(&transformed_ray)
     }
 
+    // Default implementation, for non-nested shapes.
+    //
+    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
+        self.id() == object.id()
+    }
+
     // Local (object-level) bounds, with the shape transformation applied.
     //
     fn bounds(&self) -> Bounds {

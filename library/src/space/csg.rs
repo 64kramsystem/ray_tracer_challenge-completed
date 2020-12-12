@@ -11,7 +11,15 @@ use crate::{math::Matrix, math::Tuple, properties::Material};
 
 #[derive(Debug, PartialEq)]
 pub enum Operation {
+    Difference,
+    Intersection,
     Union,
+}
+
+#[derive(Clone, Copy)]
+pub enum ChildHit {
+    Left,
+    Right,
 }
 
 #[derive(Debug, SmartDefault)]
@@ -54,6 +62,69 @@ impl Csg {
     pub fn children(&self) -> MutexGuard<(Arc<dyn Shape>, Arc<dyn Shape>)> {
         self.children.lock().unwrap()
     }
+
+    pub(crate) fn intersection_allowed(
+        &self,
+        child_hit: ChildHit,
+        inside_left: bool,
+        inside_right: bool,
+    ) -> bool {
+        match self.operation {
+            Operation::Difference => {
+                return match child_hit {
+                    ChildHit::Left => !inside_right,
+                    ChildHit::Right => inside_left,
+                }
+            }
+            Operation::Intersection => {
+                return match child_hit {
+                    ChildHit::Left => inside_right,
+                    ChildHit::Right => inside_left,
+                }
+            }
+            Operation::Union => {
+                return match child_hit {
+                    ChildHit::Left => !inside_right,
+                    ChildHit::Right => !inside_left,
+                }
+            }
+        }
+    }
+
+    pub(crate) fn filter_intersections(
+        &self,
+        intersections: Vec<Intersection>,
+    ) -> Vec<Intersection> {
+        // begin outside of both children
+        //
+        let mut inside_left = false;
+        let mut inside_right = false;
+
+        let mut result = Vec::with_capacity(intersections.len());
+
+        let left_child = &self.children().0;
+
+        for intersection in intersections {
+            let child_hit = if left_child.includes(&intersection.object) {
+                ChildHit::Left
+            } else {
+                ChildHit::Right
+            };
+
+            if self.intersection_allowed(child_hit, inside_left, inside_right) {
+                result.push(intersection);
+            }
+
+            // depending on which object was hit, toggle either inside_left or inside_right;
+
+            match child_hit {
+                ChildHit::Left => inside_left = !inside_left,
+                ChildHit::Right => inside_right = !inside_right,
+            };
+        }
+
+        result
+    }
 }
 
 impl Shape for Csg {
@@ -85,6 +156,12 @@ impl Shape for Csg {
         panic!()
     }
 
+    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
+        let children = self.children();
+
+        children.0.includes(object) || children.1.includes(object)
+    }
+
     #[cfg(test)]
     fn as_any(&self) -> &dyn Any {
         self
@@ -96,8 +173,24 @@ impl ShapeLocal for Csg {
         todo!()
     }
 
-    fn local_intersections(self: Arc<Self>, _transformed_ray: &Ray) -> Vec<Intersection> {
-        todo!()
+    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
+        // filter_intersections() locks the children, so we need to drop the mutex before then.
+        //
+        let mut all_intersections = {
+            let (left_child, right_child) = &(*self.children());
+
+            let mut left_intersections = Arc::clone(left_child).intersections(&transformed_ray);
+            let right_intersections = Arc::clone(right_child).intersections(&transformed_ray);
+
+            left_intersections.extend(right_intersections);
+
+            left_intersections
+        };
+
+        all_intersections.sort();
+        all_intersections.dedup();
+
+        return self.filter_intersections(all_intersections);
     }
 }
 

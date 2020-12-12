@@ -3,10 +3,8 @@ use demonstrate::demonstrate;
 demonstrate! {
     describe "Csg" {
         use std::sync::Arc;
-        // use crate::math::*;
-        // use crate::space::{*, shape::private::ShapeLocal};
-
-        use crate::space::*;
+        use crate::math::*;
+        use crate::space::{*, shape::private::ShapeLocal, csg};
 
         // before {
         //     let plane = Arc::new(Plane::default());
@@ -27,75 +25,103 @@ demonstrate! {
         }
 
         it "Evaluating the rule for a CSG operation" {
-            // When result ← intersection_allowed("<op>", <lhit>, <inl>, <inr>)
-            // Then result = <result>
+            let examples = vec![
+                // op                          lhit                   inl     inr     result
+                (csg::Operation::Union,        csg::ChildHit::Left,   true,   true,   false),
+                (csg::Operation::Union,        csg::ChildHit::Left,   true,   false,  true),
+                (csg::Operation::Union,        csg::ChildHit::Left,   false,  true,   false),
+                (csg::Operation::Union,        csg::ChildHit::Left,   false,  false,  true),
+                (csg::Operation::Union,        csg::ChildHit::Right,  true,   true,   false),
+                (csg::Operation::Union,        csg::ChildHit::Right,  true,   false,  false),
+                (csg::Operation::Union,        csg::ChildHit::Right,  false,  true,   true),
+                (csg::Operation::Union,        csg::ChildHit::Right,  false,  false,  true),
+                (csg::Operation::Intersection, csg::ChildHit::Left,   true,   true,   true),
+                (csg::Operation::Intersection, csg::ChildHit::Left,   true,   false,  false),
+                (csg::Operation::Intersection, csg::ChildHit::Left,   false,  true,   true),
+                (csg::Operation::Intersection, csg::ChildHit::Left,   false,  false,  false),
+                (csg::Operation::Intersection, csg::ChildHit::Right,  true,   true,   true),
+                (csg::Operation::Intersection, csg::ChildHit::Right,  true,   false,  true),
+                (csg::Operation::Intersection, csg::ChildHit::Right,  false,  true,   false),
+                (csg::Operation::Intersection, csg::ChildHit::Right,  false,  false,  false),
+                (csg::Operation::Difference,   csg::ChildHit::Left,   true,   true,   false),
+                (csg::Operation::Difference,   csg::ChildHit::Left,   true,   false,  true),
+                (csg::Operation::Difference,   csg::ChildHit::Left,   false,  true,   false),
+                (csg::Operation::Difference,   csg::ChildHit::Left,   false,  false,  true),
+                (csg::Operation::Difference,   csg::ChildHit::Right,  true,   true,   true),
+                (csg::Operation::Difference,   csg::ChildHit::Right,  true,   false,  true),
+                (csg::Operation::Difference,   csg::ChildHit::Right,  false,  true,   false),
+                (csg::Operation::Difference,   csg::ChildHit::Right,  false,  false,  false),
+            ];
 
-            // Examples:
-            // | op           | lhit  | inl   | inr   | result |
-            // | union        | true  | true  | true  | false  |
-            // | union        | true  | true  | false | true   |
-            // | union        | true  | false | true  | false  |
-            // | union        | true  | false | false | true   |
-            // | union        | false | true  | true  | false  |
-            // | union        | false | true  | false | false  |
-            // | union        | false | false | true  | true   |
-            // | union        | false | false | false | true   |
-            // # append after the union examples...
-            // | intersection | true  | true  | true  | true   |
-            // | intersection | true  | true  | false | false  |
-            // | intersection | true  | false | true  | true   |
-            // | intersection | true  | false | false | false  |
-            // | intersection | false | true  | true  | true   |
-            // | intersection | false | true  | false | true   |
-            // | intersection | false | false | true  | false  |
-            // | intersection | false | false | false | false  |
-            // # append after the intersection examples...
-            // | difference   | true  | true  | true  | false  |
-            // | difference   | true  | true  | false | true   |
-            // | difference   | true  | false | true  | false  |
-            // | difference   | true  | false | false | true   |
-            // | difference   | false | true  | true  | true   |
-            // | difference   | false | true  | false | true   |
-            // | difference   | false | false | true  | false  |
-            // | difference   | false | false | false | false  |
+            for (operation, child_hit, in_left, in_right, expected_result) in examples.into_iter() {
+                let csg = Arc::new(Csg { operation, ..Csg::default() });
+                let actual_result = csg.intersection_allowed(child_hit, in_left, in_right);
+
+                assert_eq!(actual_result, expected_result);
+            }
         }
 
         it "Filtering a list of intersections" {
-            // Given s1 ← sphere()
-            //   And s2 ← cube()
-            //   And c ← csg("<operation>", s1, s2)
-            //   And xs ← intersections(1:s1, 2:s2, 3:s1, 4:s2)
-            // When result ← filter_intersections(c, xs)
-            // Then result.count = 2
-            //   And result[0] = xs[<x0>]
-            //   And result[1] = xs[<x1>]
+            let examples = vec![
+                // operation                    x0 x1
+                (csg::Operation::Union,         0, 3),
+                (csg::Operation::Intersection,  1, 2),
+                (csg::Operation::Difference,    0, 1),
+            ];
 
-            // Examples:
-            // | operation    | x0 | x1 |
-            // | union        | 0  | 3  |
-            // | intersection | 1  | 2  |
-            // | difference   | 0  | 1  |
+            let left: Arc<dyn Shape> = Arc::new(Sphere::default());
+            let right: Arc<dyn Shape> = Arc::new(Cube::default());
+
+            let intersections = vec![
+                Intersection { t: 1.0, object: Arc::clone(&left), ..Intersection::default() },
+                Intersection { t: 2.0, object: Arc::clone(&right), ..Intersection::default() },
+                Intersection { t: 3.0, object: Arc::clone(&left), ..Intersection::default() },
+                Intersection { t: 4.0, object: Arc::clone(&right), ..Intersection::default() },
+            ];
+
+            for (operation, x0, x1) in examples.into_iter() {
+                let csg = Arc::new(Csg { operation, ..Csg::default() });
+                csg.set_children(Arc::clone(&left), Arc::clone(&right));
+
+                let result = csg.filter_intersections(intersections.clone());
+
+                assert_eq!(result.len(), 2);
+
+                assert_eq!(result[0], intersections[x0]);
+                assert_eq!(result[1], intersections[x1]);
+            }
         }
 
         it "A ray misses a CSG object" {
-            // Given c ← csg("union", sphere(), cube())
-            //   And r ← ray(point(0, 2, -5), vector(0, 0, 1))
-            // When xs ← local_intersect(c, r)
-            // Then xs is empty
+            let csg = Arc::new(Csg { operation: csg::Operation::Union, ..Csg::default() });
+            csg.set_children(Arc::new(Sphere::default()), Arc::new(Cube::default()));
+
+            let ray = Ray::new((0, 2, -5), (0, 0, 1));
+
+            let intersections = csg.local_intersections(&ray);
+
+            assert_eq!(intersections.len(), 0);
         }
 
         it "A ray hits a CSG object" {
-            // Given s1 ← sphere()
-            //   And s2 ← sphere()
-            //   And set_transform(s2, translation(0, 0, 0.5))
-            //   And c ← csg("union", s1, s2)
-            //   And r ← ray(point(0, 0, -5), vector(0, 0, 1))
-            // When xs ← local_intersect(c, r)
-            // Then xs.count = 2
-            //   And xs[0].t = 4
-            //   And xs[0].object = s1
-            //   And xs[1].t = 6.5
-            //   And xs[1].object = s2
+            let s1: Arc<dyn Shape> = Arc::new(Sphere::default());
+            let s2: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(0.0, 0.0, 0.5),
+                ..Sphere::default()
+            });
+
+            let csg = Arc::new(Csg { operation: csg::Operation::Union, ..Csg::default() });
+            csg.set_children(Arc::clone(&s1), Arc::clone(&s2));
+
+            let ray = Ray::new((0, 0, -5), (0, 0, 1));
+
+            let intersections = csg.local_intersections(&ray);
+
+            assert_eq!(intersections.len(), 2);
+            assert_eq!(intersections[0].t, 4.0);
+            assert_eq!(&intersections[0].object, &s1);
+            assert_eq!(intersections[1].t, 6.5);
+            assert_eq!(&intersections[1].object, &s2);
         }
     }
 }
