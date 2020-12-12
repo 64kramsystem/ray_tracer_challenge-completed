@@ -1,0 +1,1 @@
+Downloaded from https://nasa3d.arc.nasa.gov/detail/astronaut (and converted).
