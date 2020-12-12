@@ -42,19 +42,36 @@ pub struct Csg {
 }
 
 impl Csg {
-    // Can't define a new() function, without returning Arc<Self>, since the children's parent needs
-    // to be so. It could be ok to return Arc, but first the whole architecture needs to settle.
+    // Sets the children's parent to the new Csg instance.
+    // This can't be translated to a convenient constructor with defaults, because of the cross-references.
+    // Besides being arguably more convenient, it follows the book's pattern. The tradeoff is `transform`
+    // not having a default.
     //
-    // In the book, this is `csg()`.
-    //
-    pub fn set_children(self: &Arc<Self>, left: Arc<dyn Shape>, right: Arc<dyn Shape>) {
-        *self.children.lock().unwrap() = (Arc::clone(&left), Arc::clone(&right));
+    pub fn new(
+        operation: Operation,
+        left: Arc<dyn Shape>,
+        right: Arc<dyn Shape>,
+        transform: Matrix,
+    ) -> Arc<Csg> {
+        let csg = Arc::new(Csg {
+            operation,
+            children: Mutex::new((left, right)),
+            transform,
+            ..Csg::default()
+        });
 
-        let mut left_parent_ref = left.parent_mut();
-        *left_parent_ref = Arc::downgrade(&(Arc::clone(self) as Arc<dyn Shape>));
+        // Must release the mutex (which borrows) in order to return the owned instance.
+        {
+            let (left, right) = &(*csg.children());
 
-        let mut right_parent_ref = right.parent_mut();
-        *right_parent_ref = Arc::downgrade(&(Arc::clone(self) as Arc<dyn Shape>));
+            let mut left_parent_ref = left.parent_mut();
+            *left_parent_ref = Arc::downgrade(&(Arc::clone(&csg) as Arc<dyn Shape>));
+
+            let mut right_parent_ref = right.parent_mut();
+            *right_parent_ref = Arc::downgrade(&(Arc::clone(&csg) as Arc<dyn Shape>));
+        }
+
+        csg
     }
 
     // Convenience method.

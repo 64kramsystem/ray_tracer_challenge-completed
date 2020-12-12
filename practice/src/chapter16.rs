@@ -90,12 +90,12 @@ fn add_csg(objects: &mut Vec<Arc<dyn Shape>>) {
         ..Cube::default()
     });
 
-    let csg = Arc::new(Csg {
-        operation: csg::Operation::Difference,
-        transform: Matrix::translation(0.0, 1.0, 0.0),
-        ..Csg::default()
-    });
-    csg.set_children(Arc::clone(&sphere), Arc::clone(&cube));
+    let csg = Csg::new(
+        csg::Operation::Difference,
+        Arc::clone(&sphere),
+        Arc::clone(&cube),
+        Matrix::translation(0.0, 1.0, 0.0),
+    );
 
     objects.push(csg);
 
