@@ -6,7 +6,7 @@ use std::{
     sync::{Arc, Mutex, MutexGuard, Weak},
 };
 
-use super::{BoundedShape, Bounds, Group, Intersection, PointLight, Ray};
+use super::{BoundedShape, Bounds, Intersection, PointLight, Ray};
 use crate::{
     math::{Matrix, Tuple},
     properties::{Color, Material},
@@ -46,8 +46,8 @@ pub(crate) mod private {
 
 pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     fn id(&self) -> u32;
-    fn parent(&self) -> Option<Arc<Group>>;
-    fn parent_mut(&self) -> MutexGuard<Weak<Group>>;
+    fn parent(&self) -> Option<Arc<dyn Shape>>;
+    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>>;
     fn transform(&self) -> &Matrix;
     fn transform_mut(&mut self) -> &mut Matrix;
     fn material(&self) -> &Material;
@@ -99,6 +99,12 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     fn intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
         let transformed_ray = ray.inverse_transform(self.transform());
         self.local_intersections(&transformed_ray)
+    }
+
+    // Default implementation, for non-nested shapes.
+    //
+    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
+        self.id() == object.id()
     }
 
     // Local (object-level) bounds, with the shape transformation applied.

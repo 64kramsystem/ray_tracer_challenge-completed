@@ -22,8 +22,8 @@ pub struct Group {
     pub id: u32,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
-    #[default(Mutex::new(Weak::<Group>::new()))]
-    pub parent: Mutex<Weak<Group>>,
+    #[default(Mutex::new(Weak::<Self>::new()))]
+    pub parent: Mutex<Weak<dyn Shape>>,
     // This is tricky. Wrapping the vector with the mutex will cause contention, but wrapping the shape
     // will require all the Shape methods to be converted to functions taking Arc<Mutex<dyn shape>>;
     // this is possible, but ugly.
@@ -38,7 +38,7 @@ impl Group {
 
         let mut child_parent_ref = child.parent_mut();
 
-        *child_parent_ref = Arc::downgrade(&self);
+        *child_parent_ref = Arc::downgrade(&(Arc::clone(self) as Arc<dyn Shape>));
     }
 
     // Convenience method.
@@ -53,11 +53,11 @@ impl Shape for Group {
         self.id
     }
 
-    fn parent(&self) -> Option<Arc<Group>> {
+    fn parent(&self) -> Option<Arc<dyn Shape>> {
         Weak::upgrade(&*self.parent.lock().unwrap())
     }
 
-    fn parent_mut(&self) -> MutexGuard<Weak<Group>> {
+    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>> {
         self.parent.lock().unwrap()
     }
 
@@ -75,6 +75,10 @@ impl Shape for Group {
 
     fn material_mut(&mut self) -> &mut Material {
         panic!()
+    }
+
+    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
+        self.children().iter().any(|child| child.includes(object))
     }
 
     #[cfg(test)]
@@ -117,7 +121,7 @@ impl BoundedShape for Group {
     fn local_bounds(&self) -> Bounds {
         let mut group_bounds = Bounds::default();
 
-        for child in (*self.children.lock().unwrap()).iter() {
+        for child in self.children().iter() {
             let child_bounds = child.bounds();
 
             // "Optimized for readability".
