@@ -14,8 +14,8 @@ use crate::{
 pub struct Cone {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
-    #[default(Mutex::new(Weak::<Self>::new()))]
-    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Weak::<Mutex<Self>>::new())]
+    pub parent: Weak<Mutex<dyn Shape>>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]
@@ -31,7 +31,7 @@ pub struct Cone {
 impl Cone {
     fn intersect_caps(
         &self,
-        self_arc: &Arc<dyn Shape>,
+        self_arc: &Arc<Mutex<dyn Shape>>,
         ray: &Ray,
         intersections: &mut Vec<Intersection>,
     ) {
@@ -98,7 +98,7 @@ impl ShapeLocal for Cone {
 
     fn local_intersections(
         &self,
-        self_arc: &Arc<dyn Shape>,
+        self_arc: &Arc<Mutex<dyn Shape>>,
         transformed_ray: &super::Ray,
     ) -> Vec<Intersection> {
         let mut intersections = Vec::with_capacity(4);
@@ -123,7 +123,7 @@ impl ShapeLocal for Cone {
 
                 intersections.push(Intersection {
                     t,
-                    object: Arc::clone(&self_arc),
+                    object: Arc::clone(self_arc),
                     ..Intersection::default()
                 });
             }

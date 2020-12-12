@@ -1,4 +1,8 @@
-use std::{cmp::Ordering, fmt::Debug, sync::Arc};
+use std::{
+    cmp::Ordering,
+    fmt::Debug,
+    sync::{Arc, Mutex},
+};
 
 use crate::space::{Shape, Triangle};
 
@@ -12,8 +16,8 @@ use crate::space::{Shape, Triangle};
 pub struct Intersection {
     pub t: f64,
     pub uv: Option<(f64, f64)>,
-    #[default(Arc::new(Triangle::default()))]
-    pub object: Arc<dyn Shape>,
+    #[default(Arc::new(Mutex::new(Triangle::default())))]
+    pub object: Arc<Mutex<dyn Shape>>,
 }
 
 impl Eq for Intersection {}
@@ -24,7 +28,7 @@ impl Eq for Intersection {}
 //
 impl PartialEq for Intersection {
     fn eq(&self, other: &Self) -> bool {
-        self.t == other.t && self.object.id() == other.object.id()
+        self.t == other.t && self.object.lock().unwrap().id() == other.object.lock().unwrap().id()
     }
 }
 

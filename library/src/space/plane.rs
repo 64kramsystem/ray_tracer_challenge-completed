@@ -10,8 +10,8 @@ use crate::{lang::ApproximateFloat64Ops, math::Matrix, math::Tuple, properties::
 pub struct Plane {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
-    #[default(Mutex::new(Weak::<Self>::new()))]
-    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Weak::<Mutex<Self>>::new())]
+    pub parent: Weak<Mutex<dyn Shape>>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]
@@ -25,7 +25,7 @@ impl ShapeLocal for Plane {
 
     fn local_intersections(
         &self,
-        self_arc: &Arc<dyn Shape>,
+        self_arc: &Arc<Mutex<dyn Shape>>,
         transformed_ray: &Ray,
     ) -> Vec<Intersection> {
         if transformed_ray.direction.y.within_epsilon() {

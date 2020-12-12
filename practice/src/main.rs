@@ -1,20 +1,20 @@
 #![allow(dead_code)]
 
-mod chapter01;
-mod chapter02;
-mod chapter03;
-mod chapter04;
-mod chapter05;
-mod chapter06;
-mod chapter07;
-mod chapter09;
-mod chapter10;
-mod chapter11;
-mod chapter12;
-mod chapter13;
-mod chapter14;
+// mod chapter01;
+// mod chapter02;
+// mod chapter03;
+// mod chapter04;
+// mod chapter05;
+// mod chapter06;
+// mod chapter07;
+// mod chapter09;
+// mod chapter10;
+// mod chapter11;
+// mod chapter12;
+// mod chapter13;
+// mod chapter14;
 mod chapter15;
-mod chapter16;
+// mod chapter16;
 
 fn main() {
     // chapter01::practice();

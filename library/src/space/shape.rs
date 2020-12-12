@@ -26,7 +26,7 @@ pub(crate) fn new_shape_id() -> u32 {
 }
 
 pub(crate) mod private {
-    use std::sync::Arc;
+    use std::sync::{Arc, Mutex};
 
     use super::{Ray, Shape};
     use crate::{math::Tuple, space::Intersection};
@@ -42,7 +42,7 @@ pub(crate) mod private {
         //
         fn local_intersections(
             &self,
-            self_arc: &Arc<dyn Shape>,
+            self_arc: &Arc<Mutex<dyn Shape>>,
             transformed_ray: &Ray,
         ) -> Vec<Intersection>;
     }
@@ -50,8 +50,8 @@ pub(crate) mod private {
 
 pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     fn id(&self) -> u32;
-    fn parent(&self) -> Option<Arc<dyn Shape>>;
-    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>>;
+    fn parent(&self) -> Option<Arc<Mutex<dyn Shape>>>;
+    fn parent_mut(&mut self) -> &mut Weak<Mutex<dyn Shape>>;
     fn transform(&self) -> &Matrix;
     fn transform_mut(&mut self) -> &mut Matrix;
     fn material(&self) -> &Material;
@@ -73,7 +73,7 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
         let transform_inverse = self.transform().inverse();
 
         if let Some(parent) = self.parent() {
-            transform_inverse * &parent.world_to_object(world_point)
+            transform_inverse * &parent.lock().unwrap().world_to_object(world_point)
         } else {
             transform_inverse * world_point
         }
@@ -85,7 +85,7 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
         object_normal = object_normal.normalize();
 
         if let Some(parent) = self.parent() {
-            parent.normal_to_world(&object_normal)
+            parent.lock().unwrap().normal_to_world(&object_normal)
         } else {
             object_normal
         }
@@ -100,15 +100,15 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     // the intersections while traversing the tree, instead of creating separate arrays and sorting
     // the end result. This is a valid design even without considering the performance, as it fits nicely.
     //
-    fn intersections(&self, self_arc: &Arc<dyn Shape>, ray: &Ray) -> Vec<Intersection> {
+    fn intersections(&self, self_arc: &Arc<Mutex<dyn Shape>>, ray: &Ray) -> Vec<Intersection> {
         let transformed_ray = ray.inverse_transform(self.transform());
         self.local_intersections(self_arc, &transformed_ray)
     }
 
     // Default implementation, for non-nested shapes.
     //
-    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
-        self.id() == object.id()
+    fn includes(&self, object: &Arc<Mutex<dyn Shape>>) -> bool {
+        self.id() == object.lock().unwrap().id()
     }
 
     // Local (object-level) bounds, with the shape transformation applied.

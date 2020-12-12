@@ -26,8 +26,8 @@ pub enum ChildHit {
 pub struct Csg {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
-    #[default(Mutex::new(Weak::<Self>::new()))]
-    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Weak::<Mutex<Self>>::new())]
+    pub parent: Weak<Mutex<dyn Shape>>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
 
@@ -37,8 +37,8 @@ pub struct Csg {
     pub operation: Operation,
     // For ease, we follow the Group#children pattern, but this prevents modifications to the children.
     // Structure: (left, right).
-    #[default(Mutex::new((Arc::new(Plane::default()), Arc::new(Plane::default()))))]
-    pub children: Mutex<(Arc<dyn Shape>, Arc<dyn Shape>)>,
+    #[default((Arc::new(Mutex::new(Plane::default())), Arc::new(Mutex::new(Plane::default()))))]
+    pub children: (Arc<Mutex<dyn Shape>>, Arc<Mutex<dyn Shape>>),
 }
 
 impl Csg {
@@ -49,35 +49,32 @@ impl Csg {
     //
     pub fn new(
         operation: Operation,
-        left: Arc<dyn Shape>,
-        right: Arc<dyn Shape>,
+        left: Arc<Mutex<dyn Shape>>,
+        right: Arc<Mutex<dyn Shape>>,
         transform: Matrix,
-    ) -> Arc<Csg> {
-        let csg = Arc::new(Csg {
+    ) -> Arc<Mutex<Csg>> {
+        let csg = Arc::new(Mutex::new(Csg {
             operation,
-            children: Mutex::new((left, right)),
+            children: (left, right),
             transform,
             ..Csg::default()
-        });
+        }));
 
         // Must release the mutex (which borrows) in order to return the owned instance.
         {
-            let (left, right) = &(*csg.children());
+            let csg_mtx = csg.lock().unwrap();
 
-            let mut left_parent_ref = left.parent_mut();
-            *left_parent_ref = Arc::downgrade(&(Arc::clone(&csg) as Arc<dyn Shape>));
+            let mut left = csg_mtx.children.0.lock().unwrap();
+            let mut right = csg_mtx.children.1.lock().unwrap();
 
-            let mut right_parent_ref = right.parent_mut();
-            *right_parent_ref = Arc::downgrade(&(Arc::clone(&csg) as Arc<dyn Shape>));
+            let left_parent_ref = left.parent_mut();
+            *left_parent_ref = Arc::downgrade(&(Arc::clone(&csg) as Arc<Mutex<dyn Shape>>));
+
+            let right_parent_ref = right.parent_mut();
+            *right_parent_ref = Arc::downgrade(&(Arc::clone(&csg) as Arc<Mutex<dyn Shape>>));
         }
 
         csg
-    }
-
-    // Convenience method.
-    //
-    pub fn children(&self) -> MutexGuard<(Arc<dyn Shape>, Arc<dyn Shape>)> {
-        self.children.lock().unwrap()
     }
 
     pub(crate) fn intersection_allowed(
@@ -119,7 +116,7 @@ impl Csg {
 
         let mut result = Vec::with_capacity(intersections.len());
 
-        let left_child = &self.children().0;
+        let left_child = self.children.0.lock().unwrap();
 
         for intersection in intersections {
             let child_hit = if left_child.includes(&intersection.object) {
@@ -149,12 +146,12 @@ impl Shape for Csg {
         self.id
     }
 
-    fn parent(&self) -> Option<Arc<dyn Shape>> {
-        Weak::upgrade(&*self.parent.lock().unwrap())
+    fn parent(&self) -> Option<Arc<Mutex<dyn Shape>>> {
+        Weak::upgrade(&self.parent)
     }
 
-    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>> {
-        self.parent.lock().unwrap()
+    fn parent_mut(&mut self) -> &mut Weak<Mutex<dyn Shape>> {
+        &mut self.parent
     }
 
     fn transform(&self) -> &Matrix {
@@ -173,10 +170,11 @@ impl Shape for Csg {
         panic!()
     }
 
-    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
-        let children = self.children();
+    fn includes(&self, object: &Arc<Mutex<dyn Shape>>) -> bool {
+        let left = self.children.0.lock().unwrap();
+        let right = self.children.1.lock().unwrap();
 
-        children.0.includes(object) || children.1.includes(object)
+        left.includes(object) || right.includes(object)
     }
 
     #[cfg(test)]
@@ -192,16 +190,23 @@ impl ShapeLocal for Csg {
 
     fn local_intersections(
         &self,
-        _self_arc: &Arc<dyn Shape>,
+        _self_arc: &Arc<Mutex<dyn Shape>>,
         transformed_ray: &Ray,
     ) -> Vec<Intersection> {
         // filter_intersections() locks the children, so we need to drop the mutex before then.
         //
         let mut all_intersections = {
-            let (left_child, right_child) = &(*self.children());
+            let left_child = &self.children.0;
+            let right_child = &self.children.1;
 
-            let mut left_intersections = left_child.intersections(left_child, transformed_ray);
-            let right_intersections = right_child.intersections(right_child, transformed_ray);
+            let mut left_intersections = left_child
+                .lock()
+                .unwrap()
+                .intersections(&left_child, transformed_ray);
+            let right_intersections = right_child
+                .lock()
+                .unwrap()
+                .intersections(&right_child, transformed_ray);
 
             left_intersections.extend(right_intersections);
 

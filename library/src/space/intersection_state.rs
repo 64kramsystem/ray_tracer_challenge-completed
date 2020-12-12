@@ -1,11 +1,11 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use crate::{math::Tuple, space::Shape};
 
 #[derive(Debug)]
 pub struct IntersectionState {
     pub t: f64,
-    pub object: Arc<dyn Shape>,
+    pub object: Arc<Mutex<dyn Shape>>,
     pub point: Tuple,
     pub over_point: Tuple,
     pub under_point: Tuple,
@@ -22,7 +22,7 @@ pub struct IntersectionState {
 impl PartialEq for IntersectionState {
     fn eq(&self, other: &Self) -> bool {
         self.t == other.t
-            && self.object.eq(&other.object)
+            && self.object.lock().unwrap().id() == other.object.lock().unwrap().id()
             && self.point == other.point
             && self.over_point == other.over_point
             && self.under_point == other.under_point

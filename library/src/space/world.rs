@@ -1,4 +1,7 @@
-use std::{collections::BTreeSet, sync::Arc};
+use std::{
+    collections::BTreeSet,
+    sync::{Arc, Mutex},
+};
 
 use super::{intersection::Intersection, IntersectionState, PointLight, Ray, Shape, Sphere};
 use crate::{
@@ -11,34 +14,34 @@ use crate::{
 pub struct World {
     // In order to make the objects modifiable, a Mutex is required.
     //
-    pub objects: Vec<Arc<dyn Shape>>,
+    pub objects: Vec<Arc<Mutex<dyn Shape>>>,
     pub light_source: PointLight,
 }
 
 impl World {
-    pub fn default() -> Self {
-        World {
-            objects: vec![
-                Arc::new(Sphere {
-                    material: Material {
-                        pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
-                        diffuse: 0.7,
-                        specular: 0.2,
-                        ..Material::default()
-                    },
-                    ..Sphere::default()
-                }),
-                Arc::new(Sphere {
-                    transform: Matrix::scaling(0.5, 0.5, 0.5),
-                    ..Sphere::default()
-                }),
-            ],
-            light_source: PointLight {
-                position: Tuple::point(-10, 10, -10),
-                intensity: COLOR_WHITE,
-            },
-        }
-    }
+    // pub fn default() -> Self {
+    //     World {
+    //         objects: vec![
+    //             Arc::new(Sphere {
+    //                 material: Material {
+    //                     pattern: Box::new(FlatPattern::new(0.8, 1.0, 0.6)),
+    //                     diffuse: 0.7,
+    //                     specular: 0.2,
+    //                     ..Material::default()
+    //                 },
+    //                 ..Sphere::default()
+    //             }),
+    //             Arc::new(Sphere {
+    //                 transform: Matrix::scaling(0.5, 0.5, 0.5),
+    //                 ..Sphere::default()
+    //             }),
+    //         ],
+    //         light_source: PointLight {
+    //             position: Tuple::point(-10, 10, -10),
+    //             intensity: COLOR_WHITE,
+    //         },
+    //     }
+    // }
 
     // Returns the hit, and all the (sorted) intersections.
     //
@@ -51,7 +54,7 @@ impl World {
         let mut hit: Option<Intersection> = None;
 
         for object in self.objects.iter() {
-            let object_intersections = object.intersections(object, ray);
+            let object_intersections = object.lock().unwrap().intersections(object, ray);
 
             // Object intersections are not guaranteed to be ordered, so we need to go through each.
             //
@@ -84,7 +87,7 @@ impl World {
     //
     pub fn is_ray_obstructed(&self, ray: &Ray, distance: f64) -> bool {
         for object in self.objects.iter() {
-            let object_intersections = object.intersections(object, ray);
+            let object_intersections = object.lock().unwrap().intersections(object, ray);
 
             for intersection in object_intersections {
                 if intersection.t >= 0.0 && intersection.t < distance {
@@ -99,7 +102,9 @@ impl World {
     pub fn shade_hit(&self, intersection_state: IntersectionState, max_recursions: u8) -> Color {
         let is_shadowed = self.is_shadowed(&intersection_state.over_point);
 
-        let surface_color = intersection_state.object.lighting(
+        let intersection_state_obj_mtx = intersection_state.object.lock().unwrap();
+
+        let surface_color = intersection_state_obj_mtx.lighting(
             &self.light_source,
             &intersection_state.point,
             &intersection_state.eyev,
@@ -110,7 +115,7 @@ impl World {
         let reflected_color = self.reflected_color(&intersection_state, max_recursions);
         let refracted_color = self.refracted_color(&intersection_state, max_recursions);
 
-        let material = intersection_state.object.material();
+        let material = intersection_state_obj_mtx.material();
 
         if material.reflective > 0.0 && material.transparency > 0.0 {
             let reflectance = intersection_state.schlick();
@@ -139,9 +144,10 @@ impl World {
         intersection_state: &IntersectionState,
         max_recursions: u8,
     ) -> Color {
+        let intersection_state_obj_mtx = intersection_state.object.lock().unwrap();
+
         if max_recursions == 0
-            || intersection_state
-                .object
+            || intersection_state_obj_mtx
                 .material()
                 .reflective
                 .approximate()
@@ -157,7 +163,7 @@ impl World {
 
         let color = self.color_at(&reflect_ray, max_recursions - 1);
 
-        return color * intersection_state.object.material().reflective;
+        color * intersection_state_obj_mtx.material().reflective
     }
 
     pub fn refracted_color(
@@ -165,7 +171,9 @@ impl World {
         intersection_state: &IntersectionState,
         max_recursions: u8,
     ) -> Color {
-        if max_recursions == 0 || intersection_state.object.material().transparency == 0.0 {
+        let intersection_state_obj_mtx = intersection_state.object.lock().unwrap();
+
+        if max_recursions == 0 || intersection_state_obj_mtx.material().transparency == 0.0 {
             return COLOR_BLACK;
         }
 
@@ -190,7 +198,7 @@ impl World {
         };
 
         self.color_at(&refracted_ray, max_recursions - 1)
-            * intersection_state.object.material().transparency
+            * intersection_state_obj_mtx.material().transparency
     }
 
     pub fn is_shadowed(&self, point: &Tuple) -> bool {

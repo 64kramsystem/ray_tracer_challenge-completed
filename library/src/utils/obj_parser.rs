@@ -2,7 +2,7 @@ use std::{
     collections::HashMap,
     error::Error,
     io::{self, BufRead, BufReader},
-    sync::Arc,
+    sync::{Arc, Mutex},
 };
 
 use regex::Regex;
@@ -47,7 +47,8 @@ pub struct ObjParser {
     //
     vertices: Vec<Tuple>,
     normals: Vec<Tuple>,
-    groups: HashMap<String, Arc<Group>>,
+    // The Arc<Mutex> can be avoided by just using a Vec<Triangle>, and converting on export.
+    groups: HashMap<String, Arc<Mutex<Group>>>,
 }
 
 impl ObjParser {
@@ -58,7 +59,7 @@ impl ObjParser {
         // for loop (match) scope, they don't survive this (the outer) scope.
         //
         let mut groups = HashMap::new();
-        let default_group: Arc<Group> = Arc::new(Group::default());
+        let default_group: Arc<Mutex<Group>> = Arc::new(Mutex::new(Group::default()));
         groups.insert(DEFAULT_GROUP_NAME.to_string(), default_group);
 
         let mut parser = Self {
@@ -81,10 +82,11 @@ impl ObjParser {
                         let p2 = parser.vertex(p2i);
                         let p3 = parser.vertex(p3i);
 
-                        let triangle: Arc<dyn Shape> = Arc::new(Triangle::new(p1, p2, p3));
+                        let triangle: Arc<Mutex<dyn Shape>> =
+                            Arc::new(Mutex::new(Triangle::new(p1, p2, p3)));
 
                         let group = parser.groups.entry(current_group_name.to_string());
-                        group.and_modify(|group| group.add_child(&triangle));
+                        group.and_modify(|group| Group::add_child(group, &triangle));
                     }
                 }
                 FaceWithNormal((p1i, n1i), (p2i, n2i), (p3i, n3i)) => {
@@ -95,17 +97,17 @@ impl ObjParser {
                     let n2 = parser.normal(n2i);
                     let n3 = parser.normal(n3i);
 
-                    let triangle: Arc<dyn Shape> =
-                        Arc::new(Triangle::smooth(p1, p2, p3, n1, n2, n3));
+                    let triangle: Arc<Mutex<dyn Shape>> =
+                        Arc::new(Mutex::new(Triangle::smooth(p1, p2, p3, n1, n2, n3)));
 
                     let group = parser.groups.entry(current_group_name.to_string());
-                    group.and_modify(|group| group.add_child(&triangle));
+                    group.and_modify(|group| Group::add_child(group, &triangle));
                 }
                 Group(group_name) => {
                     let groups = &mut parser.groups;
                     groups
                         .entry(group_name.clone())
-                        .or_insert(Arc::new(Group::default()));
+                        .or_insert(Arc::new(Mutex::new(Group::default())));
                     current_group_name = group_name;
                 }
                 Invalid => {}
@@ -115,23 +117,23 @@ impl ObjParser {
         Ok(parser)
     }
 
-    pub fn default_group(&self) -> &Arc<Group> {
+    pub fn default_group(&self) -> &Arc<Mutex<Group>> {
         &self.groups[DEFAULT_GROUP_NAME]
     }
 
-    pub fn group(&self, group_name: &str) -> Arc<Group> {
+    pub fn group(&self, group_name: &str) -> Arc<Mutex<Group>> {
         Arc::clone(&self.groups[group_name])
     }
 
     // Export the groups as tree, with thre group as leaves of a new root group.
     // In the group, this is `obj_to_group()`;
     //
-    pub fn export_tree(&self) -> Arc<Group> {
-        let root_group: Arc<Group> = Arc::new(Group::default());
+    pub fn export_tree(&self) -> Arc<Mutex<Group>> {
+        let root_group: Arc<Mutex<Group>> = Arc::new(Mutex::new(Group::default()));
 
         for group in self.groups.values() {
-            let group = Arc::clone(group) as Arc<dyn Shape>;
-            root_group.add_child(&group)
+            let group = Arc::clone(group) as Arc<Mutex<dyn Shape>>;
+            Group::add_child(&root_group, &group);
         }
 
         root_group

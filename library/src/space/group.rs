@@ -22,39 +22,33 @@ pub struct Group {
     pub id: u32,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
-    #[default(Mutex::new(Weak::<Self>::new()))]
-    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Weak::<Mutex<Self>>::new())]
+    pub parent: Weak<Mutex<dyn Shape>>,
     // This is tricky. Wrapping the vector with the mutex will cause contention, but wrapping the shape
     // will require all the Shape methods to be converted to functions taking Arc<Mutex<dyn shape>>;
     // this is possible, but ugly.
     //
-    #[default(Mutex::new(vec![]))]
-    pub children: Mutex<Vec<Arc<dyn Shape>>>,
+    #[default(vec![])]
+    pub children: Vec<Arc<Mutex<dyn Shape>>>,
 
-    // Simple optimization. Needs to be behind a Mutex since it's used in an Arc<Self> context (damn);
-    // otherwise, it should be manipulated from outside.
+    // Simple optimization.
     // It saves relatively little (10% on the astronaut1 test), however, it's very simple and fits nicely.
     //
-    pub local_bounds: Mutex<Bounds>,
+    pub local_bounds: Bounds,
 }
 
 impl Group {
-    pub fn add_child(self: &Arc<Self>, child: &Arc<dyn Shape>) {
-        self.children().push(Arc::clone(child));
+    pub fn add_child(group: &Arc<Mutex<Self>>, child: &Arc<Mutex<dyn Shape>>) {
+        let mut group_mtx = group.lock().unwrap();
+        group_mtx.children.push(Arc::clone(child));
 
-        let mut child_parent_ref = child.parent_mut();
+        let mut child_mtx = child.lock().unwrap();
 
-        *child_parent_ref = Arc::downgrade(&(Arc::clone(self) as Arc<dyn Shape>));
+        let child_parent_ref = child_mtx.parent_mut();
 
-        let mut local_bounds_mtx = self.local_bounds.lock().unwrap();
+        *child_parent_ref = Arc::downgrade(&(Arc::clone(group) as Arc<Mutex<dyn Shape>>));
 
-        Bounds::update_from_bound(&mut *local_bounds_mtx, &child.local_bounds());
-    }
-
-    // Convenience method.
-    //
-    pub fn children(&self) -> MutexGuard<Vec<Arc<dyn Shape>>> {
-        self.children.lock().unwrap()
+        Bounds::update_from_bound(&mut group_mtx.local_bounds, &child_mtx.local_bounds());
     }
 }
 
@@ -63,12 +57,12 @@ impl Shape for Group {
         self.id
     }
 
-    fn parent(&self) -> Option<Arc<dyn Shape>> {
-        Weak::upgrade(&*self.parent.lock().unwrap())
+    fn parent(&self) -> Option<Arc<Mutex<dyn Shape>>> {
+        Weak::upgrade(&self.parent)
     }
 
-    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>> {
-        self.parent.lock().unwrap()
+    fn parent_mut(&mut self) -> &mut Weak<Mutex<dyn Shape>> {
+        &mut self.parent
     }
 
     fn transform(&self) -> &Matrix {
@@ -87,8 +81,10 @@ impl Shape for Group {
         panic!()
     }
 
-    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
-        self.children().iter().any(|child| child.includes(object))
+    fn includes(&self, object: &Arc<Mutex<dyn Shape>>) -> bool {
+        self.children
+            .iter()
+            .any(|child| child.lock().unwrap().includes(object))
     }
 
     #[cfg(test)]
@@ -104,7 +100,7 @@ impl ShapeLocal for Group {
 
     fn local_intersections(
         &self,
-        self_arc: &Arc<dyn Shape>,
+        self_arc: &Arc<Mutex<dyn Shape>>,
         transformed_ray: &Ray,
     ) -> Vec<Intersection> {
         let local_bounds = self.local_bounds();
@@ -117,9 +113,9 @@ impl ShapeLocal for Group {
         }
 
         let mut intersections = self
-            .children()
+            .children
             .iter()
-            .flat_map(|child| child.intersections(child, transformed_ray))
+            .flat_map(|child| child.lock().unwrap().intersections(child, transformed_ray))
             .collect::<Vec<_>>();
 
         intersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -130,6 +126,6 @@ impl ShapeLocal for Group {
 
 impl BoundedShape for Group {
     fn local_bounds(&self) -> Bounds {
-        *self.local_bounds.lock().unwrap()
+        self.local_bounds
     }
 }

@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use super::{Intersection, IntersectionState};
 use crate::{
@@ -61,7 +61,11 @@ impl Ray {
     ) -> IntersectionState {
         let point = self.position(intersection.t);
         let eyev = -self.direction;
-        let mut normalv = intersection.object.normal(&point, intersection);
+        let mut normalv = intersection
+            .object
+            .lock()
+            .unwrap()
+            .normal(&point, intersection);
         let inside = if normalv.dot_product(&eyev) >= 0.0 {
             false
         } else {
@@ -91,7 +95,7 @@ impl Ray {
     // In the book, this is part of `prepare_computations(i, r)`.
     //
     pub fn refraction_indexes(hit: &Intersection, intersections: &[Intersection]) -> (f64, f64) {
-        let mut containers = Vec::<Arc<dyn Shape>>::new();
+        let mut containers = Vec::<Arc<Mutex<dyn Shape>>>::new();
         let mut comps = (None, None);
 
         for intersection in intersections.iter() {
@@ -99,16 +103,15 @@ impl Ray {
                 let container_last = containers.last();
 
                 if let Some(object) = container_last {
-                    comps.0 = Some(object.material().refractive_index);
+                    comps.0 = Some(object.lock().unwrap().material().refractive_index);
                 } else {
                     comps.0 = Some(REFRACTIVE_INDEX_VACUUM);
                 }
             }
 
-            if let Some(pos) = containers
-                .iter()
-                .position(|object| object.id() == intersection.object.id())
-            {
+            if let Some(pos) = containers.iter().position(|object| {
+                object.lock().unwrap().id() == intersection.object.lock().unwrap().id()
+            }) {
                 containers.remove(pos);
             } else {
                 containers.push(Arc::clone(&intersection.object));
@@ -118,7 +121,7 @@ impl Ray {
                 let container_last = containers.last();
 
                 if let Some(object) = container_last {
-                    comps.1 = Some(object.material().refractive_index);
+                    comps.1 = Some(object.lock().unwrap().material().refractive_index);
                 } else {
                     comps.1 = Some(REFRACTIVE_INDEX_VACUUM);
                 }

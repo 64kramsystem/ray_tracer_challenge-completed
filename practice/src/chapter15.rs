@@ -1,4 +1,10 @@
-use std::{f64::consts::PI, fs::File, io::BufReader, path::Path, sync::Arc};
+use std::{
+    f64::consts::PI,
+    fs::File,
+    io::BufReader,
+    path::Path,
+    sync::{Arc, Mutex},
+};
 
 use library::{
     interface::Sdl2Interface,
@@ -9,11 +15,11 @@ use library::{
 
 const ASSETS_PATH: &str = "testing_assets";
 
-const SCREEN_WIDTH: u16 = 25; // height is half
+const SCREEN_WIDTH: u16 = 2; // height is half
 
 const LIGHT_POSITION: (i32, i32, i32) = (0, 50, -100);
 
-fn add_astronaut(objects: &mut Vec<Arc<dyn Shape>>) {
+fn add_astronaut(objects: &mut Vec<Arc<Mutex<dyn Shape>>>) {
     let file_path = Path::new(ASSETS_PATH).join("astronaut1.obj");
     let file_reader = BufReader::new(File::open(file_path).unwrap());
 
@@ -21,7 +27,7 @@ fn add_astronaut(objects: &mut Vec<Arc<dyn Shape>>) {
 
     let default_group = Arc::clone(parser.default_group());
 
-    objects.push(default_group as Arc<dyn Shape>);
+    objects.push(default_group as Arc<Mutex<dyn Shape>>);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
