@@ -1,6 +1,3 @@
-#[cfg(test)]
-use std::any::Any;
-
 use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
 use super::{
@@ -8,6 +5,9 @@ use super::{
     BoundedShape, Bounds, Cube, Intersection, Ray, Shape,
 };
 use crate::{math::Matrix, math::Tuple, properties::Material};
+
+#[cfg(test)]
+use std::any::Any;
 
 // For nested groups, an optimization is to reduce the transformations by pushing them to the children,
 // although it requires some modification. Since in this project there is a maximum of one level, the

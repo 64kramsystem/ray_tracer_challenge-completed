@@ -1,6 +1,3 @@
-#[cfg(test)]
-use std::any::Any;
-
 use std::{
     fmt,
     sync::{Arc, Mutex, MutexGuard, Weak},
@@ -11,6 +8,9 @@ use crate::{
     math::{Matrix, Tuple},
     properties::{Color, Material},
 };
+
+#[cfg(test)]
+use std::any::Any;
 
 lazy_static::lazy_static! {
   static ref NEXT_ID: Mutex<u32> = Mutex::new(1);

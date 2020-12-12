@@ -1,6 +1,3 @@
-#[cfg(test)]
-use std::any::Any;
-
 use std::sync::{Arc, Mutex, MutexGuard, Weak};
 
 use super::{
@@ -8,6 +5,9 @@ use super::{
     BoundedShape, Bounds, Intersection, Plane, Ray, Shape,
 };
 use crate::{math::Matrix, math::Tuple, properties::Material};
+
+#[cfg(test)]
+use std::any::Any;
 
 #[derive(Debug, PartialEq)]
 pub enum Operation {
