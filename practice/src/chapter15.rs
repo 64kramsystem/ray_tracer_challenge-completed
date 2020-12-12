@@ -61,7 +61,7 @@ pub fn practice() {
     let world = prepare_world();
     let camera = prepare_camera();
 
-    let mut interface: Sdl2Interface = camera.render(&world);
+    let mut _interface: Sdl2Interface = camera.render(&world);
 
-    interface.wait_keypress();
+    // interface.wait_keypress();
 }
