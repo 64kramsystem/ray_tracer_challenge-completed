@@ -6,8 +6,6 @@ use super::{
 };
 use crate::{lang::ApproximateFloat64Ops, math::Matrix, math::Tuple, properties::Material};
 
-const UNSUPPORTED_FEATURE_MESSAGE: &str = "Group/Box logic not implemented";
-
 #[derive(Debug, ShapeAccessors, SmartDefault)]
 pub struct Triangle {
     #[default(_code = "shape::new_shape_id()")]
@@ -149,6 +147,18 @@ impl ShapeLocal for Triangle {
 
 impl BoundedShape for Triangle {
     fn local_bounds(&self) -> Bounds {
-        panic!(UNSUPPORTED_FEATURE_MESSAGE)
+        let mut bounds = Bounds::default();
+
+        for p in &[self.p1, self.p2, self.p3] {
+            bounds.min.x = bounds.min.x.min(p.x);
+            bounds.min.y = bounds.min.y.min(p.y);
+            bounds.min.z = bounds.min.z.min(p.z);
+
+            bounds.max.x = bounds.max.x.max(p.x);
+            bounds.max.y = bounds.max.y.max(p.y);
+            bounds.max.z = bounds.max.z.max(p.z);
+        }
+
+        bounds
     }
 }
