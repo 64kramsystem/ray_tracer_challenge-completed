@@ -29,7 +29,7 @@ pub struct Cone {
 }
 
 impl Cone {
-    fn intersect_caps(self: Arc<Self>, ray: &Ray, intersections: &mut Vec<Intersection>) {
+    fn intersect_caps(self: &Arc<Self>, ray: &Ray, intersections: &mut Vec<Intersection>) {
         // Caps only matter if the Cone is closed, and might possibly be intersected by the ray.
         //
         if !self.closed || ray.direction.y.approximate() == 0.0 {
@@ -44,7 +44,7 @@ impl Cone {
         if Self::check_cap(&ray, t1, self.minimum) {
             intersections.push(Intersection {
                 t: t1,
-                object: Arc::clone(&self) as Arc<dyn Shape>,
+                object: Arc::clone(self) as Arc<dyn Shape>,
                 ..Intersection::default()
             });
         }
@@ -54,7 +54,7 @@ impl Cone {
         if Self::check_cap(&ray, t2, self.maximum) {
             intersections.push(Intersection {
                 t: t2,
-                object: self,
+                object: Arc::clone(self) as Arc<dyn Shape>,
                 ..Intersection::default()
             });
         }
