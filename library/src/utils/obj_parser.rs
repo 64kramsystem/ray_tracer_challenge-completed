@@ -18,8 +18,8 @@ lazy_static::lazy_static! {
     // Faces with texture vertices (`f a/b/c...`) are decoded as faces with normals only, as texture
     // vertices are not supported.
 
-    static ref VERTEX_REGEX: Regex = Regex::new(r"^v (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?)$").unwrap();
-    static ref VERTEX_NORMAL_REGEX: Regex = Regex::new(r"^vn (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?) (-?\d(?:\.\d+)?)$").unwrap();
+    static ref VERTEX_REGEX: Regex = Regex::new(r"^v (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)$").unwrap();
+    static ref VERTEX_NORMAL_REGEX: Regex = Regex::new(r"^vn (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)$").unwrap();
     static ref FACES_REGEX: Regex = Regex::new(r"^f (\d+) (\d+(?: \d+)+)$").unwrap();
     static ref FACE_WITH_NORMAL_REGEX: Regex = Regex::new(r"^f (\d+)/\d*/(\d+) (\d+)/\d*/(\d+) (\d+)/\d*/(\d+)$").unwrap();
     static ref GROUP_REGEX: Regex = Regex::new(r"^g (\w+)$").unwrap();
