@@ -121,7 +121,7 @@ impl BoundedShape for Group {
     fn local_bounds(&self) -> Bounds {
         let mut group_bounds = Bounds::default();
 
-        for child in (*self.children.lock().unwrap()).iter() {
+        for child in self.children().iter() {
             let child_bounds = child.bounds();
 
             // "Optimized for readability".
