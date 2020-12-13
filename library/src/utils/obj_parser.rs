@@ -115,22 +115,26 @@ impl ObjParser {
         Ok(parser)
     }
 
-    pub fn default_group(&self) -> &Arc<Group> {
-        &self.groups[DEFAULT_GROUP_NAME]
+    // For testing purposes.
+    //
+    pub fn default_group(&self) -> Arc<Group> {
+        self.group(DEFAULT_GROUP_NAME)
     }
 
+    // Originally for testing purposes; currently, used as reference to export a group.
+    //
     pub fn group(&self, group_name: &str) -> Arc<Group> {
         Arc::clone(&self.groups[group_name])
     }
 
-    // Export the groups as tree, with thre group as leaves of a new root group.
-    // In the group, this is `obj_to_group()`;
+    // Export the groups as tree, with the group as leaves of a new root group.
+    // In the book, this is `obj_to_group()`.
     //
     pub fn export_tree(&self) -> Arc<Group> {
         let root_group: Arc<Group> = Arc::new(Group::default());
 
-        for group in self.groups.values() {
-            let group = Arc::clone(group) as Arc<dyn Shape>;
+        for group_name in self.groups.keys() {
+            let group = self.group(group_name) as Arc<dyn Shape>;
             root_group.add_child(&group)
         }
 

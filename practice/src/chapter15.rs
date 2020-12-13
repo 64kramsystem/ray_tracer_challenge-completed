@@ -19,7 +19,7 @@ fn add_astronaut(objects: &mut Vec<Arc<dyn Shape>>) {
 
     let parser = ObjParser::parse(file_reader).unwrap();
 
-    let default_group = Arc::clone(parser.default_group());
+    let default_group = parser.default_group();
 
     objects.push(default_group as Arc<dyn Shape>);
 }
