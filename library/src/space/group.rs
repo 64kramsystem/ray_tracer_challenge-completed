@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex, MutexGuard, Weak};
+use std::sync::{Arc, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},
@@ -22,29 +22,50 @@ pub struct Group {
     pub id: u32,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
-    #[default(Mutex::new(Weak::<Self>::new()))]
-    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Weak::<Self>::new())]
+    pub parent: Weak<dyn Shape>,
+
     // This is tricky. Wrapping the vector with the mutex will cause contention, but wrapping the shape
     // will require all the Shape methods to be converted to functions taking Arc<Mutex<dyn shape>>;
     // this is possible, but ugly.
     //
-    #[default(Mutex::new(vec![]))]
-    pub children: Mutex<Vec<Arc<dyn Shape>>>,
+    #[default(vec![])]
+    pub children: Vec<Arc<dyn Shape>>,
 }
 
 impl Group {
-    pub fn add_child(self: &Arc<Self>, child: &Arc<dyn Shape>) {
-        self.children().push(Arc::clone(child));
-
-        let mut child_parent_ref = child.parent_mut();
-
-        *child_parent_ref = Arc::downgrade(&(Arc::clone(self) as Arc<dyn Shape>));
-    }
-
-    // Convenience method.
+    // In the book, this is `add_child()`.
     //
-    pub fn children(&self) -> MutexGuard<Vec<Arc<dyn Shape>>> {
-        self.children.lock().unwrap()
+    // In order to create a bidirectional tree, interior mutability is required. Since the intent is
+    // _not_ to have mutexes, unsafe code is used.
+    //
+    // Although an Arc can be borrowed as mutable, it's still not possible, because:
+    //
+    // - if we get the group mutable reference before the children parent set cycle, the children will
+    //   require an immutable borrow (in order to clone the Arc)
+    // - if we get the mutable reference after the children cycle, there are now multiple Arc clones,
+    //   so the mutable reference will fail
+    //
+    // Group mutability is required in order to add the children.
+    //
+    pub fn new(transform: Matrix, mut children: Vec<Arc<dyn Shape>>) -> Arc<Group> {
+        let mut group = Arc::new(Group {
+            transform,
+            ..Group::default()
+        });
+
+        for child in children.iter_mut() {
+            // Children needs to be unchecked as well, otherwise shapes can't be nested.
+            //
+            let child_parent_ref = unsafe { Arc::get_mut_unchecked(child) }.parent_mut();
+            let parent_ref = Arc::clone(&group) as Arc<dyn Shape>;
+            *child_parent_ref = Arc::downgrade(&parent_ref);
+        }
+
+        let group_mut = unsafe { Arc::get_mut_unchecked(&mut group) };
+        group_mut.children = children;
+
+        group
     }
 }
 
@@ -54,11 +75,11 @@ impl Shape for Group {
     }
 
     fn parent(&self) -> Option<Arc<dyn Shape>> {
-        Weak::upgrade(&*self.parent.lock().unwrap())
+        Weak::upgrade(&self.parent)
     }
 
-    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>> {
-        self.parent.lock().unwrap()
+    fn parent_mut(&mut self) -> &mut Weak<dyn Shape> {
+        &mut self.parent
     }
 
     fn transform(&self) -> &Matrix {
@@ -78,7 +99,7 @@ impl Shape for Group {
     }
 
     fn includes(&self, object: &Arc<dyn Shape>) -> bool {
-        self.children().iter().any(|child| child.includes(object))
+        self.children.iter().any(|child| child.includes(object))
     }
 
     #[cfg(test)]
@@ -106,7 +127,7 @@ impl ShapeLocal for Group {
         }
 
         let mut intersections = self
-            .children()
+            .children
             .iter()
             .flat_map(|child| Arc::clone(child).intersections(transformed_ray))
             .collect::<Vec<_>>();
@@ -124,7 +145,7 @@ impl BoundedShape for Group {
     fn local_bounds(&self) -> Bounds {
         let mut group_bounds = Bounds::default();
 
-        for child in self.children().iter() {
+        for child in self.children.iter() {
             let child_bounds = child.bounds();
             Bounds::update_from_bound(&mut group_bounds, &child_bounds);
         }

@@ -31,35 +31,27 @@ fn hexagon_edge() -> Arc<dyn Shape> {
 }
 
 fn hexagon_side(transform: Matrix) -> Arc<dyn Shape> {
-    let side: Arc<Group> = Arc::new(Group {
-        transform,
-        ..Group::default()
-    });
+    let children = vec![hexagon_corner(), hexagon_edge()];
 
-    Group::add_child(&side, &hexagon_corner());
-    Group::add_child(&side, &hexagon_edge());
-
-    side
+    Group::new(transform, children)
 }
 
 fn hexagon() -> Arc<dyn Shape> {
+    let sides = (0..6)
+        .map(|n| {
+            let transform = Matrix::rotation(Axis::Y, n as f64 * PI / 3.0);
+            hexagon_side(transform)
+        })
+        .collect::<Vec<_>>();
+
     // Transformation added to make it look nicer.
     //
-    let hex: Arc<Group> = Arc::new(Group {
-        transform: Matrix::translation(-0.2, 0.7, 0.0)
+    Group::new(
+        Matrix::translation(-0.2, 0.7, 0.0)
             * &Matrix::rotation(Axis::Y, PI / 6.0)
             * &Matrix::rotation(Axis::X, -PI / 6.0),
-        ..Group::default()
-    });
-
-    for n in 0..6 {
-        let transform = Matrix::rotation(Axis::Y, n as f64 * PI / 3.0);
-        let side: Arc<dyn Shape> = hexagon_side(transform);
-
-        Group::add_child(&hex, &side);
-    }
-
-    hex
+        sides,
+    )
 }
 
 fn add_objects(objects: &mut Vec<Arc<dyn Shape>>) {

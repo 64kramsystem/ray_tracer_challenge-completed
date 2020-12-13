@@ -57,7 +57,7 @@ demonstrate! {
 
             let group = &parser.default_group();
 
-            let children = &group.children().iter().map(|child| Arc::clone(&child)).collect::<Vec<_>>();
+            let children = &group.children.iter().map(|child| Arc::clone(&child)).collect::<Vec<_>>();
 
             let t1 = children[0].as_any().downcast_ref::<Triangle>().unwrap();
             let t2 = children[1].as_any().downcast_ref::<Triangle>().unwrap();
@@ -85,7 +85,7 @@ demonstrate! {
 
             let group = &parser.default_group();
 
-            let children = &group.children().iter().map(|child| Arc::clone(&child)).collect::<Vec<_>>();
+            let children = &group.children.iter().map(|child| Arc::clone(&child)).collect::<Vec<_>>();
 
             let t1 = children[0].as_any().downcast_ref::<Triangle>().unwrap();
             let t2 = children[1].as_any().downcast_ref::<Triangle>().unwrap();
@@ -110,8 +110,8 @@ demonstrate! {
 
             let groups = parser.groups(&["FirstGroup", "SecondGroup"]);
 
-            let t1 = Arc::clone(&groups[0].children()[0]);
-            let t2 = Arc::clone(&groups[1].children()[0]);
+            let t1 = Arc::clone(&groups[0].children[0]);
+            let t2 = Arc::clone(&groups[1].children[0]);
 
             let t1 = t1.as_any().downcast_ref::<Triangle>().unwrap();
             let t2 = t2.as_any().downcast_ref::<Triangle>().unwrap();
@@ -180,8 +180,8 @@ demonstrate! {
 
             let group = parser.default_group();
 
-            let t1 = Arc::clone(&group.children()[0]);
-            let t2 = Arc::clone(&group.children()[1]);
+            let t1 = Arc::clone(&group.children[0]);
+            let t2 = Arc::clone(&group.children[1]);
 
             let t1 = t1.as_any().downcast_ref::<Triangle>().unwrap();
             let t2 = t2.as_any().downcast_ref::<Triangle>().unwrap();

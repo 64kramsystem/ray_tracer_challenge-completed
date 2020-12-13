@@ -8,7 +8,7 @@ use std::{
 use regex::Regex;
 
 use crate::{
-    math::Tuple,
+    math::{Matrix, Tuple},
     space::{Group, Shape, Triangle},
 };
 
@@ -142,17 +142,16 @@ impl ObjParser {
         group_names
             .iter()
             .map(|group_name| {
-                let group = Arc::new(Group::default());
                 let triangles = self.groups.remove(*group_name).unwrap();
 
-                for triangle in triangles {
-                    let triangle = Arc::new(triangle) as Arc<dyn Shape>;
-                    group.add_child(&triangle);
-                }
+                let triangles = triangles
+                    .into_iter()
+                    .map(|triangle| Arc::new(triangle) as Arc<dyn Shape>)
+                    .collect::<Vec<_>>();
 
-                group
+                Group::new(Matrix::identity(4), triangles)
             })
-            .collect::<Vec<_>>()
+            .collect()
     }
 
     // Export the groups as tree, with the group as leaves of a new root group.
@@ -165,20 +164,20 @@ impl ObjParser {
 
         self.exported = true;
 
-        let root_group: Arc<Group> = Arc::new(Group::default());
-
         let all_group_triangles = self.groups.drain().map(|(_, v)| v);
 
-        for group_triangles in all_group_triangles {
-            let group = Arc::new(Group::default());
+        let groups = all_group_triangles
+            .map(|group_triangles| {
+                let children = group_triangles
+                    .into_iter()
+                    .map(|child| Arc::new(child) as Arc<dyn Shape>)
+                    .collect::<Vec<_>>();
 
-            for triangle in group_triangles {
-                let triangle = Arc::new(triangle) as Arc<dyn Shape>;
-                group.add_child(&triangle);
-            }
-        }
+                Group::new(Matrix::identity(4), children) as Arc<dyn Shape>
+            })
+            .collect();
 
-        root_group
+        Group::new(Matrix::identity(4), groups)
     }
 
     pub fn vertex(&self, i: usize) -> Tuple {

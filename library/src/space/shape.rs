@@ -1,6 +1,6 @@
 use std::{
     fmt,
-    sync::{Arc, Mutex, MutexGuard, Weak},
+    sync::{Arc, Mutex, Weak},
 };
 
 use super::{BoundedShape, Bounds, Intersection, PointLight, Ray};
@@ -47,7 +47,7 @@ pub(crate) mod private {
 pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     fn id(&self) -> u32;
     fn parent(&self) -> Option<Arc<dyn Shape>>;
-    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>>;
+    fn parent_mut(&mut self) -> &mut Weak<dyn Shape>;
     fn transform(&self) -> &Matrix;
     fn transform_mut(&mut self) -> &mut Matrix;
     fn material(&self) -> &Material;

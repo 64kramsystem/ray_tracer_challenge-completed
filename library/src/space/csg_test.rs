@@ -21,8 +21,8 @@ demonstrate! {
             );
 
             assert_eq!(csg.operation, csg::Operation::Union);
-            assert_eq!(csg.children().0.id(), sphere1.id());
-            assert_eq!(csg.children().1.id(), sphere2.id());
+            assert_eq!(csg.children.0.id(), sphere1.id());
+            assert_eq!(csg.children.1.id(), sphere2.id());
             assert_eq!(sphere1.parent().unwrap().id(), csg.id());
             assert_eq!(sphere2.parent().unwrap().id(), csg.id());
         }

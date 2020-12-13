@@ -9,7 +9,7 @@ use library::{
 
 const ASSETS_PATH: &str = "testing_assets";
 
-const SCREEN_WIDTH: u16 = 25; // height is half
+const SCREEN_WIDTH: u16 = 100; // height is half
 
 const LIGHT_POSITION: (i32, i32, i32) = (0, 50, -100);
 
