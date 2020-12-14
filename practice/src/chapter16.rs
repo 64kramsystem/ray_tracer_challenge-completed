@@ -8,7 +8,7 @@ use library::{
     Axis,
 };
 
-const SCREEN_WIDTH: u16 = 400; // height is half
+const SCREEN_WIDTH: u16 = 800; // height is half
 
 const LIGHT_POSITION: (i32, i32, i32) = (-8, 10, -10);
 
@@ -90,12 +90,12 @@ fn add_csg(objects: &mut Vec<Arc<dyn Shape>>) {
         ..Cube::default()
     });
 
-    let csg = Arc::new(Csg {
-        operation: csg::Operation::Difference,
-        transform: Matrix::translation(0.0, 1.0, 0.0),
-        ..Csg::default()
-    });
-    csg.set_children(Arc::clone(&sphere), Arc::clone(&cube));
+    let csg = Csg::new(
+        csg::Operation::Difference,
+        sphere,
+        cube,
+        Matrix::translation(0.0, 1.0, 0.0),
+    );
 
     objects.push(csg);
 

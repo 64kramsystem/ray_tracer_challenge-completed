@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex, Weak};
+use std::sync::{Arc, Weak};
 
 use super::{
     shape::{self, private::ShapeLocal},
@@ -6,14 +6,12 @@ use super::{
 };
 use crate::{lang::ApproximateFloat64Ops, math::Matrix, math::Tuple, properties::Material};
 
-const UNSUPPORTED_FEATURE_MESSAGE: &str = "Group/Box logic not implemented";
-
 #[derive(Debug, ShapeAccessors, SmartDefault)]
 pub struct Triangle {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
-    #[default(Mutex::new(Weak::<Self>::new()))]
-    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Weak::<Self>::new())]
+    pub parent: Weak<dyn Shape>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]
@@ -149,6 +147,12 @@ impl ShapeLocal for Triangle {
 
 impl BoundedShape for Triangle {
     fn local_bounds(&self) -> Bounds {
-        panic!(UNSUPPORTED_FEATURE_MESSAGE)
+        let mut bounds = Bounds::default();
+
+        for p in &[self.p1, self.p2, self.p3] {
+            Bounds::update_from_tuple(&mut bounds, p);
+        }
+
+        bounds
     }
 }

@@ -1,6 +1,6 @@
 use std::{
     mem,
-    sync::{Arc, Mutex, Weak},
+    sync::{Arc, Weak},
 };
 
 use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Ray, Shape};
@@ -14,8 +14,8 @@ use crate::{
 pub struct Cone {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
-    #[default(Mutex::new(Weak::<Self>::new()))]
-    pub parent: Mutex<Weak<dyn Shape>>,
+    #[default(Weak::<Self>::new())]
+    pub parent: Weak<dyn Shape>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]
@@ -29,7 +29,7 @@ pub struct Cone {
 }
 
 impl Cone {
-    fn intersect_caps(self: Arc<Self>, ray: &Ray, intersections: &mut Vec<Intersection>) {
+    fn intersect_caps(self: &Arc<Self>, ray: &Ray, intersections: &mut Vec<Intersection>) {
         // Caps only matter if the Cone is closed, and might possibly be intersected by the ray.
         //
         if !self.closed || ray.direction.y.approximate() == 0.0 {
@@ -44,7 +44,7 @@ impl Cone {
         if Self::check_cap(&ray, t1, self.minimum) {
             intersections.push(Intersection {
                 t: t1,
-                object: Arc::clone(&self) as Arc<dyn Shape>,
+                object: Arc::clone(self) as Arc<dyn Shape>,
                 ..Intersection::default()
             });
         }
@@ -54,7 +54,7 @@ impl Cone {
         if Self::check_cap(&ray, t2, self.maximum) {
             intersections.push(Intersection {
                 t: t2,
-                object: self,
+                object: Arc::clone(self) as Arc<dyn Shape>,
                 ..Intersection::default()
             });
         }

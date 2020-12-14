@@ -1,3 +1,5 @@
+#![feature(get_mut_unchecked)]
+
 pub mod interface;
 pub mod lang;
 pub mod math;

@@ -1,37 +1,36 @@
-#![allow(unused_imports)]
-
 use demonstrate::demonstrate;
 
 demonstrate! {
     describe "Group" {
         use crate::math::*;
         use crate::space::{*, shape::private::ShapeLocal};
-        use std::sync::{Arc, Mutex, Weak};
-
-        before {
-            #[allow(unused_variables)]
-            let group: Arc<Group> = Arc::new(Group::default());
-        }
+        use std::sync::{Arc};
 
         it "Creating a new group" {
+            let group: Arc<Group> = Arc::new(Group::default());
+
             assert_eq!(*group.transform(), Matrix::identity(4));
-            assert_eq!((*group).children().len(), 0);
+            assert_eq!((*group).children.len(), 0);
         }
 
         it "Adding a child to a group" {
             let shape: Arc<dyn Shape> = Arc::new(Plane::default());
+            let shape_id = shape.id();
 
-            group.add_child(&shape);
+            let group = Group::new(
+                Matrix::identity(4),
+                vec![shape],
+            );
 
-            let actual_children = group.children();
+            let actual_children = &group.children;
 
             assert_eq!(actual_children.len(), 1);
-            assert_eq!(actual_children[0].id(), shape.id());
-
-            assert_eq!(shape.parent().unwrap().id(), group.id());
+            assert_eq!(actual_children[0].id(), shape_id);
+            assert_eq!(actual_children[0].parent().unwrap().id(), group.id());
         }
 
         it "Intersecting a ray with an empty group" {
+            let group: Arc<Group> = Arc::new(Group::default());
             let ray = Ray::new((0, 0, 0), (0, 0, 1));
 
             assert_eq!(group.local_intersections(&ray).len(), 0);
@@ -50,9 +49,13 @@ demonstrate! {
                 ..Sphere::default()
             });
 
-            group.add_child(&sphere1);
-            group.add_child(&sphere2);
-            group.add_child(&sphere3);
+            let sphere1_id = sphere1.id();
+            let sphere2_id = sphere2.id();
+
+            let group = Group::new(
+                Matrix::identity(4),
+                vec![sphere1, sphere2, sphere3],
+            );
 
             let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
@@ -60,24 +63,22 @@ demonstrate! {
 
             assert_eq!(actual_intersections.len(), 4);
 
-            assert_eq!(actual_intersections[0].object.id(), sphere2.id());
-            assert_eq!(actual_intersections[1].object.id(), sphere2.id());
-            assert_eq!(actual_intersections[2].object.id(), sphere1.id());
-            assert_eq!(actual_intersections[3].object.id(), sphere1.id());
+            assert_eq!(actual_intersections[0].object.id(), sphere2_id);
+            assert_eq!(actual_intersections[1].object.id(), sphere2_id);
+            assert_eq!(actual_intersections[2].object.id(), sphere1_id);
+            assert_eq!(actual_intersections[3].object.id(), sphere1_id);
         }
 
         it "Intersecting a transformed group" {
-            let group: Arc<Group> = Arc::new(Group {
-                transform: Matrix::scaling(2, 2, 2),
-                ..Group::default()
-            });
-
             let sphere: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(5, 0, 0),
                 ..Sphere::default()
             });
 
-            group.add_child(&sphere);
+            let group = Group::new(
+                Matrix::scaling(2, 2, 2),
+                vec![sphere],
+            );
 
             let ray = Ray::new((10, 0, -10), (0, 0, 1));
 

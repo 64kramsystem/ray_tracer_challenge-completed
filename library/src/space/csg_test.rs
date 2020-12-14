@@ -13,13 +13,16 @@ demonstrate! {
         it "CSG is created with an operation and two shapes" {
             let sphere1: Arc<dyn Shape> = Arc::new(Sphere::default());
             let sphere2: Arc<dyn Shape> = Arc::new(Cube::default());
-            let csg = Arc::new(Csg { operation: csg::Operation::Union, ..Csg::default() });
-
-            csg.set_children(Arc::clone(&sphere1), Arc::clone(&sphere2));
+            let csg = Csg::new(
+                csg::Operation::Union,
+                Arc::clone(&sphere1),
+                Arc::clone(&sphere2),
+                Matrix::identity(4)
+            );
 
             assert_eq!(csg.operation, csg::Operation::Union);
-            assert_eq!(csg.children().0.id(), sphere1.id());
-            assert_eq!(csg.children().1.id(), sphere2.id());
+            assert_eq!(csg.children.0.id(), sphere1.id());
+            assert_eq!(csg.children.1.id(), sphere2.id());
             assert_eq!(sphere1.parent().unwrap().id(), csg.id());
             assert_eq!(sphere2.parent().unwrap().id(), csg.id());
         }
@@ -80,8 +83,12 @@ demonstrate! {
             ];
 
             for (operation, x0, x1) in examples.into_iter() {
-                let csg = Arc::new(Csg { operation, ..Csg::default() });
-                csg.set_children(Arc::clone(&left), Arc::clone(&right));
+                let csg = Csg::new(
+                    operation,
+                    Arc::clone(&left),
+                    Arc::clone(&right),
+                    Matrix::identity(4)
+                );
 
                 let result = csg.filter_intersections(intersections.clone());
 
@@ -93,8 +100,12 @@ demonstrate! {
         }
 
         it "A ray misses a CSG object" {
-            let csg = Arc::new(Csg { operation: csg::Operation::Union, ..Csg::default() });
-            csg.set_children(Arc::new(Sphere::default()), Arc::new(Cube::default()));
+            let csg = Csg::new(
+                csg::Operation::Union,
+                Arc::new(Sphere::default()),
+                Arc::new(Cube::default()),
+                Matrix::identity(4),
+            );
 
             let ray = Ray::new((0, 2, -5), (0, 0, 1));
 
@@ -110,8 +121,12 @@ demonstrate! {
                 ..Sphere::default()
             });
 
-            let csg = Arc::new(Csg { operation: csg::Operation::Union, ..Csg::default() });
-            csg.set_children(Arc::clone(&s1), Arc::clone(&s2));
+            let csg = Csg::new(
+                csg::Operation::Union,
+                Arc::clone(&s1),
+                Arc::clone(&s2),
+                Matrix::identity(4),
+            );
 
             let ray = Ray::new((0, 0, -5), (0, 0, 1));
 

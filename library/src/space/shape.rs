@@ -1,9 +1,6 @@
-#[cfg(test)]
-use std::any::Any;
-
 use std::{
     fmt,
-    sync::{Arc, Mutex, MutexGuard, Weak},
+    sync::{Arc, Mutex, Weak},
 };
 
 use super::{BoundedShape, Bounds, Intersection, PointLight, Ray};
@@ -11,6 +8,9 @@ use crate::{
     math::{Matrix, Tuple},
     properties::{Color, Material},
 };
+
+#[cfg(test)]
+use std::any::Any;
 
 lazy_static::lazy_static! {
   static ref NEXT_ID: Mutex<u32> = Mutex::new(1);
@@ -47,7 +47,7 @@ pub(crate) mod private {
 pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     fn id(&self) -> u32;
     fn parent(&self) -> Option<Arc<dyn Shape>>;
-    fn parent_mut(&self) -> MutexGuard<Weak<dyn Shape>>;
+    fn parent_mut(&mut self) -> &mut Weak<dyn Shape>;
     fn transform(&self) -> &Matrix;
     fn transform_mut(&mut self) -> &mut Matrix;
     fn material(&self) -> &Material;
@@ -134,23 +134,7 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
         for corner in local_corners.iter() {
             let transformed_corner = transform * corner;
 
-            if transformed_corner.x < bounds.min.x {
-                bounds.min.x = transformed_corner.x
-            } else if transformed_corner.x > bounds.max.x {
-                bounds.max.x = transformed_corner.x
-            }
-
-            if transformed_corner.y < bounds.min.y {
-                bounds.min.y = transformed_corner.y
-            } else if transformed_corner.y > bounds.max.y {
-                bounds.max.y = transformed_corner.y
-            }
-
-            if transformed_corner.z < bounds.min.z {
-                bounds.min.z = transformed_corner.z
-            } else if transformed_corner.z > bounds.max.z {
-                bounds.max.z = transformed_corner.z
-            }
+            Bounds::update_from_tuple(&mut bounds, &transformed_corner);
         }
 
         bounds

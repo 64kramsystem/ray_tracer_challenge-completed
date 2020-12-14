@@ -9,8 +9,6 @@ use crate::{
 };
 
 pub struct World {
-    // In order to make the objects modifiable, a Mutex is required.
-    //
     pub objects: Vec<Arc<dyn Shape>>,
     pub light_source: PointLight,
 }
