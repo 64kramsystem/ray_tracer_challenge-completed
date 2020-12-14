@@ -51,6 +51,8 @@ pub(crate) mod private {
 // Inheritance has been implemented in a pure-trait form (base/sub traits + macro).
 // Implementing it as base type + sub trait + sub types would have simplified the code. It'd be interesting
 // to see if that implementation has a measurable performance difference (likely not).
+// Among the other things, a base type would have made possible/easy to implement transformation chainable
+// methods (see sphere.rs history).
 // If the current design had to be pushed further, an attribute macro should be written, in order to
 // deduplicate the attributes; attributes macros have very little documentation around, though.
 //

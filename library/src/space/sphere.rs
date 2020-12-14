@@ -3,10 +3,8 @@ use std::sync::{Arc, Weak};
 use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Shape};
 use crate::{
     lang::math::sqrt,
-    lang::HasFloat64Value,
     math::{Matrix, Tuple},
     properties::Material,
-    Axis,
 };
 
 #[derive(Debug, ShapeAccessors, SmartDefault)]
@@ -19,32 +17,6 @@ pub struct Sphere {
     pub transform: Matrix,
     #[default(Material::default())]
     pub material: Material,
-}
-
-impl Sphere {
-    pub fn scale<T: HasFloat64Value>(self, x: T, y: T, z: T) -> Self {
-        self.transform(&Matrix::scaling(x, y, z))
-    }
-
-    pub fn equiscale<T: HasFloat64Value + Copy>(self, s: T) -> Self {
-        self.transform(&Matrix::scaling(s, s, s))
-    }
-
-    pub fn translate<T: HasFloat64Value>(self, x: T, y: T, z: T) -> Self {
-        self.transform(&Matrix::translation(x, y, z))
-    }
-
-    pub fn rotate(self, axis: Axis, r: f64) -> Self {
-        self.transform(&Matrix::rotation(axis, r))
-    }
-
-    // Returns a new Sphere with same id, with new transformation = (transformation * self.transformation).
-    //
-    pub fn transform(mut self, transformation: &Matrix) -> Self {
-        let new_transformation = transformation * &self.transform;
-        self.transform = new_transformation;
-        self
-    }
 }
 
 impl ShapeLocal for Sphere {
