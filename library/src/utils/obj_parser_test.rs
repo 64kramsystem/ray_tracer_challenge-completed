@@ -9,7 +9,6 @@ demonstrate! {
         use crate::utils::ObjParser;
         use crate::math::Tuple;
         use crate::space::Triangle;
-        use std::sync::Arc;
         use std::{io::BufReader, fs::File, path::Path};
 
         it "Ignoring unrecognized lines" {
@@ -57,10 +56,8 @@ demonstrate! {
 
             let group = &parser.default_group();
 
-            let children = &group.children.iter().map(|child| Arc::clone(&child)).collect::<Vec<_>>();
-
-            let t1 = children[0].as_any().downcast_ref::<Triangle>().unwrap();
-            let t2 = children[1].as_any().downcast_ref::<Triangle>().unwrap();
+            let t1 = group.children[0].as_any().downcast_ref::<Triangle>().unwrap();
+            let t2 = group.children[1].as_any().downcast_ref::<Triangle>().unwrap();
 
             assert_eq!(t1.p1, parser.vertex(1));
             assert_eq!(t1.p2, parser.vertex(2));
@@ -85,11 +82,9 @@ demonstrate! {
 
             let group = &parser.default_group();
 
-            let children = &group.children.iter().map(|child| Arc::clone(&child)).collect::<Vec<_>>();
-
-            let t1 = children[0].as_any().downcast_ref::<Triangle>().unwrap();
-            let t2 = children[1].as_any().downcast_ref::<Triangle>().unwrap();
-            let t3 = children[2].as_any().downcast_ref::<Triangle>().unwrap();
+            let t1 = group.children[0].as_any().downcast_ref::<Triangle>().unwrap();
+            let t2 = group.children[1].as_any().downcast_ref::<Triangle>().unwrap();
+            let t3 = group.children[2].as_any().downcast_ref::<Triangle>().unwrap();
 
             assert_eq!(t1.p1, parser.vertex(1));
             assert_eq!(t1.p2, parser.vertex(2));
@@ -110,11 +105,8 @@ demonstrate! {
 
             let groups = parser.groups(&["FirstGroup", "SecondGroup"]);
 
-            let t1 = Arc::clone(&groups[0].children[0]);
-            let t2 = Arc::clone(&groups[1].children[0]);
-
-            let t1 = t1.as_any().downcast_ref::<Triangle>().unwrap();
-            let t2 = t2.as_any().downcast_ref::<Triangle>().unwrap();
+            let t1 = groups[0].children[0].as_any().downcast_ref::<Triangle>().unwrap();
+            let t2 = groups[1].children[0].as_any().downcast_ref::<Triangle>().unwrap();
 
             assert_eq!(t1.p1, parser.vertex(1));
             assert_eq!(t1.p2, parser.vertex(2));
@@ -180,11 +172,8 @@ demonstrate! {
 
             let group = parser.default_group();
 
-            let t1 = Arc::clone(&group.children[0]);
-            let t2 = Arc::clone(&group.children[1]);
-
-            let t1 = t1.as_any().downcast_ref::<Triangle>().unwrap();
-            let t2 = t2.as_any().downcast_ref::<Triangle>().unwrap();
+            let t1 = group.children[0].as_any().downcast_ref::<Triangle>().unwrap();
+            let t2 = group.children[1].as_any().downcast_ref::<Triangle>().unwrap();
 
             assert_eq!(t1.p1, parser.vertex(1));
             assert_eq!(t1.p2, parser.vertex(2));
