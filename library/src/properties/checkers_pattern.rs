@@ -22,10 +22,12 @@ impl Pattern for CheckersPattern {
         &self.previous_pattern
     }
 
-    fn current_color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
-        let approximated_floors_sum = pattern_point.x.approximate().floor()
-            + pattern_point.y.approximate().floor()
-            + pattern_point.z.approximate().floor();
+    // point: In pattern space.
+    //
+    fn current_color_at(&self, point: &crate::math::Tuple) -> Color {
+        let approximated_floors_sum = point.x.approximate().floor()
+            + point.y.approximate().floor()
+            + point.z.approximate().floor();
 
         if approximated_floors_sum as i32 % 2 == 0 {
             self.color_a

@@ -22,8 +22,10 @@ impl Pattern for RingPattern {
         &self.previous_pattern
     }
 
-    fn current_color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
-        let approximated_root_floor = sqrt(pattern_point.x.powi(2) + pattern_point.z.powi(2))
+    // point: In pattern space.
+    //
+    fn current_color_at(&self, point: &crate::math::Tuple) -> Color {
+        let approximated_root_floor = sqrt(point.x.powi(2) + point.z.powi(2))
             .approximate()
             .floor();
 

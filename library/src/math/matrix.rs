@@ -278,6 +278,9 @@ impl PartialEq for Matrix {
     }
 }
 
+// It would be more readable just to have the owned version of the operations, with a borrowed one for
+// the exceptional cases.
+
 impl Mul<&Matrix> for Matrix {
     type Output = Self;
 

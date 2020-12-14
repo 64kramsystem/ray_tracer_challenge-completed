@@ -32,18 +32,30 @@ pub(crate) mod private {
     use crate::{math::Tuple, space::Intersection};
 
     pub trait ShapeLocal {
+        // point: In object space.
+        //
         // See `Shape#normal()` for the `intersection` explanation.
         //
         // In the book, this is local_normal_at().
         //
-        fn local_normal(&self, world_point: &Tuple, intersection: &Intersection) -> Tuple;
+        fn local_normal(&self, point: &Tuple, intersection: &Intersection) -> Tuple;
 
+        // ray: In object space.
+        //
         // In the book, this is local_intersect(), and returns also the shapes.
         //
-        fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection>;
+        fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection>;
     }
 }
 
+// Inheritance has been implemented in a pure-trait form (base/sub traits + macro).
+// Implementing it as base type + sub trait + sub types would have simplified the code. It'd be interesting
+// to see if that implementation has a measurable performance difference (likely not).
+// Among the other things, a base type would have made possible/easy to implement transformation chainable
+// methods (see sphere.rs history).
+// If the current design had to be pushed further, an attribute macro should be written, in order to
+// deduplicate the attributes; attributes macros have very little documentation around, though.
+//
 pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     fn id(&self) -> u32;
     fn parent(&self) -> Option<Arc<dyn Shape>>;
@@ -65,25 +77,29 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
         self.normal_to_world(&local_normal)
     }
 
-    fn world_to_object(&self, world_point: &Tuple) -> Tuple {
+    // point: In world space.
+    //
+    fn world_to_object(&self, point: &Tuple) -> Tuple {
         let transform_inverse = self.transform().inverse();
 
         if let Some(parent) = self.parent() {
-            transform_inverse * &parent.world_to_object(world_point)
+            transform_inverse * &parent.world_to_object(point)
         } else {
-            transform_inverse * world_point
+            transform_inverse * point
         }
     }
 
-    fn normal_to_world(&self, object_normal: &Tuple) -> Tuple {
-        let mut object_normal = self.transform().inverse().transpose() * object_normal;
-        object_normal.w = 0.0;
-        object_normal = object_normal.normalize();
+    // normal: In object space.
+    //
+    fn normal_to_world(&self, normal: &Tuple) -> Tuple {
+        let mut normal = self.transform().inverse().transpose() * normal;
+        normal.w = 0.0;
+        normal = normal.normalize();
 
         if let Some(parent) = self.parent() {
-            parent.normal_to_world(&object_normal)
+            parent.normal_to_world(&normal)
         } else {
-            object_normal
+            normal
         }
     }
 

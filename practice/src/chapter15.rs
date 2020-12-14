@@ -7,11 +7,9 @@ use library::{
     utils::ObjParser,
 };
 
-const ASSETS_PATH: &str = "testing_assets";
+const ASSETS_PATH: &str = "assets/testing";
 
 const SCREEN_WIDTH: u16 = 100; // height is half
-
-const LIGHT_POSITION: (i32, i32, i32) = (0, 50, -100);
 
 fn add_astronaut(objects: &mut Vec<Arc<dyn Shape>>) {
     let file_path = Path::new(ASSETS_PATH).join("astronaut1.obj");
@@ -29,7 +27,9 @@ fn add_astronaut(objects: &mut Vec<Arc<dyn Shape>>) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 fn prepare_world() -> World {
-    let light_source = PointLight::new(LIGHT_POSITION, (1, 1, 1));
+    let light_position = (0, -50, -100);
+
+    let light_source = PointLight::new(light_position, (1, 1, 1));
 
     let mut objects = vec![];
 
@@ -45,8 +45,8 @@ fn prepare_camera() -> Camera {
     let mut camera = Camera::new(SCREEN_WIDTH, SCREEN_WIDTH / 2, PI / 3.0);
 
     camera.transform = Matrix::view_transform(
-        &Tuple::point(0, 0, -100),
-        &Tuple::point(-40, 0, 0),
+        &Tuple::point(50, -50, -20),
+        &Tuple::point(-70, 30, -10),
         &Tuple::vector(0, 1, 0),
     );
 

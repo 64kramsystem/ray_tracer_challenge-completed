@@ -90,7 +90,7 @@ impl Triangle {
 }
 
 impl ShapeLocal for Triangle {
-    fn local_normal(&self, _object_point: &Tuple, intersection: &Intersection) -> Tuple {
+    fn local_normal(&self, _point: &Tuple, intersection: &Intersection) -> Tuple {
         // We can unwrap in the inner block because the intersection that is passed here comes indirectly
         // from `self.local_intersections()`. Considering this, unwrapping also acts as assertion.
         //
@@ -103,10 +103,12 @@ impl ShapeLocal for Triangle {
         }
     }
 
+    // ray: In object space.
+    //
     // In the book, this is `intersection_with_uv`, when self.smooth is true.
     //
-    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
-        let dir_cross_e2 = transformed_ray.direction.cross_product(self.e2);
+    fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
+        let dir_cross_e2 = ray.direction.cross_product(self.e2);
         let determinant = self.e1.dot_product(&dir_cross_e2);
 
         if determinant.within_epsilon() {
@@ -114,7 +116,7 @@ impl ShapeLocal for Triangle {
         }
 
         let f = 1.0 / determinant;
-        let p1_to_origin = transformed_ray.origin - &self.p1;
+        let p1_to_origin = ray.origin - &self.p1;
         let u = f * p1_to_origin.dot_product(&dir_cross_e2);
 
         if u < 0.0 || u > 1.0 {
@@ -122,7 +124,7 @@ impl ShapeLocal for Triangle {
         }
 
         let origin_cross_e1 = p1_to_origin.cross_product(self.e1);
-        let v = f * transformed_ray.direction.dot_product(&origin_cross_e1);
+        let v = f * ray.direction.dot_product(&origin_cross_e1);
 
         if v < 0.0 || (u + v) > 1.0 {
             return vec![];

@@ -21,7 +21,7 @@ pub struct Sdl2Interface {
     height: u16,
 
     // For simple applications. They'd be cool if set by method chaining, however, they're not needed
-    // anymore with camera rendering.
+    // anymore with camera rendering. Inversion is applied when writing pixels.
     //
     pub invert_y: bool,
     pub origin: (i16, i16),
@@ -164,11 +164,8 @@ impl Image for Sdl2Interface {
     }
 
     fn to_pixels(&self) -> Vec<&Color> {
-        // Inverts the y axis, using rev().
-        //
         self.pixels_buffer
             .chunks_exact(self.width as usize)
-            .rev()
             .flatten()
             .collect::<Vec<_>>()
     }

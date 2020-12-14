@@ -39,8 +39,8 @@ impl Material {
         normalv: &Tuple,
         in_shadow: bool,
     ) -> Color {
-        let pattern_point = self.pattern.transform().inverse() * object_point;
-        let color = self.pattern.color_at(&pattern_point);
+        let point = self.pattern.transform().inverse() * object_point;
+        let color = self.pattern.color_at(&point);
 
         let effective_color = color * &light.intensity;
 

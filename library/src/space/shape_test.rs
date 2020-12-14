@@ -9,15 +9,13 @@ demonstrate! {
         use std::sync::Arc;
         use std::f64::consts::PI;
 
-        before {
-            #[allow(unused_variables)]
-            let test_shape = Sphere::default();
-        }
-
         it "should return the normal on a transformed sphere" {
-            let sphere: Box<dyn Shape> = Box::new(test_shape.translate(0, 1, 0));
+            let test_shape: Arc<dyn Shape> = Arc::new(Sphere {
+                transform: Matrix::translation(0, 1, 0),
+                ..Sphere::default()
+            });
 
-            let actual_normal = sphere.normal(&Tuple::point(0.0, 1.70711, -0.70711), &Intersection::default());
+            let actual_normal = test_shape.normal(&Tuple::point(0.0, 1.70711, -0.70711), &Intersection::default());
             let expected_normal = Tuple::vector(0, 0.70711, -0.70711);
 
             assert_eq!(actual_normal, expected_normal);
@@ -34,7 +32,11 @@ demonstrate! {
             context "with a transformed shape" {
                 it "scaled" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
-                    let test_shape: Arc<dyn Shape> = Arc::new(test_shape.scale(2, 2, 2));
+
+                    let test_shape: Arc<dyn Shape> = Arc::new(Sphere {
+                        transform: Matrix::scaling(2, 2, 2),
+                        ..Sphere::default()
+                    });
 
                     let actual_intersections = test_shape.intersections(&ray);
 
@@ -47,7 +49,10 @@ demonstrate! {
                 it "translated" {
                     let ray = Ray::new((0, 0, -5), (0, 0, 1));
 
-                    let test_shape: Arc<dyn Shape> = Arc::new(test_shape.translate(5, 0, 0));
+                    let test_shape: Arc<dyn Shape> = Arc::new(Sphere {
+                        transform: Matrix::translation(5, 0, 0),
+                        ..Sphere::default()
+                    });
 
                     assert_eq!(test_shape.intersections(&ray), vec![]);
                 }
@@ -72,7 +77,7 @@ demonstrate! {
 
             let expected_point = Tuple::point(0, 0, -1);
 
-            let group2 = group1.children[0].as_ref().as_any().downcast_ref::<Group>().unwrap();
+            let group2 = group1.children[0].as_any().downcast_ref::<Group>().unwrap();
             let sphere = &group2.children[0];
 
             assert_eq!(sphere.world_to_object(&Tuple::point(-2, 0, -10)), expected_point);
@@ -94,7 +99,7 @@ demonstrate! {
                 vec![group2],
             );
 
-            let group2 = &group1.children[0].as_ref().as_any().downcast_ref::<Group>().unwrap();
+            let group2 = &group1.children[0].as_any().downcast_ref::<Group>().unwrap();
             let sphere = &group2.children[0];
 
             let actual_normal = sphere.normal_to_world(&Tuple::vector(sqrt(3) / 3.0, sqrt(3) / 3.0, sqrt(3) / 3.0));
@@ -118,7 +123,7 @@ demonstrate! {
                 vec![group2],
             );
 
-            let group2 = group1.children[0].as_ref().as_any().downcast_ref::<Group>();
+            let group2 = group1.children[0].as_any().downcast_ref::<Group>();
             let sphere = &group2.unwrap().children[0];
 
             let actual_normal = sphere.normal(&Tuple::point(1.7321, 1.1547, -5.5774), &Intersection::default());

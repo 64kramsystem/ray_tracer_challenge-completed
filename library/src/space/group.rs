@@ -48,6 +48,8 @@ impl Group {
     //
     // Group mutability is required in order to add the children.
     //
+    // There are no trivial/clean solutions to this problem; see https://users.rust-lang.org/t/is-it-possible-to-safely-build-a-read-only-thread-safe-bidirectional-tree/52759.
+    //
     pub fn new(transform: Matrix, mut children: Vec<Arc<dyn Shape>>) -> Arc<Group> {
         let mut group = Arc::new(Group {
             transform,
@@ -109,17 +111,19 @@ impl Shape for Group {
 }
 
 impl ShapeLocal for Group {
-    fn local_normal(&self, _object_point: &Tuple, _intersection: &Intersection) -> Tuple {
+    fn local_normal(&self, _point: &Tuple, _intersection: &Intersection) -> Tuple {
         panic!("local normal is not meaningful for Group")
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
+    // ray: In object space.
+    //
+    fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
         let local_bounds = self.local_bounds();
 
         let box_intersections = Cube::generalized_intersections(
             Arc::clone(&self) as Arc<dyn Shape>,
             &local_bounds,
-            transformed_ray,
+            ray,
         );
 
         if box_intersections.is_empty() {
@@ -129,7 +133,7 @@ impl ShapeLocal for Group {
         let mut intersections = self
             .children
             .iter()
-            .flat_map(|child| Arc::clone(child).intersections(transformed_ray))
+            .flat_map(|child| Arc::clone(child).intersections(ray))
             .collect::<Vec<_>>();
 
         intersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
