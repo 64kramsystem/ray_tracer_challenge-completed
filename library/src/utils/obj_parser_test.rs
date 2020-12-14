@@ -1,6 +1,6 @@
 use demonstrate::demonstrate;
 
-const ASSETS_PATH: &str = "../testing_assets";
+const ASSETS_PATH: &str = "../assets/testing";
 
 demonstrate! {
     describe "ObjParser" {

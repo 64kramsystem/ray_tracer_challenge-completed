@@ -7,7 +7,7 @@ use library::{
     utils::ObjParser,
 };
 
-const ASSETS_PATH: &str = "testing_assets";
+const ASSETS_PATH: &str = "assets/testing";
 
 const SCREEN_WIDTH: u16 = 100; // height is half
 
