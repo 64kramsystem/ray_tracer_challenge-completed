@@ -15,3 +15,33 @@ Two functions are unsafe; this has been necessary in order to make the objects t
 A change that would simplify the design is to convert the Shape trait into a base class; this is discussed on the trait comment. Also, it would be more readable just to have the owned version of the Matrix/Tuple operations, with a borrowed one for the exceptional cases.
 
 The project is divided in `library`, `macros` and `practice`.
+
+## Demo renderings (from the last chapters)
+
+<details>
+  <summary>Chapters 1-13: Shapes and properties</summary>
+  <a target="_blank" rel="noopener noreferrer" href="/assets/readme/chapter13_shapes_with_effects.png?raw=true">
+    <img src="/assets/readme/chapter13_shapes_with_effects.png?raw=true" width="800" style="max-width:100%;">
+  </a>
+</details>
+
+<details>
+  <summary>Chapter 14: Groups</summary>
+  <a target="_blank" rel="noopener noreferrer" href="/assets/readme/chapter14_hexagon.png?raw=true">
+    <img src="/assets/readme/chapter14_hexagon.png?raw=true" width="800" style="max-width:100%;">
+  </a>
+</details>
+
+<details>
+  <summary>Chapter 15: Triangles/WaveFront OBJ format</summary>
+  <a target="_blank" rel="noopener noreferrer" href="/assets/readme/chapter15_astronaut.png?raw=true">
+    <img src="/assets/readme/chapter15_astronaut.png?raw=true" width="800" style="max-width:100%;">
+  </a>
+</details>
+
+<details>
+  <summary>Chapter 16: CSG</summary>
+  <a target="_blank" rel="noopener noreferrer" href="/assets/readme/chapter16_csg.png?raw=true">
+    <img src="/assets/readme/chapter16_csg.png?raw=true" width="800" style="max-width:100%;">
+  </a>
+</details>
