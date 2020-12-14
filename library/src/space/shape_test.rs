@@ -72,7 +72,7 @@ demonstrate! {
 
             let expected_point = Tuple::point(0, 0, -1);
 
-            let group2 = group1.children[0].as_ref().as_any().downcast_ref::<Group>().unwrap();
+            let group2 = group1.children[0].as_any().downcast_ref::<Group>().unwrap();
             let sphere = &group2.children[0];
 
             assert_eq!(sphere.world_to_object(&Tuple::point(-2, 0, -10)), expected_point);
@@ -94,7 +94,7 @@ demonstrate! {
                 vec![group2],
             );
 
-            let group2 = &group1.children[0].as_ref().as_any().downcast_ref::<Group>().unwrap();
+            let group2 = &group1.children[0].as_any().downcast_ref::<Group>().unwrap();
             let sphere = &group2.children[0];
 
             let actual_normal = sphere.normal_to_world(&Tuple::vector(sqrt(3) / 3.0, sqrt(3) / 3.0, sqrt(3) / 3.0));
@@ -118,7 +118,7 @@ demonstrate! {
                 vec![group2],
             );
 
-            let group2 = group1.children[0].as_ref().as_any().downcast_ref::<Group>();
+            let group2 = group1.children[0].as_any().downcast_ref::<Group>();
             let sphere = &group2.unwrap().children[0];
 
             let actual_normal = sphere.normal(&Tuple::point(1.7321, 1.1547, -5.5774), &Intersection::default());
