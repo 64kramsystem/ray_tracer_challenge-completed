@@ -5,6 +5,10 @@ use syn;
 
 use proc_macro::TokenStream;
 
+// This should have a parameter handling the containers, which don't have a material; currently, they
+// can't use this, since they can't redefine the macro accessors, and it's not possible to create another
+// macro, since there can't be two trait imlementation blocks.
+//
 #[proc_macro_derive(ShapeAccessors)]
 pub fn shape_accessors_derive(input: TokenStream) -> TokenStream {
     let ast: syn::DeriveInput = syn::parse(input).unwrap();
