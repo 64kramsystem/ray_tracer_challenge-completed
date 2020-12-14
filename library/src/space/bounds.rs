@@ -1,4 +1,8 @@
+use std::sync::Arc;
+
 use crate::math::Tuple;
+
+use super::Shape;
 
 #[derive(Copy, Clone, Debug, SmartDefault)]
 pub struct Bounds {
@@ -9,6 +13,20 @@ pub struct Bounds {
 }
 
 impl Bounds {
+    // A simple optimization is to precompute the bounds on container instantiation. Note that if, hypothetically,
+    // a children addition API should be added, the parents bounds should be recursively updated.
+    //
+    pub fn compute_for_children(children: &Vec<Arc<dyn Shape>>) -> Bounds {
+        let mut computed_bounds = Bounds::default();
+
+        for child in children.iter() {
+            let child_bounds = child.bounds();
+            Bounds::update_from_bound(&mut computed_bounds, &child_bounds);
+        }
+
+        computed_bounds
+    }
+
     // Updates the reference.
     //
     // Simple logic, but convenient to have it ready.

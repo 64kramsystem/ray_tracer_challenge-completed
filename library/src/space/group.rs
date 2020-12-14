@@ -139,17 +139,7 @@ impl ShapeLocal for Group {
 }
 
 impl BoundedShape for Group {
-    // A simple optimization is to precompute the bounds when the children are added (but must recursively
-    // update the parents).
-    //
     fn local_bounds(&self) -> Bounds {
-        let mut group_bounds = Bounds::default();
-
-        for child in self.children.iter() {
-            let child_bounds = child.bounds();
-            Bounds::update_from_bound(&mut group_bounds, &child_bounds);
-        }
-
-        group_bounds
+        Bounds::compute_for_children(&self.children)
     }
 }

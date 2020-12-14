@@ -207,6 +207,7 @@ impl ShapeLocal for Csg {
 
 impl BoundedShape for Csg {
     fn local_bounds(&self) -> Bounds {
-        todo!()
+        let children = vec![Arc::clone(&self.children.0), Arc::clone(&self.children.1)];
+        Bounds::compute_for_children(&children)
     }
 }
