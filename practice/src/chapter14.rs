@@ -47,7 +47,7 @@ fn hexagon() -> Arc<dyn Shape> {
     // Transformation added to make it look nicer.
     //
     Group::new(
-        Matrix::translation(-0.2, 0.7, 0.0)
+        Matrix::translation(-0.35, 1.0, 0.0)
             * &Matrix::rotation(Axis::Y, PI / 6.0)
             * &Matrix::rotation(Axis::X, -PI / 6.0),
         sides,
