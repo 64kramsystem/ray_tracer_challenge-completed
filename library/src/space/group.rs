@@ -48,6 +48,8 @@ impl Group {
     //
     // Group mutability is required in order to add the children.
     //
+    // There are no trivial/clean solutions to this problem; see https://users.rust-lang.org/t/is-it-possible-to-safely-build-a-read-only-thread-safe-bidirectional-tree/52759.
+    //
     pub fn new(transform: Matrix, mut children: Vec<Arc<dyn Shape>>) -> Arc<Group> {
         let mut group = Arc::new(Group {
             transform,

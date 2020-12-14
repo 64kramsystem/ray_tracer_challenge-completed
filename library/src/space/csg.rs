@@ -43,9 +43,6 @@ pub struct Csg {
 
 impl Csg {
     // Sets the children's parent to the new Csg instance.
-    // This can't be translated to a convenient constructor with defaults, because of the cross-references.
-    // Besides being arguably more convenient, it follows the book's pattern. The tradeoff is `transform`
-    // not having a default.
     //
     pub fn new(
         operation: Operation,
