@@ -48,18 +48,20 @@ impl Sphere {
 }
 
 impl ShapeLocal for Sphere {
-    fn local_normal(&self, object_point: &Tuple, _intersection: &Intersection) -> Tuple {
-        object_point - &Tuple::point(0, 0, 0)
+    // point: In object space.
+    //
+    fn local_normal(&self, point: &Tuple, _intersection: &Intersection) -> Tuple {
+        point - &Tuple::point(0, 0, 0)
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &super::Ray) -> Vec<Intersection> {
+    // ray: In object space.
+    //
+    fn local_intersections(self: Arc<Self>, ray: &super::Ray) -> Vec<Intersection> {
         let sphere_location = Tuple::point(0, 0, 0);
-        let sphere_to_ray = transformed_ray.origin - &sphere_location;
+        let sphere_to_ray = ray.origin - &sphere_location;
 
-        let a = transformed_ray
-            .direction
-            .dot_product(&transformed_ray.direction);
-        let b = 2.0 * transformed_ray.direction.dot_product(&sphere_to_ray);
+        let a = ray.direction.dot_product(&ray.direction);
+        let b = 2.0 * ray.direction.dot_product(&sphere_to_ray);
         let c = sphere_to_ray.dot_product(&sphere_to_ray) - 1.0;
 
         let discriminant = b.powi(2) - 4.0 * a * c;

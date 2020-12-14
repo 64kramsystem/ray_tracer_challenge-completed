@@ -79,24 +79,26 @@ impl Cube {
 }
 
 impl ShapeLocal for Cube {
-    fn local_normal(&self, object_point: &Tuple, _intersection: &Intersection) -> Tuple {
-        let x_abs = object_point.x.abs();
-        let y_abs = object_point.y.abs();
-        let z_abs = object_point.z.abs();
+    // point: In object space.
+    //
+    fn local_normal(&self, point: &Tuple, _intersection: &Intersection) -> Tuple {
+        let x_abs = point.x.abs();
+        let y_abs = point.y.abs();
+        let z_abs = point.z.abs();
 
         // Algorithm with less comparisons. An extreme version, possibly without any measurable improvement,
         // is to duplicate the second if/else inside the branches of the first.
 
         let (max_dimension_abs, current_normal) = if x_abs > y_abs {
-            (x_abs, (object_point.x, 0.0, 0.0))
+            (x_abs, (point.x, 0.0, 0.0))
         } else {
-            (y_abs, (0.0, object_point.y, 0.0))
+            (y_abs, (0.0, point.y, 0.0))
         };
 
         return if max_dimension_abs > z_abs {
             Tuple::vector(current_normal.0, current_normal.1, current_normal.2)
         } else {
-            Tuple::vector(0.0, 0.0, object_point.z)
+            Tuple::vector(0.0, 0.0, point.z)
         };
 
         // Original algorithm
@@ -104,21 +106,23 @@ impl ShapeLocal for Cube {
         // let max_dimension_abs = x_abs.max(y_abs).max(z_abs);
 
         // return if max_dimension_abs == x_abs {
-        //     Tuple::vector(object_point.x, 0.0, 0.0)
+        //     Tuple::vector(point.x, 0.0, 0.0)
         // } else if max_dimension_abs == y_abs {
-        //     Tuple::vector(0.0, object_point.y, 0.0)
+        //     Tuple::vector(0.0, point.y, 0.0)
         // } else {
-        //     Tuple::vector(0.0, 0.0, object_point.z)
+        //     Tuple::vector(0.0, 0.0, point.z)
         // };
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
+    // ray: In object space.
+    //
+    fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
         let bounds = Bounds {
             min: Tuple::point(-1, -1, -1),
             max: Tuple::point(1, 1, 1),
         };
 
-        Self::generalized_intersections(self as Arc<dyn Shape>, &bounds, transformed_ray)
+        Self::generalized_intersections(self as Arc<dyn Shape>, &bounds, ray)
     }
 }
 

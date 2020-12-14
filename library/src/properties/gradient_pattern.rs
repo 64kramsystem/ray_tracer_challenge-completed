@@ -24,13 +24,15 @@ impl Pattern for GradientPattern {
         &self.previous_pattern
     }
 
-    fn current_color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
+    // point: In pattern space.
+    //
+    fn current_color_at(&self, point: &crate::math::Tuple) -> Color {
         // This shouldn't need float approximate, as it doesn't rely on exact transformations/operations.
         //
         // Original formula:
         //
         //   let distance = self.color_b - &self.color_a;
-        //   let fraction = pattern_point.x - pattern_point.x.floor();
+        //   let fraction = point.x - point.x.floor();
         //   self.color_a + &(distance * fraction)
 
         // This formula starts at (color_a + half_distance), for simplicity (see test suite).
@@ -39,6 +41,6 @@ impl Pattern for GradientPattern {
         let distance = self.color_b - &self.color_a;
         let half_distance = distance * 0.5;
 
-        self.color_a + &half_distance - &(half_distance * (2.0 * PI * pattern_point.x).sin())
+        self.color_a + &half_distance - &(half_distance * (2.0 * PI * point.x).sin())
     }
 }

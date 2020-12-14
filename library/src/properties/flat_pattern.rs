@@ -37,7 +37,9 @@ impl Pattern for FlatPattern {
         &self.previous_pattern
     }
 
-    fn current_color_at(&self, _pattern_point: &crate::math::Tuple) -> Color {
+    // point: In pattern space.
+    //
+    fn current_color_at(&self, _point: &crate::math::Tuple) -> Color {
         self.color
     }
 }

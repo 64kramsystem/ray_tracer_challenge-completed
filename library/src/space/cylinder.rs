@@ -71,36 +71,39 @@ impl Cylinder {
 }
 
 impl ShapeLocal for Cylinder {
-    fn local_normal(&self, object_point: &Tuple, _intersection: &Intersection) -> Tuple {
+    // point: In object space.
+    //
+    fn local_normal(&self, point: &Tuple, _intersection: &Intersection) -> Tuple {
         // Compute the square of the distance from the y axis.
         //
-        let dist = object_point.x.powi(2) + object_point.z.powi(2);
+        let dist = point.x.powi(2) + point.z.powi(2);
 
-        if dist < 1.0 && object_point.y.approximate_greater_or_equal(self.maximum) {
+        if dist < 1.0 && point.y.approximate_greater_or_equal(self.maximum) {
             Tuple::vector(0, 1, 0)
-        } else if dist < 1.0 && object_point.y.approximate_less_or_equal(self.minimum) {
+        } else if dist < 1.0 && point.y.approximate_less_or_equal(self.minimum) {
             Tuple::vector(0, -1, 0)
         } else {
-            Tuple::vector(object_point.x, 0, object_point.z)
+            Tuple::vector(point.x, 0, point.z)
         }
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &super::Ray) -> Vec<Intersection> {
+    // ray: In object space.
+    //
+    fn local_intersections(self: Arc<Self>, ray: &super::Ray) -> Vec<Intersection> {
         let mut intersections = Vec::with_capacity(2);
 
-        let a = transformed_ray.direction.x.powi(2) + transformed_ray.direction.z.powi(2);
+        let a = ray.direction.x.powi(2) + ray.direction.z.powi(2);
 
         // Ray is parallel to the y axis.
         //
         if a.approximate_equals(0.0) {
-            self.intersect_caps(transformed_ray, &mut intersections);
+            self.intersect_caps(ray, &mut intersections);
 
             return intersections;
         }
 
-        let b = 2.0 * transformed_ray.origin.x * transformed_ray.direction.x
-            + 2.0 * transformed_ray.origin.z * transformed_ray.direction.z;
-        let c = transformed_ray.origin.x.powi(2) + transformed_ray.origin.z.powi(2) - 1.0;
+        let b = 2.0 * ray.origin.x * ray.direction.x + 2.0 * ray.origin.z * ray.direction.z;
+        let c = ray.origin.x.powi(2) + ray.origin.z.powi(2) - 1.0;
 
         let disc = b.powi(2) - 4.0 * a * c;
 
@@ -115,7 +118,7 @@ impl ShapeLocal for Cylinder {
                 mem::swap(&mut t0, &mut t1);
             }
 
-            let y0 = transformed_ray.origin.y + t0 * transformed_ray.direction.y;
+            let y0 = ray.origin.y + t0 * ray.direction.y;
 
             if self.minimum < y0 && y0 < self.maximum {
                 intersections.push(Intersection {
@@ -125,7 +128,7 @@ impl ShapeLocal for Cylinder {
                 });
             }
 
-            let y1 = transformed_ray.origin.y + t1 * transformed_ray.direction.y;
+            let y1 = ray.origin.y + t1 * ray.direction.y;
 
             if self.minimum < y1 && y1 < self.maximum {
                 intersections.push(Intersection {
@@ -136,7 +139,7 @@ impl ShapeLocal for Cylinder {
             }
         }
 
-        self.intersect_caps(transformed_ray, &mut intersections);
+        self.intersect_caps(ray, &mut intersections);
 
         intersections
     }

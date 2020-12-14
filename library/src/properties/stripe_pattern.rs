@@ -22,8 +22,10 @@ impl Pattern for StripePattern {
         &self.previous_pattern
     }
 
-    fn current_color_at(&self, pattern_point: &crate::math::Tuple) -> Color {
-        let approximated_floor = pattern_point.x.approximate().floor();
+    // point: In pattern space.
+    //
+    fn current_color_at(&self, point: &crate::math::Tuple) -> Color {
+        let approximated_floor = point.x.approximate().floor();
 
         if approximated_floor as i32 % 2 == 0 {
             self.color_a

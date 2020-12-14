@@ -19,15 +19,17 @@ pub struct Plane {
 }
 
 impl ShapeLocal for Plane {
-    fn local_normal(&self, _object_point: &Tuple, _intersection: &Intersection) -> Tuple {
+    fn local_normal(&self, _point: &Tuple, _intersection: &Intersection) -> Tuple {
         Tuple::vector(0, 1, 0)
     }
 
-    fn local_intersections(self: Arc<Self>, transformed_ray: &Ray) -> Vec<Intersection> {
-        if transformed_ray.direction.y.within_epsilon() {
+    // ray: In object space.
+    //
+    fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
+        if ray.direction.y.within_epsilon() {
             vec![]
         } else {
-            let t = -transformed_ray.origin.y / transformed_ray.direction.y;
+            let t = -ray.origin.y / ray.direction.y;
 
             vec![Intersection {
                 t,
