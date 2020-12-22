@@ -26,7 +26,7 @@ demonstrate! {
 
                     let expected_intersection_state = IntersectionState {
                         t: intersection_clone.t.clone(),
-                        object: intersection_clone.object,
+                        object: intersection_clone.object.as_ref(),
                         point: Tuple::point(0, 0, -1),
                         over_point: Tuple::point(0, 0, -1),
                         under_point: Tuple::point(0, 0, -0.9999),
@@ -50,7 +50,7 @@ demonstrate! {
 
                     let expected_intersection_state = IntersectionState {
                         t: intersection_clone.t,
-                        object: intersection_clone.object,
+                        object: intersection_clone.object.as_ref(),
                         point: Tuple::point(0, 0, 1),
                         over_point: Tuple::point(0, 0, 0.9999),
                         under_point: Tuple::point(0, 0, 1),

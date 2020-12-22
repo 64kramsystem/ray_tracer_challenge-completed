@@ -58,7 +58,7 @@ impl Ray {
         &self,
         intersection: &'a Intersection,
         intersections: &[Intersection],
-    ) -> IntersectionState {
+    ) -> IntersectionState<'a> {
         let point = self.position(intersection.t);
         let eyev = -self.direction;
         let mut normalv = intersection.object.normal(&point, intersection);
@@ -75,7 +75,7 @@ impl Ray {
 
         IntersectionState {
             t: intersection.t,
-            object: Arc::clone(&intersection.object),
+            object: intersection.object.as_ref(),
             point,
             over_point,
             under_point,
