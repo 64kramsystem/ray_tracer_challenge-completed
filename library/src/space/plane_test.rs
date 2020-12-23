@@ -11,11 +11,17 @@ demonstrate! {
         }
 
         it "should have a constant normal, everywhere" {
+            let default_intersection = Intersection {
+                t: 0.0,
+                uv: None,
+                object: &Plane::default(),
+            };
+
             let expected_normal = Tuple::vector(0, 1, 0);
 
-            assert_eq!(plane.local_normal(&Tuple::point(0, 0, 0), &Intersection::default()), expected_normal);
-            assert_eq!(plane.local_normal(&Tuple::point(10, 0, -10), &Intersection::default()), expected_normal);
-            assert_eq!(plane.local_normal(&Tuple::point(-5, 0, 150), &Intersection::default()), expected_normal);
+            assert_eq!(plane.local_normal(&Tuple::point(0, 0, 0), &default_intersection), expected_normal);
+            assert_eq!(plane.local_normal(&Tuple::point(10, 0, -10), &default_intersection), expected_normal);
+            assert_eq!(plane.local_normal(&Tuple::point(-5, 0, 150), &default_intersection), expected_normal);
         }
 
         context "intersections" {

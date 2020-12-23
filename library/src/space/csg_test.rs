@@ -76,10 +76,10 @@ demonstrate! {
             let right: Arc<dyn Shape> = Arc::new(Cube::default());
 
             let intersections = vec![
-                Intersection { t: 1.0, object: Arc::clone(&left), ..Intersection::default() },
-                Intersection { t: 2.0, object: Arc::clone(&right), ..Intersection::default() },
-                Intersection { t: 3.0, object: Arc::clone(&left), ..Intersection::default() },
-                Intersection { t: 4.0, object: Arc::clone(&right), ..Intersection::default() },
+                Intersection { t: 1.0, uv: None, object: left.as_ref() },
+                Intersection { t: 2.0, uv: None, object: right.as_ref() },
+                Intersection { t: 3.0, uv: None, object: left.as_ref() },
+                Intersection { t: 4.0, uv: None, object: right.as_ref() },
             ];
 
             for (operation, x0, x1) in examples.into_iter() {
@@ -134,9 +134,9 @@ demonstrate! {
 
             assert_eq!(intersections.len(), 2);
             assert_eq!(intersections[0].t, 4.0);
-            assert_eq!(&intersections[0].object, &s1);
+            assert_eq!(intersections[0].object, s1.as_ref());
             assert_eq!(intersections[1].t, 6.5);
-            assert_eq!(&intersections[1].object, &s2);
+            assert_eq!(intersections[1].object, s2.as_ref());
         }
     }
 }
