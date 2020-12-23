@@ -26,8 +26,6 @@ pub(crate) fn new_shape_id() -> u32 {
 }
 
 pub(crate) mod private {
-    use std::sync::Arc;
-
     use super::Ray;
     use crate::{math::Tuple, space::Intersection};
 
@@ -44,7 +42,7 @@ pub(crate) mod private {
         //
         // In the book, this is local_intersect(), and returns also the shapes.
         //
-        fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection>;
+        fn local_intersections<'a>(&'a self, ray: &Ray) -> Vec<Intersection<'a>>;
     }
 }
 
@@ -112,14 +110,14 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     // the intersections while traversing the tree, instead of creating separate arrays and sorting
     // the end result. This is a valid design even without considering the performance, as it fits nicely.
     //
-    fn intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
+    fn intersections<'a>(&'a self, ray: &Ray) -> Vec<Intersection<'a>> {
         let transformed_ray = ray.inverse_transform(self.transform());
         self.local_intersections(&transformed_ray)
     }
 
     // Default implementation, for non-nested shapes.
     //
-    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
+    fn includes(&self, object: &dyn Shape) -> bool {
         self.id() == object.id()
     }
 

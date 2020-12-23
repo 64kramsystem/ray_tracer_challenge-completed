@@ -70,7 +70,7 @@ demonstrate! {
                 it "with reflection" {
                     let object = Arc::new(Plane::default());
                     let ray = Ray::new((0, 1, -1), (0.0, -sqrt(2) / 2.0, sqrt(2) / 2.0));
-                    let intersection = Intersection { t: sqrt(2), object: object, ..Intersection::default() };
+                    let intersection = Intersection { t: sqrt(2), object, ..Intersection::default() };
 
                     let actual_intersection_state = ray.intersection_state(&intersection, &[]);
                     let expected_reflectv = Tuple::vector(0.0, sqrt(2) / 2.0, sqrt(2) / 2.0);

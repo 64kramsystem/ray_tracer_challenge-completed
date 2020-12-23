@@ -1,7 +1,4 @@
-use std::{
-    mem,
-    sync::{Arc, Weak},
-};
+use std::{mem, sync::Weak};
 
 use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Ray, Shape};
 use crate::{
@@ -29,7 +26,7 @@ pub struct Cone {
 }
 
 impl Cone {
-    fn intersect_caps(self: &Arc<Self>, ray: &Ray, intersections: &mut Vec<Intersection>) {
+    fn intersect_caps<'a>(&'a self, ray: &Ray, intersections: &mut Vec<Intersection<'a>>) {
         // Caps only matter if the Cone is closed, and might possibly be intersected by the ray.
         //
         if !self.closed || ray.direction.y.approximate() == 0.0 {
@@ -44,8 +41,8 @@ impl Cone {
         if Self::check_cap(&ray, t1, self.minimum) {
             intersections.push(Intersection {
                 t: t1,
-                object: Arc::clone(self) as Arc<dyn Shape>,
-                ..Intersection::default()
+                uv: None,
+                object: self,
             });
         }
 
@@ -54,8 +51,8 @@ impl Cone {
         if Self::check_cap(&ray, t2, self.maximum) {
             intersections.push(Intersection {
                 t: t2,
-                object: Arc::clone(self) as Arc<dyn Shape>,
-                ..Intersection::default()
+                uv: None,
+                object: self,
             });
         }
     }
@@ -95,7 +92,7 @@ impl ShapeLocal for Cone {
 
     // ray: In object space.
     //
-    fn local_intersections(self: Arc<Self>, ray: &super::Ray) -> Vec<Intersection> {
+    fn local_intersections(&self, ray: &super::Ray) -> Vec<Intersection> {
         let mut intersections = Vec::with_capacity(4);
 
         let a = ray.direction.x.powi(2) - ray.direction.y.powi(2) + ray.direction.z.powi(2);
@@ -115,8 +112,8 @@ impl ShapeLocal for Cone {
 
                 intersections.push(Intersection {
                     t,
-                    object: Arc::clone(&self) as Arc<dyn Shape>,
-                    ..Intersection::default()
+                    uv: None,
+                    object: self,
                 });
             }
         }
@@ -138,8 +135,8 @@ impl ShapeLocal for Cone {
             if self.minimum < y0 && y0 < self.maximum {
                 intersections.push(Intersection {
                     t: t0,
-                    object: Arc::clone(&self) as Arc<dyn Shape>,
-                    ..Intersection::default()
+                    uv: None,
+                    object: self,
                 });
             }
 
@@ -148,8 +145,8 @@ impl ShapeLocal for Cone {
             if self.minimum < y1 && y1 < self.maximum {
                 intersections.push(Intersection {
                     t: t1,
-                    object: Arc::clone(&self) as Arc<dyn Shape>,
-                    ..Intersection::default()
+                    uv: None,
+                    object: self,
                 });
             }
         }

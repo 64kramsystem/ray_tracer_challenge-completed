@@ -1,4 +1,4 @@
-use std::sync::{Arc, Weak};
+use std::sync::Weak;
 
 use super::{
     shape::{self, private::ShapeLocal},
@@ -23,10 +23,10 @@ impl Cube {
     // use this logic on any Shape.
     //
     pub fn generalized_intersections<'a>(
-        object: Arc<dyn Shape>,
+        object: &'a dyn Shape,
         bounds: &Bounds,
         transformed_ray: &Ray,
-    ) -> Vec<Intersection> {
+    ) -> Vec<Intersection<'a>> {
         let (xtmin, xtmax) = Self::check_axis(
             transformed_ray.origin.x,
             transformed_ray.direction.x,
@@ -65,13 +65,13 @@ impl Cube {
             vec![
                 Intersection {
                     t: tmin,
-                    object: Arc::clone(&object),
-                    ..Intersection::default()
+                    uv: None,
+                    object,
                 },
                 Intersection {
                     t: tmax,
-                    object: object,
-                    ..Intersection::default()
+                    uv: None,
+                    object,
                 },
             ]
         }
@@ -116,13 +116,13 @@ impl ShapeLocal for Cube {
 
     // ray: In object space.
     //
-    fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
+    fn local_intersections(&self, ray: &Ray) -> Vec<Intersection> {
         let bounds = Bounds {
             min: Tuple::point(-1, -1, -1),
             max: Tuple::point(1, 1, 1),
         };
 
-        Self::generalized_intersections(self as Arc<dyn Shape>, &bounds, ray)
+        Self::generalized_intersections(self, &bounds, ray)
     }
 }
 

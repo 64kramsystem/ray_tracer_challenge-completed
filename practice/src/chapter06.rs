@@ -14,7 +14,7 @@ use library::{
 };
 use rayon::prelude::*;
 
-fn hit(ray: &Ray, sphere: Arc<Sphere>) -> Option<Intersection> {
+fn hit<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersection<'a>> {
     // At this stage, shapes always returned ordered hits, so we can use the first.
     //
     sphere.intersections(ray).get(0).cloned()
@@ -63,9 +63,14 @@ pub fn practice() {
                     direction: eye_ray_direction,
                 };
 
-                if let Some(hit) = hit(&eye_ray, Arc::clone(&sphere)) {
+                if let Some(hit) = hit(&eye_ray, &sphere) {
                     let hit_point = eye_ray.position(hit.t);
-                    let hit_normal = sphere.normal(&hit_point, &Intersection::default());
+                    let intersection = Intersection {
+                        t: 0.0,
+                        uv: None,
+                        object: &Sphere::default(), // phony
+                    };
+                    let hit_normal = sphere.normal(&hit_point, &intersection);
 
                     let light_color = sphere.lighting(
                         &light,

@@ -9,7 +9,7 @@ use library::{
     Axis,
 };
 
-fn hit(ray: &Ray, sphere: Arc<Sphere>) -> Option<Intersection> {
+fn hit<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersection<'a>> {
     // At this stage, shapes always returned ordered hits, so we can use the first.
     //
     sphere.intersections(ray).get(0).cloned()
@@ -56,7 +56,7 @@ pub fn practice() {
                 direction: ray_direction,
             };
 
-            if let Some(_) = hit(&ray, Arc::clone(&sphere)) {
+            if let Some(_) = hit(&ray, &sphere) {
                 interface.write_pixel(x, y, hit_color);
             };
         }

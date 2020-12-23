@@ -1,4 +1,4 @@
-use std::sync::{Arc, Weak};
+use std::sync::Weak;
 
 use super::{
     shape::{self, private::ShapeLocal},
@@ -25,7 +25,7 @@ impl ShapeLocal for Plane {
 
     // ray: In object space.
     //
-    fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
+    fn local_intersections(&self, ray: &Ray) -> Vec<Intersection> {
         if ray.direction.y.within_epsilon() {
             vec![]
         } else {
@@ -33,8 +33,8 @@ impl ShapeLocal for Plane {
 
             vec![Intersection {
                 t,
+                uv: None,
                 object: self,
-                ..Intersection::default()
             }]
         }
     }
