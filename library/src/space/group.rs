@@ -100,7 +100,7 @@ impl Shape for Group {
         panic!()
     }
 
-    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
+    fn includes(&self, object: &dyn Shape) -> bool {
         self.children.iter().any(|child| child.includes(object))
     }
 
@@ -117,14 +117,10 @@ impl ShapeLocal for Group {
 
     // ray: In object space.
     //
-    fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
+    fn local_intersections(&self, ray: &Ray) -> Vec<Intersection> {
         let local_bounds = self.local_bounds();
 
-        let box_intersections = Cube::generalized_intersections(
-            Arc::clone(&self) as Arc<dyn Shape>,
-            &local_bounds,
-            ray,
-        );
+        let box_intersections = Cube::generalized_intersections(self, &local_bounds, ray);
 
         if box_intersections.is_empty() {
             return vec![];
@@ -133,7 +129,7 @@ impl ShapeLocal for Group {
         let mut intersections = self
             .children
             .iter()
-            .flat_map(|child| Arc::clone(child).intersections(ray))
+            .flat_map(|child| child.intersections(ray))
             .collect::<Vec<_>>();
 
         intersections.sort_by(|a, b| a.partial_cmp(b).unwrap());

@@ -26,7 +26,7 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let actual_intersections = Arc::clone(&cone).local_intersections(&ray);
+                let actual_intersections = &cone.local_intersections(&ray);
 
                 assert_eq!(actual_intersections.len(), 2);
                 assert!(actual_intersections[0].t.approximate_equals(*t1));
@@ -67,14 +67,13 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let intersections = Arc::clone(&cone).local_intersections(&ray);
+                let intersections = &cone.local_intersections(&ray);
 
                 assert_eq!(intersections.len(), *expected_count);
             }
         }
 
         it "Computing the normal vector on a cone" {
-
             let examples = [
                 // point      normal
                 (( 0,  0, 0), ( 0,      0.0, 0)),
@@ -83,10 +82,15 @@ demonstrate! {
             ];
 
             for ((px, py, pz), (nx, ny, nz)) in examples.iter() {
+                let default_intersection = Intersection {
+                    t: 0.0,
+                    uv: None,
+                    object: &Plane::default(),
+                };
                 let point = Tuple::point(*px, *py, *pz);
                 let expected_normal = Tuple::vector(*nx, *ny, *nz);
 
-                assert_eq!(cone.local_normal(&point, &Intersection::default()), expected_normal);
+                assert_eq!(cone.local_normal(&point, &default_intersection), expected_normal);
             }
         }
     }

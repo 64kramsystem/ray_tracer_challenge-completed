@@ -9,13 +9,22 @@ demonstrate! {
         use std::sync::Arc;
         use std::f64::consts::PI;
 
+        before {
+            #[allow(unused_variables)]
+            let default_intersection = Intersection {
+                t: 0.0,
+                uv: None,
+                object: &Plane::default(),
+            };
+        }
+
         it "should return the normal on a transformed sphere" {
             let test_shape: Arc<dyn Shape> = Arc::new(Sphere {
                 transform: Matrix::translation(0, 1, 0),
                 ..Sphere::default()
             });
 
-            let actual_normal = test_shape.normal(&Tuple::point(0.0, 1.70711, -0.70711), &Intersection::default());
+            let actual_normal = test_shape.normal(&Tuple::point(0.0, 1.70711, -0.70711), &default_intersection);
             let expected_normal = Tuple::vector(0, 0.70711, -0.70711);
 
             assert_eq!(actual_normal, expected_normal);
@@ -126,7 +135,7 @@ demonstrate! {
             let group2 = group1.children[0].as_any().downcast_ref::<Group>();
             let sphere = &group2.unwrap().children[0];
 
-            let actual_normal = sphere.normal(&Tuple::point(1.7321, 1.1547, -5.5774), &Intersection::default());
+            let actual_normal = sphere.normal(&Tuple::point(1.7321, 1.1547, -5.5774), &default_intersection);
 
             assert_eq!(actual_normal, Tuple::vector(0.2857, 0.4286, -0.8571));
         }

@@ -101,10 +101,10 @@ impl Csg {
         }
     }
 
-    pub(crate) fn filter_intersections(
+    pub(crate) fn filter_intersections<'a>(
         &self,
-        intersections: Vec<Intersection>,
-    ) -> Vec<Intersection> {
+        intersections: Vec<Intersection<'a>>,
+    ) -> Vec<Intersection<'a>> {
         // begin outside of both children
         //
         let mut inside_left = false;
@@ -115,7 +115,7 @@ impl Csg {
         let left_child = &self.children.0;
 
         for intersection in intersections {
-            let child_hit = if left_child.includes(&intersection.object) {
+            let child_hit = if left_child.includes(intersection.object) {
                 ChildHit::Left
             } else {
                 ChildHit::Right
@@ -166,7 +166,7 @@ impl Shape for Csg {
         panic!()
     }
 
-    fn includes(&self, object: &Arc<dyn Shape>) -> bool {
+    fn includes(&self, object: &dyn Shape) -> bool {
         self.children.0.includes(object) || self.children.1.includes(object)
     }
 
@@ -183,14 +183,14 @@ impl ShapeLocal for Csg {
 
     // ray: In object space.
     //
-    fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
+    fn local_intersections<'a>(&'a self, ray: &Ray) -> Vec<Intersection<'a>> {
         // filter_intersections() locks the children, so we need to drop the mutex before then.
         //
         let mut all_intersections = {
             let (left_child, right_child) = &self.children;
 
-            let mut left_intersections = Arc::clone(left_child).intersections(&ray);
-            let right_intersections = Arc::clone(right_child).intersections(&ray);
+            let mut left_intersections = left_child.intersections(ray);
+            let right_intersections = right_child.intersections(ray);
 
             left_intersections.extend(right_intersections);
 

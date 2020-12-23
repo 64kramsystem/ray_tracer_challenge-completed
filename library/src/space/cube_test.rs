@@ -25,7 +25,7 @@ demonstrate! {
             for ((ox, oy, oz), (dx, dy, dz), t1, t2) in examples.iter() {
                 let ray = Ray::new((*ox, *oy, *oz), (*dx, *dy, *dz));
 
-                let actual_intersections = Arc::clone(&cube).local_intersections(&ray);
+                let actual_intersections = &cube.local_intersections(&ray);
 
                 assert_eq!(actual_intersections.len(), 2);
 
@@ -74,10 +74,15 @@ demonstrate! {
             ];
 
             for ((px, py, pz), (nx, ny, nz)) in examples.iter() {
+                let default_intersection = Intersection {
+                    t: 0.0,
+                    uv: None,
+                    object: &Plane::default(),
+                };
                 let point = Tuple::point(*px, *py, *pz);
                 let expected_normal = Tuple::vector(*nx, *ny, *nz);
 
-                assert_eq!(cube.local_normal(&point, &Intersection::default()), expected_normal);
+                assert_eq!(cube.local_normal(&point, &default_intersection), expected_normal);
             }
         }
     }

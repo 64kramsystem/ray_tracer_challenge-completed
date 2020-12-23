@@ -1,4 +1,4 @@
-use std::sync::{Arc, Weak};
+use std::sync::Weak;
 
 use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Shape};
 use crate::{
@@ -28,7 +28,7 @@ impl ShapeLocal for Sphere {
 
     // ray: In object space.
     //
-    fn local_intersections(self: Arc<Self>, ray: &super::Ray) -> Vec<Intersection> {
+    fn local_intersections(&self, ray: &super::Ray) -> Vec<Intersection> {
         let sphere_location = Tuple::point(0, 0, 0);
         let sphere_to_ray = ray.origin - &sphere_location;
 
@@ -47,13 +47,13 @@ impl ShapeLocal for Sphere {
             vec![
                 Intersection {
                     t: t1,
-                    object: Arc::clone(&self) as Arc<dyn Shape>,
-                    ..Intersection::default()
+                    uv: None,
+                    object: self,
                 },
                 Intersection {
                     t: t2,
+                    uv: None,
                     object: self,
-                    ..Intersection::default()
                 },
             ]
         }

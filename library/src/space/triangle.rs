@@ -1,4 +1,4 @@
-use std::sync::{Arc, Weak};
+use std::sync::Weak;
 
 use super::{
     shape::{self, private::ShapeLocal},
@@ -107,7 +107,7 @@ impl ShapeLocal for Triangle {
     //
     // In the book, this is `intersection_with_uv`, when self.smooth is true.
     //
-    fn local_intersections(self: Arc<Self>, ray: &Ray) -> Vec<Intersection> {
+    fn local_intersections(&self, ray: &Ray) -> Vec<Intersection> {
         let dir_cross_e2 = ray.direction.cross_product(self.e2);
         let determinant = self.e1.dot_product(&dir_cross_e2);
 
@@ -142,7 +142,6 @@ impl ShapeLocal for Triangle {
             t,
             uv,
             object: self,
-            ..Intersection::default()
         }]
     }
 }

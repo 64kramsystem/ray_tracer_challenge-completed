@@ -63,10 +63,15 @@ demonstrate! {
         }
 
         it "Finding the normal on a triangle" {
+            let default_intersection = Intersection {
+                t: 0.0,
+                uv: None,
+                object: &Plane::default(),
+            };
             let t = Triangle::from_ints((0, 1, 0), (-1, 0, 0), (1, 0, 0));
-            let n1 = t.local_normal(&Tuple::point(0, 0.5, 0), &Intersection::default());
-            let n2 = t.local_normal(&Tuple::point(-0.5, 0.75, 0), &Intersection::default());
-            let n3 = t.local_normal(&Tuple::point(0.5, 0.25, 0), &Intersection::default());
+            let n1 = t.local_normal(&Tuple::point(0, 0.5, 0), &default_intersection);
+            let n2 = t.local_normal(&Tuple::point(-0.5, 0.75, 0), &default_intersection);
+            let n3 = t.local_normal(&Tuple::point(0.5, 0.25, 0), &default_intersection);
 
             assert_eq!(n1, t.normal);
             assert_eq!(n2, t.normal);
@@ -75,7 +80,6 @@ demonstrate! {
     } // describe "Triangle"
 
     describe "Smooth triangle" {
-        use std::sync::Arc;
         use crate::lang::ApproximateFloat64Ops;
         use crate::math::*;
         use crate::space::{*, shape::private::ShapeLocal};
@@ -88,7 +92,7 @@ demonstrate! {
             let n2 = Tuple::vector(-1, 0, 0);
             let n3 = Tuple::vector(1, 0, 0);
 
-            let triangle = Arc::new(Triangle::smooth(p1, p2, p3, n1, n2, n3));
+            let triangle = Triangle::smooth(p1, p2, p3, n1, n2, n3);
         }
 
         it "Constructing a smooth triangle" {
@@ -110,7 +114,7 @@ demonstrate! {
         }
 
         it "A smooth triangle uses u/v to interpolate the normal" {
-            let intersection = Intersection { t: 1.0, uv: Some((0.45, 0.25)), object: triangle };
+            let intersection = Intersection { t: 1.0, uv: Some((0.45, 0.25)), object: &triangle };
 
             // Requires `i`
             // And n ← normal_at(tri, point(0, 0, 0), i)
@@ -121,7 +125,7 @@ demonstrate! {
         }
 
         it "Preparing the normal on a smooth triangle" {
-            let intersections = [Intersection { t: 1.0, uv: Some((0.45, 0.25)), object: triangle }];
+            let intersections = [Intersection { t: 1.0, uv: Some((0.45, 0.25)), object: &triangle }];
             let ray = Ray::new((-0.2, 0.3, -2.0), (0, 0, 1));
 
             let comps = ray.intersection_state(&intersections[0], &intersections);

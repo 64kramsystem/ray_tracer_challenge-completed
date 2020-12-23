@@ -10,6 +10,13 @@ demonstrate! {
         before {
             #[allow(unused_mut,unused_variables)]
             let cylinder = Arc::new(Cylinder::default());
+
+            #[allow(unused_variables)]
+            let default_intersection = Intersection {
+                t: 0.0,
+                uv: None,
+                object: &Plane::default(),
+            };
         }
 
         it "A ray misses a cylinder" {
@@ -25,7 +32,7 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                assert_eq!(Arc::clone(&cylinder).local_intersections(&ray), vec![]);
+                assert_eq!(cylinder.local_intersections(&ray), vec![]);
             }
         }
 
@@ -42,7 +49,7 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let actual_intersections = Arc::clone(&cylinder).local_intersections(&ray);
+                let actual_intersections = &cylinder.local_intersections(&ray);
 
                 assert!(actual_intersections[0].t.approximate_equals(*t1));
                 assert!(actual_intersections[1].t.approximate_equals(*t2));
@@ -62,7 +69,7 @@ demonstrate! {
                 let point = Tuple::point(*px, *py, *pz);
                 let expected_normal = Tuple::vector(*nx, *ny, *nz);
 
-                assert_eq!(cylinder.local_normal(&point, &Intersection::default()), expected_normal);
+                assert_eq!(cylinder.local_normal(&point, &default_intersection), expected_normal);
             }
         }
 
@@ -93,7 +100,7 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let actual_intersections = Arc::clone(&cylinder).local_intersections(&ray);
+                let actual_intersections = &cylinder.local_intersections(&ray);
 
                 assert_eq!(actual_intersections.len(), *expected_count);
             }
@@ -125,7 +132,7 @@ demonstrate! {
                 let direction = Tuple::vector(*dx, *dy, *dz).normalize();
                 let ray = Ray { origin, direction };
 
-                let actual_intersections = Arc::clone(&cylinder).local_intersections(&ray);
+                let actual_intersections = &cylinder.local_intersections(&ray);
 
                 assert_eq!(actual_intersections.len(), *expected_count);
             }
@@ -153,7 +160,7 @@ demonstrate! {
                 let point = Tuple::point(*px, *py, *pz);
                 let expected_normal = Tuple::vector(*nx, *ny, *nz);
 
-                assert_eq!(cylinder.local_normal(&point, &Intersection::default()), expected_normal);
+                assert_eq!(cylinder.local_normal(&point, &default_intersection), expected_normal);
             }
         }
     }
