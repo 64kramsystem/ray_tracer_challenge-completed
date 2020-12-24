@@ -1,5 +1,5 @@
 use super::{Color, Pattern, COLOR_WHITE};
-use crate::{lang::HasFloat64Value, math::Matrix};
+use crate::math::Matrix;
 
 #[derive(Debug, SmartDefault)]
 pub struct FlatPattern {
@@ -12,16 +12,12 @@ pub struct FlatPattern {
 }
 
 impl FlatPattern {
-    pub fn new<T: HasFloat64Value, U: HasFloat64Value, V: HasFloat64Value>(
-        r: T,
-        g: U,
-        b: V,
-    ) -> Self {
+    pub fn new<T: Into<f64>, U: Into<f64>, V: Into<f64>>(r: T, g: U, b: V) -> Self {
         Self {
             color: Color {
-                r: r.as_f64(),
-                g: g.as_f64(),
-                b: b.as_f64(),
+                r: r.into(),
+                g: g.into(),
+                b: b.into(),
             },
             ..FlatPattern::default()
         }

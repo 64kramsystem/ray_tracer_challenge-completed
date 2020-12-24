@@ -2,7 +2,7 @@ use std::ops::{Add, Div, Index, IndexMut, Mul, Neg, Sub};
 
 use super::Matrix;
 use crate::{
-    lang::{math::sqrt, ApproximateFloat64Ops, HasFloat64Value},
+    lang::{math::sqrt, ApproximateFloat64Ops},
     Axis,
 };
 
@@ -27,37 +27,29 @@ pub struct Tuple {
 }
 
 impl Tuple {
-    pub fn new<T: HasFloat64Value>(x: T, y: T, z: T, w: T) -> Self {
+    pub fn new<T: Into<f64>>(x: T, y: T, z: T, w: T) -> Self {
         Self {
-            x: x.as_f64(),
-            y: y.as_f64(),
-            z: z.as_f64(),
-            w: w.as_f64(),
+            x: x.into(),
+            y: y.into(),
+            z: z.into(),
+            w: w.into(),
         }
     }
 
-    pub fn point<T: HasFloat64Value, U: HasFloat64Value, V: HasFloat64Value>(
-        x: T,
-        y: U,
-        z: V,
-    ) -> Self {
+    pub fn point<T: Into<f64>, U: Into<f64>, V: Into<f64>>(x: T, y: U, z: V) -> Self {
         Self {
-            x: x.as_f64(),
-            y: y.as_f64(),
-            z: z.as_f64(),
+            x: x.into(),
+            y: y.into(),
+            z: z.into(),
             w: POINT_TYPE,
         }
     }
 
-    pub fn vector<T: HasFloat64Value, U: HasFloat64Value, V: HasFloat64Value>(
-        x: T,
-        y: U,
-        z: V,
-    ) -> Self {
+    pub fn vector<T: Into<f64>, U: Into<f64>, V: Into<f64>>(x: T, y: U, z: V) -> Self {
         Self {
-            x: x.as_f64(),
-            y: y.as_f64(),
-            z: z.as_f64(),
+            x: x.into(),
+            y: y.into(),
+            z: z.into(),
             w: VECTOR_TYPE,
         }
     }
@@ -84,11 +76,11 @@ impl Tuple {
         )
     }
 
-    pub fn translate<T: HasFloat64Value>(&self, x: T, y: T, z: T) -> Self {
+    pub fn translate<T: Into<f64>>(&self, x: T, y: T, z: T) -> Self {
         Matrix::translation(x, y, z) * self
     }
 
-    pub fn scale<T: HasFloat64Value>(&self, x: T, y: T, z: T) -> Self {
+    pub fn scale<T: Into<f64>>(&self, x: T, y: T, z: T) -> Self {
         Matrix::scaling(x, y, z) * self
     }
 
@@ -96,15 +88,7 @@ impl Tuple {
         Matrix::rotation(axis, r) * self
     }
 
-    pub fn shear<T: HasFloat64Value>(
-        self,
-        x_py: T,
-        x_pz: T,
-        y_px: T,
-        y_pz: T,
-        z_px: T,
-        z_py: T,
-    ) -> Self {
+    pub fn shear<T: Into<f64>>(self, x_py: T, x_pz: T, y_px: T, y_pz: T, z_px: T, z_py: T) -> Self {
         Matrix::shearing(x_py, x_pz, y_px, y_pz, z_px, z_py) * &self
     }
 

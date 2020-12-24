@@ -1,6 +1,6 @@
 use std::ops::{Add, Div, Mul, Sub};
 
-use crate::lang::{ApproximateFloat64Ops, HasFloat64Value};
+use crate::lang::ApproximateFloat64Ops;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Color {
@@ -10,15 +10,11 @@ pub struct Color {
 }
 
 impl Color {
-    pub fn new<T: HasFloat64Value, U: HasFloat64Value, V: HasFloat64Value>(
-        r: T,
-        g: U,
-        b: V,
-    ) -> Self {
+    pub fn new<T: Into<f64>, U: Into<f64>, V: Into<f64>>(r: T, g: U, b: V) -> Self {
         Self {
-            r: r.as_f64(),
-            g: g.as_f64(),
-            b: b.as_f64(),
+            r: r.into(),
+            g: g.into(),
+            b: b.into(),
         }
     }
 

@@ -1,8 +1,5 @@
 use super::Tuple;
-use crate::{
-    lang::{ApproximateFloat64Ops, HasFloat64Value},
-    Axis,
-};
+use crate::{lang::ApproximateFloat64Ops, Axis};
 
 use std::ops::{Index, IndexMut, Mul};
 
@@ -16,12 +13,12 @@ impl Matrix {
     //
     // - an array of arrays doesn't work, since the size must be known at compile time;
     // - a flat list could work with by appending an empty comment to each line, but as soon as a method
-    //   is invoked on an entry (e.g. as_f64()), it alignes vertically.
+    //   is invoked on an entry (e.g. into()), it alignes vertically.
     // - using slices works, although it's quite ugly.
     //
     // So, screw rustfmt, and just use `#[rustfmt::skip]`.
     //
-    pub fn new<T: Copy + HasFloat64Value>(source_values: &[T]) -> Self {
+    pub fn new<T: Copy + Into<f64>>(source_values: &[T]) -> Self {
         let order = (source_values.len() as f64).sqrt() as usize;
 
         if source_values.len() != order.pow(2) {
@@ -34,7 +31,7 @@ impl Matrix {
             values.push(
                 source_row
                     .iter()
-                    .map(|value| value.as_f64())
+                    .map(|value| (*value).into())
                     .collect::<Vec<_>>(),
             );
         }
@@ -42,8 +39,8 @@ impl Matrix {
         Self { values }
     }
 
-    pub fn translation<T: HasFloat64Value>(x: T, y: T, z: T) -> Self {
-        let (x, y, z) = (x.as_f64(), y.as_f64(), z.as_f64());
+    pub fn translation<T: Into<f64>>(x: T, y: T, z: T) -> Self {
+        let (x, y, z) = (x.into(), y.into(), z.into());
 
         #[rustfmt::skip]
         let transformation_values = [
@@ -56,8 +53,8 @@ impl Matrix {
         Self::new(&transformation_values)
     }
 
-    pub fn scaling<T: HasFloat64Value>(x: T, y: T, z: T) -> Self {
-        let (x, y, z) = (x.as_f64(), y.as_f64(), z.as_f64());
+    pub fn scaling<T: Into<f64>>(x: T, y: T, z: T) -> Self {
+        let (x, y, z) = (x.into(), y.into(), z.into());
 
         #[rustfmt::skip]
         let transformation_values = [
@@ -100,21 +97,14 @@ impl Matrix {
         Self::new(&transformation_values)
     }
 
-    pub fn shearing<T: HasFloat64Value>(
-        x_py: T,
-        x_pz: T,
-        y_px: T,
-        y_pz: T,
-        z_px: T,
-        z_py: T,
-    ) -> Self {
+    pub fn shearing<T: Into<f64>>(x_py: T, x_pz: T, y_px: T, y_pz: T, z_px: T, z_py: T) -> Self {
         let (x_py, x_pz, y_px, y_pz, z_px, z_py) = (
-            x_py.as_f64(),
-            x_pz.as_f64(),
-            y_px.as_f64(),
-            y_pz.as_f64(),
-            z_px.as_f64(),
-            z_py.as_f64(),
+            x_py.into(),
+            x_pz.into(),
+            y_px.into(),
+            y_pz.into(),
+            z_px.into(),
+            z_py.into(),
         );
 
         #[rustfmt::skip]

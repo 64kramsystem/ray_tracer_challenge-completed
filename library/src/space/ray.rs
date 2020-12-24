@@ -1,6 +1,5 @@
 use super::{Intersection, IntersectionState};
 use crate::{
-    lang::HasFloat64Value,
     math::{Matrix, Tuple, EPSILON},
     properties::REFRACTIVE_INDEX_VACUUM,
     space::Shape,
@@ -13,28 +12,25 @@ pub struct Ray {
 }
 
 impl Ray {
-    pub fn new<T: HasFloat64Value, U: HasFloat64Value>(
-        origin: (T, T, T),
-        direction: (U, U, U),
-    ) -> Self {
+    pub fn new<T: Into<f64>, U: Into<f64>>(origin: (T, T, T), direction: (U, U, U)) -> Self {
         Ray {
             origin: Tuple::point(origin.0, origin.1, origin.2),
             direction: Tuple::vector(direction.0, direction.1, direction.2),
         }
     }
 
-    pub fn position<T: HasFloat64Value>(&self, t: T) -> Tuple {
-        self.origin + &(self.direction * t.as_f64())
+    pub fn position<T: Into<f64>>(&self, t: T) -> Tuple {
+        self.origin + &(self.direction * t.into())
     }
 
-    pub fn translate<T: HasFloat64Value>(&self, x: T, y: T, z: T) -> Self {
+    pub fn translate<T: Into<f64>>(&self, x: T, y: T, z: T) -> Self {
         Self {
             origin: self.origin.translate(x, y, z),
             direction: self.direction,
         }
     }
 
-    pub fn scale<T: HasFloat64Value + Copy>(&self, x: T, y: T, z: T) -> Self {
+    pub fn scale<T: Into<f64> + Copy>(&self, x: T, y: T, z: T) -> Self {
         Self {
             origin: self.origin.scale(x, y, z),
             direction: self.direction.scale(x, y, z),
