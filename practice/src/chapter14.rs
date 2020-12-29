@@ -13,7 +13,7 @@ const LIGHT_POSITION: (i32, i32, i32) = (-8, 10, -10);
 
 fn hexagon_corner() -> Arc<dyn Shape> {
     Arc::new(Sphere {
-        transform: Matrix::translation(0, 0, -1) * &Matrix::scaling(0.25, 0.25, 0.25),
+        transform: Matrix::scaling(0.25, 0.25, 0.25).translate(0, 0, -1),
         ..Sphere::default()
     })
 }
@@ -22,10 +22,10 @@ fn hexagon_edge() -> Arc<dyn Shape> {
     Arc::new(Cylinder {
         minimum: 0.0,
         maximum: 1.0,
-        transform: Matrix::translation(0, 0, -1)
-            * &Matrix::rotation(Axis::Y, -PI / 6.0)
-            * &Matrix::rotation(Axis::Z, -PI / 2.0)
-            * &Matrix::scaling(0.25, 1.0, 0.25),
+        transform: Matrix::scaling(0.25, 1.0, 0.25)
+            .rotate(Axis::Z, -PI / 2.0)
+            .rotate(Axis::Y, -PI / 6.0)
+            .translate(0, 0, -1),
         ..Cylinder::default()
     })
 }
@@ -47,9 +47,9 @@ fn hexagon() -> Arc<dyn Shape> {
     // Transformation added to make it look nicer.
     //
     Group::new(
-        Matrix::translation(-0.35, 1.0, 0.0)
-            * &Matrix::rotation(Axis::Y, PI / 6.0)
-            * &Matrix::rotation(Axis::X, -PI / 6.0),
+        Matrix::rotation(Axis::X, -PI / 6.0)
+            .rotate(Axis::Y, PI / 6.0)
+            .translate(-0.35, 1.0, 0.0),
         sides,
     )
 }
