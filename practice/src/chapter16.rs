@@ -22,9 +22,9 @@ fn random_color() -> Color {
 
 fn add_walls(objects: &mut Vec<Arc<dyn Shape>>) {
     let left_wall = Plane {
-        transform: Matrix::translation(0, 0, 5)
-            * &Matrix::rotation(Axis::Y, -PI / 4.0)
-            * &Matrix::rotation(Axis::X, -PI / 2.0),
+        transform: Matrix::rotation(Axis::X, -PI / 2.0)
+            .rotate(Axis::Y, -PI / 4.0)
+            .translate(0, 0, 5),
         material: Material {
             pattern: Box::new(FlatPattern {
                 color: random_color(),
@@ -47,9 +47,9 @@ fn add_walls(objects: &mut Vec<Arc<dyn Shape>>) {
     };
 
     let right_wall = Plane {
-        transform: Matrix::translation(0, 0, 5)
-            * &Matrix::rotation(Axis::Y, PI / 4.0)
-            * &Matrix::rotation(Axis::X, -PI / 2.0),
+        transform: Matrix::rotation(Axis::X, -PI / 2.0)
+            .rotate(Axis::Y, PI / 4.0)
+            .translate(0, 0, 5),
         material: Material {
             pattern: Box::new(FlatPattern {
                 color: random_color(),
@@ -78,7 +78,7 @@ fn add_csg(objects: &mut Vec<Arc<dyn Shape>>) {
         ..Sphere::default()
     });
     let cube: Arc<dyn Shape> = Arc::new(Cube {
-        transform: Matrix::translation(-0.2, 0.0, -0.5) * &Matrix::scaling(0.5, 0.5, 0.5),
+        transform: Matrix::scaling(0.5, 0.5, 0.5).translate(-0.2, 0.0, -0.5),
         material: Material {
             pattern: Box::new(FlatPattern {
                 color: COLOR_BLUE,

@@ -11,8 +11,10 @@ demonstrate! {
         }
 
         it "should allow a transformation to be set" {
-            let mut sphere = Sphere::default();
-            sphere.transform = Matrix::scaling(1, 2, 3);
+            let sphere = Sphere {
+                transform: Matrix::scaling(1, 2, 3),
+                ..Sphere::default()
+            };
 
             let expected_transform = Matrix::scaling(1, 2, 3);
 

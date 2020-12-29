@@ -145,6 +145,36 @@ impl Matrix {
         Self::new(&orientation_values) * &Matrix::translation(-from.x, -from.y, -from.z)
     }
 
+    // Builder APIs.
+    //
+    // WATCH OUT! The transformation applied in the intuitive, not mathematical, fashion - the transform
+    // applied is the left multiplication operand.
+    //
+    // The methods could be a Shape trait (e.g. `ShapeBuilder: Shape + Sized`), but they'd be less generic,
+    // e.g. they couldn't be applied to Camera; both designs are valid.
+
+    pub fn apply_transformation(&self, transform: Matrix) -> Self {
+        transform * self
+    }
+
+    pub fn scale<T: Into<f64>>(&self, x: T, y: T, z: T) -> Self {
+        Matrix::scaling(x, y, z) * self
+    }
+
+    pub fn equiscale<T: Into<f64> + Copy>(&self, s: T) -> Self {
+        Matrix::scaling(s, s, s) * self
+    }
+
+    pub fn translate<T: Into<f64>>(&self, x: T, y: T, z: T) -> Self {
+        Matrix::translation(x, y, z) * self
+    }
+
+    pub fn rotate(&self, axis: Axis, r: f64) -> Self {
+        Matrix::rotation(axis, r) * self
+    }
+
+    // Mathematical APIs
+
     pub fn transpose(&self) -> Self {
         let order = self.values.len();
         let mut result = vec![Vec::with_capacity(order); order];

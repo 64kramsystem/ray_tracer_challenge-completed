@@ -25,7 +25,7 @@ const ROTATE_VOLUMES: bool = true;
 #[rustfmt::skip]
 fn add_objects(objects: &mut Vec<Arc<dyn Shape>>) {
     let left_cylinder = Cylinder {
-        transform: Matrix::translation(-2.0, 0.33, 0.0) * &Matrix::scaling(0.33, 0.33, 0.33) * &random_rotation(),
+        transform: random_rotation().scale(0.33, 0.33, 0.33).translate(-2.0, 0.33, 0.0),
         material: random_material(None),
         maximum: 1.0,
         minimum: -1.0,
@@ -34,13 +34,13 @@ fn add_objects(objects: &mut Vec<Arc<dyn Shape>>) {
     };
 
     let middle_sphere = Sphere {
-        transform: Matrix::translation(-0.5, 1.0, 0.5) * &random_rotation(),
+        transform: random_rotation().translate(-0.5, 1.0, 0.5),
         material: random_material(Some(MaterialQuality::Refractive)),
         ..Sphere::default()
     };
 
     let back_cone = Cone {
-        transform: Matrix::translation(-0.6, 1.3, 3.0) * &random_rotation() * &Matrix::scaling(0.5, 0.9, 0.5) * &Matrix::translation(0.0, -0.5, 0.0),
+        transform: Matrix::translation(0.0, -0.5, 0.0).scale(0.5, 0.9, 0.5).apply_transformation(random_rotation()).translate(-0.6, 1.3, 3.0),
         material: random_material(None),
         minimum: 0.0,
         maximum: 1.0,
@@ -49,13 +49,13 @@ fn add_objects(objects: &mut Vec<Arc<dyn Shape>>) {
     };
 
     let right_cube = Cube {
-        transform: Matrix::translation(1.2, 1.0, 0.7) * &Matrix::scaling(0.33, 0.33, 0.33) * &random_rotation(),// * &Matrix::rotation(Axis::Y, PI / 32.0),
+        transform: random_rotation().scale(0.33, 0.33, 0.33).translate(1.2, 1.0, 0.7),
         material: random_material(Some(MaterialQuality::Reflective)),
         ..Cube::default()
     };
 
     let left_wall = Plane {
-        transform: Matrix::translation(0, 0, 5) * &Matrix::rotation(Axis::Y, -PI / 4.0) * &Matrix::rotation(Axis::X, -PI / 2.0),
+        transform: Matrix::rotation(Axis::X, -PI / 2.0).rotate(Axis::Y, -PI / 4.0).translate(0, 0, 5),
         material: random_material(None),
         ..Plane::default()
     };
@@ -66,7 +66,7 @@ fn add_objects(objects: &mut Vec<Arc<dyn Shape>>) {
     };
 
     let right_wall = Plane {
-        transform: Matrix::translation(0, 0, 5) * &Matrix::rotation(Axis::Y, PI / 4.0) * &Matrix::rotation(Axis::X, -PI / 2.0),
+        transform: Matrix::rotation(Axis::X, -PI / 2.0).rotate(Axis::Y, PI / 4.0).translate(0, 0, 5),
         material: random_material(Some(MaterialQuality::Reflective)),
         ..Plane::default()
     };
@@ -141,9 +141,9 @@ fn random_pattern() -> Box<dyn Pattern> {
 
 fn random_rotation() -> Matrix {
     if ROTATE_VOLUMES {
-        Matrix::rotation(Axis::X, rand::thread_rng().gen_range(0.0, 2.0 * PI))
-            * &Matrix::rotation(Axis::Y, rand::thread_rng().gen_range(0.0, 2.0 * PI))
-            * &Matrix::rotation(Axis::Z, rand::thread_rng().gen_range(0.0, 2.0 * PI))
+        Matrix::rotation(Axis::Z, rand::thread_rng().gen_range(0.0, 2.0 * PI))
+            .rotate(Axis::Y, rand::thread_rng().gen_range(0.0, 2.0 * PI))
+            .rotate(Axis::X, rand::thread_rng().gen_range(0.0, 2.0 * PI))
     } else {
         Matrix::identity(4)
     }

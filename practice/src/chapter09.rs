@@ -26,17 +26,17 @@ fn prepare_world() -> World {
     };
 
     let left_wall = Plane {
-        transform: Matrix::translation(0, 0, 5)
-            * &Matrix::rotation(Axis::Y, -PI / 4.0)
-            * &Matrix::rotation(Axis::X, -PI / 2.0),
+        transform: Matrix::rotation(Axis::X, -PI / 2.0)
+            .rotate(Axis::Y, -PI / 4.0)
+            .translate(0, 0, 5),
         material: prepare_material(),
         ..Plane::default()
     };
 
     let right_wall = Plane {
-        transform: Matrix::translation(0, 0, 5)
-            * &Matrix::rotation(Axis::Y, PI / 4.0)
-            * &Matrix::rotation(Axis::X, -PI / 2.0),
+        transform: Matrix::rotation(Axis::X, -PI / 2.0)
+            .rotate(Axis::Y, PI / 4.0)
+            .translate(0, 0, 5),
         material: prepare_material(),
         ..Plane::default()
     };
@@ -53,7 +53,7 @@ fn prepare_world() -> World {
     };
 
     let right = Sphere {
-        transform: Matrix::translation(1.5, 0.5, -0.5) * &Matrix::scaling(0.5, 0.5, 0.5),
+        transform: Matrix::scaling(0.5, 0.5, 0.5).translate(1.5, 0.5, -0.5),
         material: Material {
             pattern: Box::new(FlatPattern::new(0.5, 1, 0.1)),
             diffuse: 0.7,
@@ -64,7 +64,7 @@ fn prepare_world() -> World {
     };
 
     let left = Sphere {
-        transform: Matrix::translation(-1.5, 0.33, -0.75) * &Matrix::scaling(0.33, 0.33, 0.33),
+        transform: Matrix::scaling(0.33, 0.33, 0.33).translate(-1.5, 0.33, -0.75),
         material: Material {
             pattern: Box::new(FlatPattern::new(1, 0.8, 0.1)),
             diffuse: 0.7,
