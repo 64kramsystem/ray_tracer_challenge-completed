@@ -171,7 +171,7 @@ impl Shape for Csg {
 }
 
 impl ShapeLocal for Csg {
-    fn local_normal(&self, _point: &Tuple, _intersection: &Intersection) -> Tuple {
+    fn local_normal(&self, _point: Tuple, _intersection: &Intersection) -> Tuple {
         panic!("local normal is not meaningful for Group")
     }
 

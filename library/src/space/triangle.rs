@@ -90,7 +90,7 @@ impl Triangle {
 }
 
 impl ShapeLocal for Triangle {
-    fn local_normal(&self, _point: &Tuple, intersection: &Intersection) -> Tuple {
+    fn local_normal(&self, _point: Tuple, intersection: &Intersection) -> Tuple {
         // We can unwrap in the inner block because the intersection that is passed here comes indirectly
         // from `self.local_intersections()`. Considering this, unwrapping also acts as assertion.
         //

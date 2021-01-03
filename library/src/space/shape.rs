@@ -36,7 +36,7 @@ pub(crate) mod private {
         //
         // In the book, this is local_normal_at().
         //
-        fn local_normal(&self, point: &Tuple, intersection: &Intersection) -> Tuple;
+        fn local_normal(&self, point: Tuple, intersection: &Intersection) -> Tuple;
 
         // ray: In object space.
         //
@@ -71,7 +71,7 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     //
     fn normal(&self, world_point: &Tuple, intersection: &Intersection) -> Tuple {
         let local_point = self.world_to_object(world_point);
-        let local_normal = self.local_normal(&local_point, intersection);
+        let local_normal = self.local_normal(local_point, intersection);
         self.normal_to_world(&local_normal)
     }
 

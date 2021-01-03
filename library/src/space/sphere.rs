@@ -22,7 +22,7 @@ pub struct Sphere {
 impl ShapeLocal for Sphere {
     // point: In object space.
     //
-    fn local_normal(&self, point: &Tuple, _intersection: &Intersection) -> Tuple {
+    fn local_normal(&self, point: Tuple, _intersection: &Intersection) -> Tuple {
         point - &Tuple::point(0, 0, 0)
     }
 

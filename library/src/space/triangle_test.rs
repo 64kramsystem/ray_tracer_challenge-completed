@@ -69,9 +69,9 @@ demonstrate! {
                 object: &Plane::default(),
             };
             let t = Triangle::from_ints((0, 1, 0), (-1, 0, 0), (1, 0, 0));
-            let n1 = t.local_normal(&Tuple::point(0, 0.5, 0), &default_intersection);
-            let n2 = t.local_normal(&Tuple::point(-0.5, 0.75, 0), &default_intersection);
-            let n3 = t.local_normal(&Tuple::point(0.5, 0.25, 0), &default_intersection);
+            let n1 = t.local_normal(Tuple::point(0, 0.5, 0), &default_intersection);
+            let n2 = t.local_normal(Tuple::point(-0.5, 0.75, 0), &default_intersection);
+            let n3 = t.local_normal(Tuple::point(0.5, 0.25, 0), &default_intersection);
 
             assert_eq!(n1, t.normal);
             assert_eq!(n2, t.normal);
