@@ -113,7 +113,7 @@ impl ObjParser {
                 }
                 Group(group_name) => {
                     let groups = &mut parser.groups;
-                    groups.entry(group_name.clone()).or_insert(vec![]);
+                    groups.entry(group_name.clone()).or_insert_with(Vec::new);
                     current_group_name = group_name;
                 }
                 Invalid => {}
@@ -207,7 +207,7 @@ impl ObjParser {
             let p1i: usize = captures[1].parse().unwrap();
 
             let all_other_ps_i = captures[2]
-                .split(" ")
+                .split(' ')
                 .map(|s| s.parse::<usize>().unwrap())
                 .collect::<Vec<_>>();
 

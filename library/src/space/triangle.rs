@@ -119,7 +119,7 @@ impl ShapeLocal for Triangle {
         let p1_to_origin = ray.origin - &self.p1;
         let u = f * p1_to_origin.dot_product(&dir_cross_e2);
 
-        if u < 0.0 || u > 1.0 {
+        if !(0.0..=1.0).contains(&u) {
             return vec![];
         }
 
@@ -132,7 +132,7 @@ impl ShapeLocal for Triangle {
 
         let t = f * self.e2.dot_product(&origin_cross_e1);
 
-        let uv = if let Some(_) = self.vertex_normals {
+        let uv = if self.vertex_normals.is_some() {
             Some((u, v))
         } else {
             None

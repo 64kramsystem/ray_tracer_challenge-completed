@@ -80,24 +80,18 @@ impl Csg {
         inside_right: bool,
     ) -> bool {
         match self.operation {
-            Operation::Difference => {
-                return match child_hit {
-                    ChildHit::Left => !inside_right,
-                    ChildHit::Right => inside_left,
-                }
-            }
-            Operation::Intersection => {
-                return match child_hit {
-                    ChildHit::Left => inside_right,
-                    ChildHit::Right => inside_left,
-                }
-            }
-            Operation::Union => {
-                return match child_hit {
-                    ChildHit::Left => !inside_right,
-                    ChildHit::Right => !inside_left,
-                }
-            }
+            Operation::Difference => match child_hit {
+                ChildHit::Left => !inside_right,
+                ChildHit::Right => inside_left,
+            },
+            Operation::Intersection => match child_hit {
+                ChildHit::Left => inside_right,
+                ChildHit::Right => inside_left,
+            },
+            Operation::Union => match child_hit {
+                ChildHit::Left => !inside_right,
+                ChildHit::Right => !inside_left,
+            },
         }
     }
 
@@ -200,7 +194,7 @@ impl ShapeLocal for Csg {
         all_intersections.sort();
         all_intersections.dedup();
 
-        return self.filter_intersections(all_intersections);
+        self.filter_intersections(all_intersections)
     }
 }
 

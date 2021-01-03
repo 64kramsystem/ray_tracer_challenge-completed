@@ -116,11 +116,11 @@ impl World {
         if material.reflective > 0.0 && material.transparency > 0.0 {
             let reflectance = intersection_state.schlick();
 
-            return surface_color
+            surface_color
                 + &(reflected_color * reflectance)
-                + &(refracted_color * (1.0 - reflectance));
+                + &(refracted_color * (1.0 - reflectance))
         } else {
-            return surface_color + &reflected_color + &refracted_color;
+            surface_color + &reflected_color + &refracted_color
         }
     }
 

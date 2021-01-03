@@ -95,11 +95,11 @@ impl ShapeLocal for Cube {
             (y_abs, (0.0, point.y, 0.0))
         };
 
-        return if max_dimension_abs > z_abs {
+        if max_dimension_abs > z_abs {
             Tuple::vector(current_normal.0, current_normal.1, current_normal.2)
         } else {
             Tuple::vector(0.0, 0.0, point.z)
-        };
+        }
 
         // Original algorithm
         //

@@ -86,7 +86,7 @@ impl ShapeLocal for Cone {
                 y = -y;
             }
 
-            return Tuple::vector(point.x, y, point.z);
+            Tuple::vector(point.x, y, point.z)
         }
     }
 
