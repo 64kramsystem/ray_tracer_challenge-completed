@@ -140,6 +140,7 @@ impl Image for Sdl2Interface {
     // Doesn't update the canvas; for that, must invoke update_canvas().
     // Pixels outside the canvas are ignored.
     //
+    #[allow(clippy::many_single_char_names)]
     fn write_pixel(&mut self, x: i16, y: i16, color: Color) {
         let (x, y) = self.adjust_coordinates(x, y);
 

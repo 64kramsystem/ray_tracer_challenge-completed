@@ -114,7 +114,6 @@ fn random_pattern() -> Box<dyn Pattern> {
                 color_b: random_color(),
                 ..StripePattern::default()
             })),
-            ..CheckersPattern::default()
         }),
         2 => Box::new(GradientPattern {
             transform: Matrix::scaling(PATTERN_SCALE, PATTERN_SCALE, PATTERN_SCALE),
@@ -147,7 +146,7 @@ fn random_rotation() -> Matrix {
 }
 
 fn random_material(fancy_material: Option<MaterialQuality>) -> Material {
-    let pattern = if let Some(_) = fancy_material {
+    let pattern = if fancy_material.is_some() {
         Box::new(FlatPattern {
             color: random_color(),
             ..FlatPattern::default()
@@ -165,7 +164,7 @@ fn random_material(fancy_material: Option<MaterialQuality>) -> Material {
     let reflective = reflective as u32 as f64;
 
     Material {
-        pattern: pattern,
+        pattern,
         diffuse: 0.7,
         specular: 0.3, // walls originally had 0.0
         reflective,

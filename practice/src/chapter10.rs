@@ -52,7 +52,6 @@ fn random_pattern() -> Box<dyn Pattern> {
                 color_b: random_color(),
                 ..StripePattern::default()
             })),
-            ..CheckersPattern::default()
         }),
         2 => Box::new(GradientPattern {
             transform: Matrix::scaling(PATTERN_SCALE, PATTERN_SCALE, PATTERN_SCALE),

@@ -56,7 +56,7 @@ pub fn practice() {
                 direction: ray_direction,
             };
 
-            if let Some(_) = hit(&ray, &sphere) {
+            if hit(&ray, &sphere).is_some() {
                 interface.write_pixel(x, y, hit_color);
             };
         }

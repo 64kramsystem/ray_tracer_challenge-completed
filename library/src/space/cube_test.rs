@@ -82,7 +82,7 @@ demonstrate! {
                 let point = Tuple::point(*px, *py, *pz);
                 let expected_normal = Tuple::vector(*nx, *ny, *nz);
 
-                assert_eq!(cube.local_normal(&point, &default_intersection), expected_normal);
+                assert_eq!(cube.local_normal(point, &default_intersection), expected_normal);
             }
         }
     }

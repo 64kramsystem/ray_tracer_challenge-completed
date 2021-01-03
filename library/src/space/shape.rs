@@ -1,6 +1,9 @@
 use std::{
     fmt,
-    sync::{Arc, Mutex, Weak},
+    sync::{
+        atomic::{AtomicU32, Ordering},
+        Arc, Weak,
+    },
 };
 
 use super::{BoundedShape, Bounds, Intersection, PointLight, Ray};
@@ -12,17 +15,10 @@ use crate::{
 #[cfg(test)]
 use std::any::Any;
 
-lazy_static::lazy_static! {
-  static ref NEXT_ID: Mutex<u32> = Mutex::new(1);
-}
+static NEXT_ID: AtomicU32 = AtomicU32::new(1);
 
 pub(crate) fn new_shape_id() -> u32 {
-    let mut next_id_mtx = NEXT_ID.lock().unwrap();
-
-    let next_id = *next_id_mtx;
-    *next_id_mtx += 1;
-
-    next_id
+    NEXT_ID.fetch_add(1, Ordering::SeqCst)
 }
 
 pub(crate) mod private {
@@ -36,7 +32,7 @@ pub(crate) mod private {
         //
         // In the book, this is local_normal_at().
         //
-        fn local_normal(&self, point: &Tuple, intersection: &Intersection) -> Tuple;
+        fn local_normal(&self, point: Tuple, intersection: &Intersection) -> Tuple;
 
         // ray: In object space.
         //
@@ -71,7 +67,7 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     //
     fn normal(&self, world_point: &Tuple, intersection: &Intersection) -> Tuple {
         let local_point = self.world_to_object(world_point);
-        let local_normal = self.local_normal(&local_point, intersection);
+        let local_normal = self.local_normal(local_point, intersection);
         self.normal_to_world(&local_normal)
     }
 

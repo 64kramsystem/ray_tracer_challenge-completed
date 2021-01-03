@@ -124,7 +124,7 @@ impl Ray {
         // In many tests, we don't care about refraction, so we pass no intersections and get bogus
         // values.
         //
-        if intersections.len() == 0 {
+        if intersections.is_empty() {
             (REFRACTIVE_INDEX_VACUUM, REFRACTIVE_INDEX_VACUUM)
         } else {
             (comps.0.unwrap(), comps.1.unwrap())
