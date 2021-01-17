@@ -15,7 +15,7 @@ fn add_astronaut(objects: &mut Vec<Arc<dyn Shape>>) {
     let file_path = Path::new(ASSETS_PATH).join("astronaut1.obj");
     let file_reader = BufReader::new(File::open(file_path).unwrap());
 
-    let mut parser = ObjParser::parse(file_reader).unwrap();
+    let parser = ObjParser::parse(file_reader).unwrap();
 
     let default_group = parser.default_group();
 
