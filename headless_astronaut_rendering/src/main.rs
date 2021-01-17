@@ -21,21 +21,25 @@ use library::{
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// COMMANDLINE DECODING/MODEL LOADING
+// SYSTEM PREPARATION
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // PathBuf is the rigorous type to use. It's also very ugly to handle.
 //
-fn load_commandline_params() -> (String, u16) {
+fn load_commandline_params() -> (String, u16, usize) {
     // For simplicity, ignore invalid (non-UTF8) filenames.
     //
     let params = std::env::args().skip(1).collect::<Vec<_>>();
 
-    if params.len() != 2 {
-        panic!("Wrong number of args (2 expected: model_filename, horizontal_resolution; current: {:?}", params);
+    if params.len() != 3 {
+        panic!("Wrong number of args (2 expected: model_filename, horizontal_resolution, threads; current: {:?}", params);
     }
 
-    (String::from(params[0].clone()), params[1].parse().unwrap())
+    let model_filename = String::from(params[0].clone());
+    let horizontal_resolution = params[1].parse().unwrap();
+    let rendering_threads = params[2].parse().unwrap();
+
+    (model_filename, horizontal_resolution, rendering_threads)
 }
 
 fn load_model(model_filename: &str) -> Arc<Group> {
@@ -44,6 +48,15 @@ fn load_model(model_filename: &str) -> Arc<Group> {
     let parser = ObjParser::parse(file_reader).unwrap();
 
     parser.default_group()
+}
+
+fn set_rendering_threads(threads_number: usize) -> () {
+    if threads_number > 0 {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(threads_number)
+            .build_global()
+            .unwrap();
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,8 +111,10 @@ fn write_output_file(image: VirtualImage, model_filename: &str) -> String {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 fn main() {
-    let (model_filename, horizontal_resolution) = load_commandline_params();
+    let (model_filename, horizontal_resolution, rendering_threads) = load_commandline_params();
     let model = load_model(&model_filename);
+
+    set_rendering_threads(rendering_threads);
 
     let world = prepare_world(model);
     let camera = prepare_camera(horizontal_resolution);
