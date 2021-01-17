@@ -52,7 +52,7 @@ demonstrate! {
                 f 1 3 4
             "};
 
-            let mut parser = ObjParser::parse(input.as_bytes()).unwrap();
+            let parser = ObjParser::parse(input.as_bytes()).unwrap();
 
             let group = &parser.default_group();
 
@@ -78,7 +78,7 @@ demonstrate! {
                 f 1 2 3 4 5
             "};
 
-            let mut parser = ObjParser::parse(input.as_bytes()).unwrap();
+            let parser = ObjParser::parse(input.as_bytes()).unwrap();
 
             let group = &parser.default_group();
 
@@ -101,12 +101,13 @@ demonstrate! {
             let file_path = Path::new(ASSETS_PATH).join("triangles.obj");
             let file_reader = BufReader::new(File::open(file_path).unwrap());
 
-            let mut parser = ObjParser::parse(file_reader).unwrap();
+            let parser = ObjParser::parse(file_reader).unwrap();
 
-            let groups = parser.groups(&["FirstGroup", "SecondGroup"]);
+            let group0 = parser.group("FirstGroup");
+            let group1 = parser.group("SecondGroup");
 
-            let t1 = groups[0].children[0].as_any().downcast_ref::<Triangle>().unwrap();
-            let t2 = groups[1].children[0].as_any().downcast_ref::<Triangle>().unwrap();
+            let t1 = group0.children[0].as_any().downcast_ref::<Triangle>().unwrap();
+            let t2 = group1.children[0].as_any().downcast_ref::<Triangle>().unwrap();
 
             assert_eq!(t1.p1, parser.vertex(1));
             assert_eq!(t1.p2, parser.vertex(2));
@@ -168,7 +169,7 @@ demonstrate! {
                 f 1/0/3 2/102/1 3/14/2
             "};
 
-            let mut parser = ObjParser::parse(input.as_bytes()).unwrap();
+            let parser = ObjParser::parse(input.as_bytes()).unwrap();
 
             let group = parser.default_group();
 

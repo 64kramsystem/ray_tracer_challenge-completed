@@ -32,10 +32,12 @@ lazy_static::lazy_static! {
 //
 const DEFAULT_GROUP_NAME: &str = "default";
 
+#[derive(Debug)]
 enum ParsedElement {
     Vertex(Tuple),
     VertexNormal(Tuple),
     Faces(Vec<(usize, usize, usize)>),
+    Face(usize, usize, usize),
     FaceWithNormal((usize, usize), (usize, usize), (usize, usize)),
     Group(String),
     Invalid,
@@ -47,17 +49,9 @@ pub struct ObjParser {
     //
     vertices: Vec<Tuple>,
     normals: Vec<Tuple>,
-    // By storing the groups as vectors of triangles, we don't have to conform to the Group data structures
-    // (Arc/Mutex). Besides simplifying the parser code, it allows building a group more freely (see
-    // `Group.add_child()`).
-    // Taking this further, instead of Triangle, an adhoc data structure could be used (eg. tuples or
-    // something like `TrinagleData`).
+    // The values are only Face/FaceWithNormal.
     //
-    groups: HashMap<String, Vec<Triangle>>,
-    // With the design above, since we can't clone Triangles, when we remove them, we need to invalidate
-    // the parser state.
-    //
-    exported: bool,
+    groups_data: HashMap<String, Vec<ParsedElement>>,
 }
 
 impl ObjParser {
@@ -74,8 +68,7 @@ impl ObjParser {
         let mut parser = Self {
             vertices: vec![],
             normals: vec![],
-            groups,
-            exported: false,
+            groups_data: groups,
         };
 
         let mut current_group_name = DEFAULT_GROUP_NAME.to_string();
@@ -88,31 +81,20 @@ impl ObjParser {
                 VertexNormal(normal) => parser.normals.push(normal),
                 Faces(vertex_indexes) => {
                     for (p1i, p2i, p3i) in vertex_indexes {
-                        let p1 = parser.vertex(p1i);
-                        let p2 = parser.vertex(p2i);
-                        let p3 = parser.vertex(p3i);
-
-                        let triangle = Triangle::new(p1, p2, p3);
-
-                        let group = parser.groups.entry(current_group_name.to_string());
-                        group.and_modify(|group| group.push(triangle));
+                        let group = parser.groups_data.entry(current_group_name.to_string());
+                        group.and_modify(|group| group.push(Face(p1i, p2i, p3i)));
                     }
                 }
-                FaceWithNormal((p1i, n1i), (p2i, n2i), (p3i, n3i)) => {
-                    let p1 = parser.vertex(p1i);
-                    let p2 = parser.vertex(p2i);
-                    let p3 = parser.vertex(p3i);
-                    let n1 = parser.normal(n1i);
-                    let n2 = parser.normal(n2i);
-                    let n3 = parser.normal(n3i);
-
-                    let triangle = Triangle::smooth(p1, p2, p3, n1, n2, n3);
-
-                    let group = parser.groups.entry(current_group_name.to_string());
-                    group.and_modify(|group| group.push(triangle));
+                Face(p1i, p2i, p3i) => {
+                    let group = parser.groups_data.entry(current_group_name.to_string());
+                    group.and_modify(|group| group.push(Face(p1i, p2i, p3i)));
+                }
+                FaceWithNormal(_, _, _) => {
+                    let group = parser.groups_data.entry(current_group_name.to_string());
+                    group.and_modify(|group| group.push(parsed_element));
                 }
                 Group(group_name) => {
-                    let groups = &mut parser.groups;
+                    let groups = &mut parser.groups_data;
                     groups.entry(group_name.clone()).or_insert_with(Vec::new);
                     current_group_name = group_name;
                 }
@@ -123,59 +105,37 @@ impl ObjParser {
         Ok(parser)
     }
 
-    // For testing purposes. See Self.group().
+    // For testing purposes.
     //
-    pub fn default_group(&mut self) -> Arc<Group> {
-        self.groups(&[DEFAULT_GROUP_NAME]).remove(0)
+    pub fn default_group(&self) -> Arc<Group> {
+        self.group(DEFAULT_GROUP_NAME)
     }
 
-    // Originally for testing purposes; currently, used as reference to export a group.
-    // In the book, this doesn't have a specified API, it's referenced as `"group_name" from parser`.
+    // In the book, this doesn't have a specified API; it's referenced as `"group_name" from parser`.
     //
-    pub fn groups(&mut self, group_names: &[&str]) -> Vec<Arc<Group>> {
-        if self.exported {
-            panic!("Data exported! Need to reparse.")
-        }
+    pub fn group(&self, group_name: &str) -> Arc<Group> {
+        let parsed_elements = self.groups_data.get(group_name).unwrap();
 
-        self.exported = true;
-
-        group_names
+        let triangles = parsed_elements
             .iter()
-            .map(|group_name| {
-                let triangles = self.groups.remove(*group_name).unwrap();
-
-                let triangles = triangles
-                    .into_iter()
-                    .map(|triangle| Arc::new(triangle) as Arc<dyn Shape>)
-                    .collect::<Vec<_>>();
-
-                Group::new(Matrix::identity(4), triangles)
-            })
-            .collect()
-    }
-
-    // Export the groups as tree, with the group as leaves of a new root group.
-    // In the book, this is `obj_to_group()`.
-    //
-    pub fn export_tree(&mut self) -> Arc<Group> {
-        if self.exported {
-            panic!("Data exported! Need to reparse.")
-        }
-
-        self.exported = true;
-
-        let all_group_triangles = self.groups.drain().map(|(_, v)| v);
-
-        let groups = all_group_triangles
-            .map(|group_triangles| {
-                let children = group_triangles
-                    .into_iter()
-                    .map(|child| Arc::new(child) as Arc<dyn Shape>)
-                    .collect::<Vec<_>>();
-
-                Group::new(Matrix::identity(4), children) as Arc<dyn Shape>
+            .map(|parsed_element| {
+                let triangle = self.triangle_from_parsed_element(parsed_element);
+                Arc::new(triangle) as Arc<dyn Shape>
             })
             .collect();
+
+        Group::new(Matrix::identity(4), triangles)
+    }
+
+    // Convenience method for exporting the groups as tree, with the group as leaves of a new root group.
+    // In the book, this is `obj_to_group()`.
+    //
+    pub fn export_tree(&self) -> Arc<Group> {
+        let groups = self
+            .groups_data
+            .keys()
+            .map(|group_name| self.group(group_name) as Arc<dyn Shape>)
+            .collect::<Vec<_>>();
 
         Group::new(Matrix::identity(4), groups)
     }
@@ -186,6 +146,31 @@ impl ObjParser {
 
     pub fn normal(&self, i: usize) -> Tuple {
         self.normals[i - 1]
+    }
+
+    fn triangle_from_parsed_element(&self, element: &ParsedElement) -> Triangle {
+        match element {
+            Face(p1i, p2i, p3i) => {
+                let p1 = self.vertex(*p1i);
+                let p2 = self.vertex(*p2i);
+                let p3 = self.vertex(*p3i);
+
+                Triangle::new(p1, p2, p3)
+            }
+            FaceWithNormal((p1i, n1i), (p2i, n2i), (p3i, n3i)) => {
+                let p1 = self.vertex(*p1i);
+                let p2 = self.vertex(*p2i);
+                let p3 = self.vertex(*p3i);
+                let n1 = self.normal(*n1i);
+                let n2 = self.normal(*n2i);
+                let n3 = self.normal(*n3i);
+
+                Triangle::smooth(p1, p2, p3, n1, n2, n3)
+            }
+            _ => {
+                panic!("{:?}", element)
+            }
+        }
     }
 
     fn parse_line(line: String) -> ParsedElement {
@@ -224,9 +209,7 @@ impl ObjParser {
             let p2i: usize = captures[2].parse().unwrap();
             let p3i: usize = captures[3].parse().unwrap();
 
-            let faces = vec![(p1i, p2i, p3i)];
-
-            ParsedElement::Faces(faces)
+            ParsedElement::Face(p1i, p2i, p3i)
         } else if let Some(captures) = FACE_WITH_NORMAL_REGEX.captures(&line) {
             // MWAHAHAHA
 
