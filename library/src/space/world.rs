@@ -97,7 +97,12 @@ impl World {
         false
     }
 
-    pub fn shade_hit(&self, intersection_state: IntersectionState, max_recursions: u8) -> Color {
+    pub fn shade_hit(
+        &self,
+        intersection_state: IntersectionState,
+        max_recursions: u8,
+        allocator: &Vec<Box<dyn Shape>>,
+    ) -> Color {
         let is_shadowed = self.is_shadowed(&intersection_state.over_point);
 
         let surface_color = intersection_state.object.lighting(
@@ -106,10 +111,11 @@ impl World {
             &intersection_state.eyev,
             &intersection_state.normalv,
             is_shadowed,
+            allocator,
         );
 
-        let reflected_color = self.reflected_color(&intersection_state, max_recursions);
-        let refracted_color = self.refracted_color(&intersection_state, max_recursions);
+        let reflected_color = self.reflected_color(&intersection_state, max_recursions, allocator);
+        let refracted_color = self.refracted_color(&intersection_state, max_recursions, allocator);
 
         let material = intersection_state.object.material();
 
@@ -124,12 +130,17 @@ impl World {
         }
     }
 
-    pub fn color_at(&self, ray: &Ray, max_recursions: u8) -> Color {
+    pub fn color_at(
+        &self,
+        ray: &Ray,
+        max_recursions: u8,
+        allocator: &Vec<Box<dyn Shape>>,
+    ) -> Color {
         let (hit, intersections) = self.intersections(ray);
 
         if let Some(hit) = hit {
-            let intersection_state = ray.intersection_state(&hit, &intersections);
-            self.shade_hit(intersection_state, max_recursions)
+            let intersection_state = ray.intersection_state(&hit, &intersections, allocator);
+            self.shade_hit(intersection_state, max_recursions, allocator)
         } else {
             COLOR_BLACK
         }
@@ -139,6 +150,7 @@ impl World {
         &self,
         intersection_state: &IntersectionState,
         max_recursions: u8,
+        allocator: &Vec<Box<dyn Shape>>,
     ) -> Color {
         if max_recursions == 0
             || intersection_state
@@ -156,7 +168,7 @@ impl World {
             direction: intersection_state.reflectv,
         };
 
-        let color = self.color_at(&reflect_ray, max_recursions - 1);
+        let color = self.color_at(&reflect_ray, max_recursions - 1, allocator);
 
         return color * intersection_state.object.material().reflective;
     }
@@ -165,6 +177,7 @@ impl World {
         &self,
         intersection_state: &IntersectionState,
         max_recursions: u8,
+        allocator: &Vec<Box<dyn Shape>>,
     ) -> Color {
         if max_recursions == 0 || intersection_state.object.material().transparency == 0.0 {
             return COLOR_BLACK;
@@ -190,7 +203,7 @@ impl World {
             direction,
         };
 
-        self.color_at(&refracted_ray, max_recursions - 1)
+        self.color_at(&refracted_ray, max_recursions - 1, allocator)
             * intersection_state.object.material().transparency
     }
 

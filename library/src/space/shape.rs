@@ -1,9 +1,6 @@
 use std::{
     fmt,
-    sync::{
-        atomic::{AtomicU32, Ordering},
-        Arc, Weak,
-    },
+    sync::atomic::{AtomicU32, Ordering},
 };
 
 use super::{BoundedShape, Bounds, Intersection, PointLight, Ray};
@@ -52,8 +49,8 @@ pub(crate) mod private {
 //
 pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     fn id(&self) -> u32;
-    fn parent(&self) -> Option<Arc<dyn Shape>>;
-    fn parent_mut(&mut self) -> &mut Weak<dyn Shape>;
+    fn parent(&self) -> Option<usize>;
+    fn parent_mut(&mut self) -> &mut Option<usize>;
     fn transform(&self) -> &Matrix;
     fn transform_mut(&mut self) -> &mut Matrix;
     fn material(&self) -> &Material;
@@ -65,19 +62,25 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
     //
     // In the book, this is normal_at().
     //
-    fn normal(&self, world_point: &Tuple, intersection: &Intersection) -> Tuple {
-        let local_point = self.world_to_object(world_point);
+    fn normal(
+        &self,
+        world_point: &Tuple,
+        intersection: &Intersection,
+        allocator: &Vec<Box<dyn Shape>>,
+    ) -> Tuple {
+        let local_point = self.world_to_object(world_point, allocator);
         let local_normal = self.local_normal(local_point, intersection);
-        self.normal_to_world(&local_normal)
+        self.normal_to_world(&local_normal, allocator)
     }
 
     // point: In world space.
     //
-    fn world_to_object(&self, point: &Tuple) -> Tuple {
+    fn world_to_object(&self, point: &Tuple, allocator: &Vec<Box<dyn Shape>>) -> Tuple {
         let transform_inverse = self.transform().inverse();
 
         if let Some(parent) = self.parent() {
-            transform_inverse * &parent.world_to_object(point)
+            let parent = allocator[parent];
+            transform_inverse * &parent.world_to_object(point, allocator)
         } else {
             transform_inverse * point
         }
@@ -85,13 +88,14 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
 
     // normal: In object space.
     //
-    fn normal_to_world(&self, normal: &Tuple) -> Tuple {
+    fn normal_to_world(&self, normal: &Tuple, allocator: &Vec<Box<dyn Shape>>) -> Tuple {
         let mut normal = self.transform().inverse().transpose() * normal;
         normal.w = 0.0;
         normal = normal.normalize();
 
         if let Some(parent) = self.parent() {
-            parent.normal_to_world(&normal)
+            let parent = allocator[parent];
+            parent.normal_to_world(&normal, allocator)
         } else {
             normal
         }
@@ -160,8 +164,9 @@ pub trait Shape: private::ShapeLocal + BoundedShape + fmt::Debug + Sync + Send {
         eyev: &Tuple,
         normalv: &Tuple,
         in_shadow: bool,
+        allocator: &Vec<Box<dyn Shape>>,
     ) -> Color {
-        let object_point = self.world_to_object(&world_point);
+        let object_point = self.world_to_object(&world_point, allocator);
 
         self.material()
             .lighting(light, &object_point, world_point, eyev, normalv, in_shadow)

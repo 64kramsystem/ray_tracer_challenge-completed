@@ -1,5 +1,3 @@
-use std::sync::{Arc, Weak};
-
 use super::{
     shape::{self, private::ShapeLocal},
     BoundedShape, Bounds, Cube, Intersection, Ray, Shape,
@@ -22,15 +20,8 @@ pub struct Group {
     pub id: u32,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
-    #[default(Weak::<Self>::new())]
-    pub parent: Weak<dyn Shape>,
-
-    // This is tricky. Wrapping the vector with the mutex will cause contention, but wrapping the shape
-    // will require all the Shape methods to be converted to functions taking Arc<Mutex<dyn shape>>;
-    // this is possible, but ugly.
-    //
-    #[default(vec![])]
-    pub children: Vec<Arc<dyn Shape>>,
+    pub parent: Option<usize>,
+    pub children: Vec<usize>,
 }
 
 impl Group {
@@ -50,24 +41,28 @@ impl Group {
     //
     // There are no trivial/clean solutions to this problem; see https://users.rust-lang.org/t/is-it-possible-to-safely-build-a-read-only-thread-safe-bidirectional-tree/52759.
     //
-    pub fn new(transform: Matrix, mut children: Vec<Arc<dyn Shape>>) -> Arc<Group> {
-        let mut group = Arc::new(Group {
+    pub fn new(
+        transform: Matrix,
+        children: Vec<usize>,
+        allocator: &mut Vec<Box<dyn Shape>>,
+    ) -> usize {
+        let mut group = Box::new(Group {
             transform,
+            children,
             ..Group::default()
         });
 
-        for child in children.iter_mut() {
-            // Children needs to be unchecked as well, otherwise shapes can't be nested.
-            //
-            let child_parent_ref = unsafe { Arc::get_mut_unchecked(child) }.parent_mut();
-            let parent_ref = Arc::clone(&group) as Arc<dyn Shape>;
-            *child_parent_ref = Arc::downgrade(&parent_ref);
+        let group_addr = {
+            allocator.push(group);
+            allocator.len()
+        };
+
+        for child_addr in children {
+            let child_parent_ref = allocator[child_addr].parent_mut();
+            *child_parent_ref = Some(group_addr);
         }
 
-        let group_mut = unsafe { Arc::get_mut_unchecked(&mut group) };
-        group_mut.children = children;
-
-        group
+        group_addr
     }
 }
 
@@ -76,11 +71,11 @@ impl Shape for Group {
         self.id
     }
 
-    fn parent(&self) -> Option<Arc<dyn Shape>> {
-        Weak::upgrade(&self.parent)
+    fn parent(&self) -> Option<usize> {
+        self.parent
     }
 
-    fn parent_mut(&mut self) -> &mut Weak<dyn Shape> {
+    fn parent_mut(&mut self) -> &mut Option<usize> {
         &mut self.parent
     }
 
@@ -101,7 +96,8 @@ impl Shape for Group {
     }
 
     fn includes(&self, object: &dyn Shape) -> bool {
-        self.children.iter().any(|child| child.includes(object))
+        todo!()
+        // self.children.iter().any(|child| child.includes(object))
     }
 
     #[cfg(test)]
@@ -126,20 +122,23 @@ impl ShapeLocal for Group {
             return vec![];
         }
 
-        let mut intersections = self
-            .children
-            .iter()
-            .flat_map(|child| child.intersections(ray))
-            .collect::<Vec<_>>();
+        todo!()
 
-        intersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
-
-        intersections
+        //         let mut intersections = self
+        //             .children
+        //             .iter()
+        //             .flat_map(|child| child.intersections(ray))
+        //             .collect::<Vec<_>>();
+        //
+        //         intersections.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        //
+        //         intersections
     }
 }
 
 impl BoundedShape for Group {
     fn local_bounds(&self) -> Bounds {
-        Bounds::compute_for_children(&self.children)
+        todo!()
+        // Bounds::compute_for_children(&self.children)
     }
 }

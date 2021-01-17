@@ -1,5 +1,3 @@
-use std::sync::Weak;
-
 use super::{
     shape::{self, private::ShapeLocal},
     BoundedShape, Bounds, Intersection, Ray, Shape,
@@ -10,8 +8,7 @@ use crate::{lang::ApproximateFloat64Ops, math::Matrix, math::Tuple, properties::
 pub struct Plane {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
-    #[default(Weak::<Self>::new())]
-    pub parent: Weak<dyn Shape>,
+    pub parent: Option<usize>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]

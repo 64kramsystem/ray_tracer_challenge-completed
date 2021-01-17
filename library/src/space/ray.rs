@@ -52,10 +52,11 @@ impl Ray {
         &self,
         intersection: &'a Intersection,
         intersections: &[Intersection],
+        allocator: &Vec<Box<dyn Shape>>,
     ) -> IntersectionState<'a> {
         let point = self.position(intersection.t);
         let eyev = -self.direction;
-        let mut normalv = intersection.object.normal(&point, intersection);
+        let mut normalv = intersection.object.normal(&point, intersection, allocator);
         let inside = if normalv.dot_product(&eyev) >= 0.0 {
             false
         } else {

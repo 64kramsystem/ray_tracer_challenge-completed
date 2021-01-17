@@ -31,11 +31,11 @@ pub fn shape_accessors_derive(input: TokenStream) -> TokenStream {
 
             // The parent/children methods encapsulate (as possible) the typical access pattern.
 
-            fn parent(&self) -> Option<ShapeAccessorsArc<dyn ShapeAccessorsShape>> {
-                ShapeAccessorsWeak::upgrade(&self.parent)
+            fn parent(&self) -> Option<usize> {
+                self.parent
             }
 
-            fn parent_mut(&mut self) -> &mut ShapeAccessorsWeak<dyn ShapeAccessorsShape> {
+            fn parent_mut(&mut self) -> &mut Option<usize> {
                 &mut self.parent
             }
 

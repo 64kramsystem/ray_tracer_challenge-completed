@@ -2,7 +2,6 @@ use std::{
     collections::HashMap,
     error::Error,
     io::{self, BufRead, BufReader},
-    sync::Arc,
 };
 
 use regex::Regex;
@@ -125,44 +124,55 @@ impl ObjParser {
 
     // For testing purposes. See Self.group().
     //
-    pub fn default_group(&mut self) -> Arc<Group> {
-        self.groups(&[DEFAULT_GROUP_NAME]).remove(0)
+    pub fn default_group(&mut self) -> Box<dyn Shape> {
+        let (_, allocator) = self.groups(&[DEFAULT_GROUP_NAME]);
+
+        allocator[0]
     }
 
     // Originally for testing purposes; currently, used as reference to export a group.
     // In the book, this doesn't have a specified API, it's referenced as `"group_name" from parser`.
     //
-    pub fn groups(&mut self, group_names: &[&str]) -> Vec<Arc<Group>> {
+    pub fn groups(&mut self, group_names: &[&str]) -> (Vec<usize>, Vec<Box<dyn Shape>>) {
         if self.exported {
             panic!("Data exported! Need to reparse.")
         }
 
         self.exported = true;
 
-        group_names
+        let allocator = vec![];
+
+        let groups = group_names
             .iter()
             .map(|group_name| {
                 let triangles = self.groups.remove(*group_name).unwrap();
 
                 let triangles = triangles
                     .into_iter()
-                    .map(|triangle| Arc::new(triangle) as Arc<dyn Shape>)
-                    .collect::<Vec<_>>();
+                    .map(|triangle| {
+                        allocator.push(Box::new(triangle) as Box<dyn Shape>);
+                        allocator.len()
+                    })
+                    .collect();
 
-                Group::new(Matrix::identity(4), triangles)
+                Group::new(Matrix::identity(4), triangles, &mut allocator)
             })
-            .collect()
+            .collect();
+
+        (groups, allocator)
     }
 
     // Export the groups as tree, with the group as leaves of a new root group.
     // In the book, this is `obj_to_group()`.
     //
-    pub fn export_tree(&mut self) -> Arc<Group> {
+    pub fn export_tree(&mut self) -> (usize, Vec<Box<dyn Shape>>) {
         if self.exported {
             panic!("Data exported! Need to reparse.")
         }
 
         self.exported = true;
+
+        let allocator = vec![];
 
         let all_group_triangles = self.groups.drain().map(|(_, v)| v);
 
@@ -170,14 +180,19 @@ impl ObjParser {
             .map(|group_triangles| {
                 let children = group_triangles
                     .into_iter()
-                    .map(|child| Arc::new(child) as Arc<dyn Shape>)
-                    .collect::<Vec<_>>();
+                    .map(|child| {
+                        allocator.push(Box::new(child) as Box<dyn Shape>);
+                        allocator.len()
+                    })
+                    .collect();
 
-                Group::new(Matrix::identity(4), children) as Arc<dyn Shape>
+                Group::new(Matrix::identity(4), children, &mut allocator)
             })
             .collect();
 
-        Group::new(Matrix::identity(4), groups)
+        let group_addr = Group::new(Matrix::identity(4), groups, &mut allocator);
+
+        (group_addr, allocator)
     }
 
     pub fn vertex(&self, i: usize) -> Tuple {

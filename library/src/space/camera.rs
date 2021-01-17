@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use super::{Ray, World};
+use super::{Ray, Shape, World};
 use crate::{
     interface::Image,
     math::{Matrix, Tuple},
@@ -74,14 +74,14 @@ impl Camera {
         Ray { origin, direction }
     }
 
-    pub fn render<T: Image>(&self, world: &World) -> T {
+    pub fn render<T: Image>(&self, world: &World, allocator: &Vec<Box<dyn Shape>>) -> T {
         let mut pixels_buffer = vec![vec![COLOR_BLACK; self.hsize as usize]; self.vsize as usize];
         let pixels_buffer_mtx = Mutex::new(&mut pixels_buffer);
 
         (0..self.vsize).into_par_iter().for_each(|y| {
             for x in 0..self.hsize {
                 let ray = self.ray_for_pixel(x, y);
-                let color = world.color_at(&ray, MAX_REFLECTIONS);
+                let color = world.color_at(&ray, MAX_REFLECTIONS, allocator);
 
                 let mut pixels_buffer = pixels_buffer_mtx.lock().unwrap();
                 pixels_buffer[y as usize][x as usize] = color;

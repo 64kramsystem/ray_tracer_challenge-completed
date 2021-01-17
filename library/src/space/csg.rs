@@ -1,8 +1,8 @@
-use std::sync::{Arc, Weak};
+use std::sync::Arc;
 
 use super::{
     shape::{self, private::ShapeLocal},
-    BoundedShape, Bounds, Intersection, Plane, Ray, Shape,
+    BoundedShape, Bounds, Intersection, Ray, Shape,
 };
 use crate::{math::Matrix, math::Tuple, properties::Material};
 
@@ -26,8 +26,7 @@ pub enum ChildHit {
 pub struct Csg {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
-    #[default(Weak::<Self>::new())]
-    pub parent: Weak<dyn Shape>,
+    pub parent: Option<usize>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
 
@@ -37,8 +36,7 @@ pub struct Csg {
     pub operation: Operation,
     // For ease, we follow the Group#children pattern, but this prevents modifications to the children.
     // Structure: (left, right).
-    #[default((Arc::new(Plane::default()), Arc::new(Plane::default())))]
-    pub children: (Arc<dyn Shape>, Arc<dyn Shape>),
+    pub children: (usize, usize),
 }
 
 impl Csg {
@@ -46,31 +44,32 @@ impl Csg {
     //
     pub fn new(
         operation: Operation,
-        mut left: Arc<dyn Shape>,
-        mut right: Arc<dyn Shape>,
+        left: usize,
+        right: usize,
         transform: Matrix,
-    ) -> Arc<Csg> {
-        let mut csg = Arc::new(Csg {
+        allocator: &mut Vec<Box<dyn Shape>>,
+    ) -> usize {
+        let mut csg = Box::new(Csg {
             operation,
             transform,
+            children: (left, right),
             ..Csg::default()
         });
 
+        let csg_addr = {
+            allocator.push(csg);
+            allocator.len()
+        };
+
         // Children needs to be unchecked as well, otherwise shapes can't be nested.
 
-        let left_mut = unsafe { Arc::get_mut_unchecked(&mut left) };
-        let left_parent_ref = left_mut.parent_mut();
-        *left_parent_ref = Arc::downgrade(&(Arc::clone(&csg) as Arc<dyn Shape>));
+        let left_parent_ref = allocator[left].parent_mut();
+        *left_parent_ref = Some(csg_addr);
 
-        let right_mut = unsafe { Arc::get_mut_unchecked(&mut right) };
-        let right_parent_ref = right_mut.parent_mut();
-        *right_parent_ref = Arc::downgrade(&(Arc::clone(&csg) as Arc<dyn Shape>));
+        let right_parent_ref = allocator[right].parent_mut();
+        *right_parent_ref = Some(csg_addr);
 
-        let csg_mut = unsafe { Arc::get_mut_unchecked(&mut csg) };
-
-        csg_mut.children = (left, right);
-
-        csg
+        csg_addr
     }
 
     pub(crate) fn intersection_allowed(
@@ -136,11 +135,11 @@ impl Shape for Csg {
         self.id
     }
 
-    fn parent(&self) -> Option<Arc<dyn Shape>> {
-        Weak::upgrade(&self.parent)
+    fn parent(&self) -> Option<usize> {
+        self.parent
     }
 
-    fn parent_mut(&mut self) -> &mut Weak<dyn Shape> {
+    fn parent_mut(&mut self) -> &mut Option<usize> {
         &mut self.parent
     }
 

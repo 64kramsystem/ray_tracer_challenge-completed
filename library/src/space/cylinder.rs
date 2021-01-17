@@ -1,4 +1,4 @@
-use std::{mem, sync::Weak};
+use std::mem;
 
 use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Ray, Shape};
 use crate::{
@@ -11,8 +11,7 @@ use crate::{
 pub struct Cylinder {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
-    #[default(Weak::<Self>::new())]
-    pub parent: Weak<dyn Shape>,
+    pub parent: Option<usize>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]

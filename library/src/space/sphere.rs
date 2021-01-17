@@ -1,5 +1,3 @@
-use std::sync::Weak;
-
 use super::{shape, shape::private::ShapeLocal, BoundedShape, Bounds, Intersection, Shape};
 use crate::{
     lang::math::sqrt,
@@ -11,8 +9,7 @@ use crate::{
 pub struct Sphere {
     #[default(_code = "shape::new_shape_id()")]
     pub id: u32,
-    #[default(Weak::<Self>::new())]
-    pub parent: Weak<dyn Shape>,
+    pub parent: Option<usize>,
     #[default(Matrix::identity(4))]
     pub transform: Matrix,
     #[default(Material::default())]
