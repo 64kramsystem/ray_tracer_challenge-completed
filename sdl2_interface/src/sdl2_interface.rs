@@ -2,8 +2,8 @@ use sdl2::{
     event::Event, keyboard::Keycode, pixels, rect::Point, render, video::Window, EventPump,
 };
 
-use super::image::Image;
-use crate::properties::{Color, COLOR_BLACK};
+use library::interface::Image;
+use library::properties::{Color, COLOR_BLACK};
 
 // Interface for drawing to a canvas, and waiting a keypress, intentionally designed to be as simple
 // as  possible.

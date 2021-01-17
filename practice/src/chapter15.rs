@@ -1,11 +1,11 @@
 use std::{f64::consts::PI, fs::File, io::BufReader, path::Path, sync::Arc};
 
 use library::{
-    interface::Sdl2Interface,
     math::{Matrix, Tuple},
     space::*,
     utils::ObjParser,
 };
+use sdl2_interface::Sdl2Interface;
 
 const ASSETS_PATH: &str = "assets/testing";
 

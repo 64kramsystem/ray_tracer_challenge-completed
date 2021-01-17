@@ -1,13 +1,9 @@
 [package]
-
 authors = ["Saverio Miroddi <saverio.pub2@gmail.com>"]
 edition = "2018"
-name = "practice"
+name = "sdl2_interface"
 version = "0.1.0"
 
 [dependencies]
-
 library = {path = "../library"}
-rand = "0.7.3"
-rayon = "1.5.0"
-sdl2_interface = {path = "../sdl2_interface"}
+sdl2 = "0.34.3"

@@ -1,13 +1,14 @@
 use std::{f64::consts::PI, sync::Arc};
 
 use library::{
-    interface::Sdl2Interface,
     math::{Matrix, Tuple},
     properties::FlatPattern,
     properties::Material,
     space::{Camera, PointLight, Shape, Sphere, World},
     Axis,
 };
+
+use sdl2_interface::Sdl2Interface;
 
 fn prepare_material() -> Material {
     Material {

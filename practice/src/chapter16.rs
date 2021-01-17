@@ -1,12 +1,12 @@
 use std::{f64::consts::PI, sync::Arc};
 
 use library::{
-    interface::Sdl2Interface,
     math::{Matrix, Tuple},
     properties::{Color, FlatPattern, Material, COLOR_BLUE, COLOR_RED},
     space::*,
     Axis,
 };
+use sdl2_interface::Sdl2Interface;
 
 const SCREEN_WIDTH: u16 = 800; // height is half
 

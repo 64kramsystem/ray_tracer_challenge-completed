@@ -1,13 +1,15 @@
 use std::{f64::consts::PI, sync::Arc};
 
 use library::{
-    interface::{Image, Sdl2Interface},
+    interface::Image,
     math::{Matrix, Tuple},
     properties::Color,
     space::Shape,
     space::{Intersection, Ray, Sphere},
     Axis,
 };
+
+use sdl2_interface::Sdl2Interface;
 
 fn hit<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersection<'a>> {
     // At this stage, shapes always returned ordered hits, so we can use the first.

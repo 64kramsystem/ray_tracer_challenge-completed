@@ -1,11 +1,11 @@
 use std::{f64::consts::PI, sync::Arc};
 
 use library::{
-    interface::Sdl2Interface,
     math::{Matrix, Tuple},
     space::*,
     Axis,
 };
+use sdl2_interface::Sdl2Interface;
 
 const SCREEN_WIDTH: u16 = 400; // height is half
 
