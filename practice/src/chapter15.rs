@@ -1,7 +1,7 @@
 use std::{f64::consts::PI, fs::File, io::BufReader, path::Path, sync::Arc};
 
 use library::{
-    interface::Sdl2Interface,
+    interface::{Sdl2Interface, VirtualImage},
     math::{Matrix, Tuple},
     space::*,
     utils::ObjParser,
@@ -57,11 +57,17 @@ fn prepare_camera() -> Camera {
 // MAIN
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const COMPUTE_WITHOUT_DISPLAY: bool = true;
+
 pub fn practice() {
     let world = prepare_world();
     let camera = prepare_camera();
 
-    let mut interface: Sdl2Interface = camera.render(&world);
+    if COMPUTE_WITHOUT_DISPLAY {
+        camera.render::<VirtualImage>(&world);
+    } else {
+        let mut interface = camera.render::<Sdl2Interface>(&world);
 
-    interface.wait_keypress();
+        interface.wait_keypress();
+    }
 }
