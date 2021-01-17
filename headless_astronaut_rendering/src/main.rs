@@ -1,41 +1,63 @@
-// This is a copy of the practice15 exercises, without the SDL interface.
+/*
+This is a copy of the practice15 exercises, with a few changes:
 
-use std::{f64::consts::PI, fs::File, io::BufReader, path::Path, sync::Arc};
+- renders to a PPM file;
+- the model filename and horizontal resolution are specified in the commandline.
+
+*/
+
+use std::{
+    f64::consts::PI,
+    fs::File,
+    io::{BufReader, Write},
+    sync::Arc,
+};
 
 use library::{
     interface::VirtualImage,
     math::{Matrix, Tuple},
     space::*,
-    utils::ObjParser,
+    utils::{ObjParser, PpmEncoder},
 };
 
-const ASSETS_PATH: &str = "../assets/testing";
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// COMMANDLINE DECODING/MODEL LOADING
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const SCREEN_WIDTH: u16 = 100; // height is half
+// PathBuf is the rigorous type to use. It's also very ugly to handle.
+//
+fn load_commandline_params() -> (String, u16) {
+    // For simplicity, ignore invalid (non-UTF8) filenames.
+    //
+    let params = std::env::args().skip(1).collect::<Vec<_>>();
 
-fn add_astronaut(objects: &mut Vec<Arc<dyn Shape>>) {
-    let file_path = Path::new(ASSETS_PATH).join("astronaut1.obj");
-    let file_reader = BufReader::new(File::open(file_path).unwrap());
+    if params.len() != 2 {
+        panic!("Wrong number of args (2 expected: model_filename, horizontal_resolution; current: {:?}", params);
+    }
+
+    (String::from(params[0].clone()), params[1].parse().unwrap())
+}
+
+fn load_model(model_filename: &str) -> Arc<Group> {
+    let file_reader = BufReader::new(File::open(model_filename).unwrap());
 
     let parser = ObjParser::parse(file_reader).unwrap();
 
-    let default_group = parser.default_group();
-
-    objects.push(default_group as Arc<dyn Shape>);
+    parser.default_group()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // WORLD/CAMERA
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-fn prepare_world() -> World {
+fn prepare_world(model: Arc<Group>) -> World {
     let light_position = (0, -50, -100);
 
     let light_source = PointLight::new(light_position, (1, 1, 1));
 
     let mut objects = vec![];
 
-    add_astronaut(&mut objects);
+    objects.push(model as Arc<dyn Shape>);
 
     World {
         objects,
@@ -43,8 +65,8 @@ fn prepare_world() -> World {
     }
 }
 
-fn prepare_camera() -> Camera {
-    let mut camera = Camera::new(SCREEN_WIDTH, SCREEN_WIDTH / 2, PI / 3.0);
+fn prepare_camera(horizontal_resolution: u16) -> Camera {
+    let mut camera = Camera::new(horizontal_resolution, horizontal_resolution / 2, PI / 3.0);
 
     camera.transform = Matrix::view_transform(
         &Tuple::point(50, -50, -20),
@@ -56,14 +78,35 @@ fn prepare_camera() -> Camera {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+// OUTPUT
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+fn write_output_file(image: VirtualImage, model_filename: &str) -> String {
+    let output_filename = String::from(model_filename.split("/").last().unwrap()) + ".ppm";
+    let mut output_file = File::create(&output_filename).unwrap();
+
+    let mut buffer_bytes = Vec::new();
+    PpmEncoder::export_image(&image, &mut buffer_bytes);
+
+    output_file.write_all(&buffer_bytes).unwrap();
+
+    output_filename
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 fn main() {
-    let world = prepare_world();
-    let camera = prepare_camera();
+    let (model_filename, horizontal_resolution) = load_commandline_params();
+    let model = load_model(&model_filename);
 
-    camera.render::<VirtualImage>(&world);
+    let world = prepare_world(model);
+    let camera = prepare_camera(horizontal_resolution);
 
-    println!("Rendering completed!");
+    let image = camera.render::<VirtualImage>(&world);
+
+    let output_filename = write_output_file(image, &model_filename);
+
+    println!("Rendering completed to {}", output_filename);
 }
