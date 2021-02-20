@@ -5,13 +5,15 @@ use std::{
 };
 
 use library::{
-    interface::{Image, Sdl2Interface},
+    interface::Image,
     math::{Matrix, Tuple},
     properties::FlatPattern,
     properties::COLOR_BLACK,
     space::{Intersection, PointLight, Ray, Shape, Sphere},
     Axis,
 };
+use sdl2_interface::Sdl2Interface;
+
 use rayon::prelude::*;
 
 fn hit<'a>(ray: &Ray, sphere: &'a Sphere) -> Option<Intersection<'a>> {

@@ -1,7 +1,6 @@
 use std::{f64::consts::PI, sync::Arc};
 
 use library::{
-    interface::Sdl2Interface,
     math::{Matrix, Tuple},
     properties::*,
     space::Cube,
@@ -9,6 +8,8 @@ use library::{
     space::{Camera, PointLight, Shape, Sphere, World},
     Axis,
 };
+use sdl2_interface::Sdl2Interface;
+
 use rand::Rng;
 
 enum MaterialQuality {

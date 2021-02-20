@@ -1,8 +1,5 @@
-use library::{
-    interface::{Image, Sdl2Interface},
-    math::Tuple,
-    properties::Color,
-};
+use library::{interface::Image, math::Tuple, properties::Color};
+use sdl2_interface::Sdl2Interface;
 
 use crate::chapter01::{Environment, Projectile};
 
